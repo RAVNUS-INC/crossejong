@@ -1,0 +1,10 @@
+Test1 filter=lfs diff=lfs merge=lfs -text
+webgl_sharing filter=lfs diff=lfs merge=lfs -text
+Assets filter=lfs diff=lfs merge=lfs -text
+ProjectSettings filter=lfs diff=lfs merge=lfs -text
+WebGL[[:space:]]Builds filter=lfs diff=lfs merge=lfs -text
+connectwebgl.zip filter=lfs diff=lfs merge=lfs -text
+output filter=lfs diff=lfs merge=lfs -text
+Default[[:space:]]Builds filter=lfs diff=lfs merge=lfs -text
+Packages filter=lfs diff=lfs merge=lfs -text
+UpgradeLog.htm filter=lfs diff=lfs merge=lfs -text
