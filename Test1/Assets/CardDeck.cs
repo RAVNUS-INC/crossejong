@@ -4,19 +4,14 @@ using System.Collections.Generic;
 
 public class CardDeck : MonoBehaviour
 {
-    [System.Serializable]
-    public class Card
-    {
-        public string cardName; // 카드 이름
-        public Sprite cardImage; // 카드 이미지 (Sprite 타입)
-    }
-
-    public List<Card> cardList = new List<Card>(); // 카드 리스트 (인스펙터에서 설정 가능)
-    public GameObject cardPrefab; // 카드 프리팹
+    public List<GameObject> cardPrefabs; // 카드 프리팹 리스트
     public Transform cardContainer; // 카드를 배치할 컨테이너
-    public float cardSpacing = 115f; // 카드 간격
     public Button createCardButton; // 카드 생성 버튼
-    private List<Card> selectedCards = new List<Card>(); // 이미 선택된 카드 리스트
+    public float cardSpacing = 115f; // 카드 간격
+    public Vector2 startPosition = new Vector2(385, 142); // 카드 시작 위치
+
+    private List<GameObject> displayedCards = new List<GameObject>(); // 화면에 표시된 카드 리스트
+    private HashSet<int> selectedCardIndices = new HashSet<int>(); // 선택된 카드 인덱스 집합
 
     void Start()
     {
@@ -25,48 +20,41 @@ public class CardDeck : MonoBehaviour
 
     private void OnCreateCard()
     {
-        CreateCard(); // 카드 생성 로직
-        createCardButton.interactable = false; // 버튼을 비활성화
+        CreateCards(); // 카드 생성 로직
     }
 
-    public void CreateCard()
+    public void CreateCards()
     {
-        // 카드가 11개 이하일 때만 생성
-        if (selectedCards.Count >= cardList.Count)
+        // 이미 표시된 카드가 있다면 제거
+        foreach (var card in displayedCards)
         {
-            Debug.Log("모든 카드가 이미 선택되었습니다.");
-            return;
+            Destroy(card);
+        }
+        displayedCards.Clear(); // 리스트 초기화
+        selectedCardIndices.Clear(); // 선택된 카드 인덱스 초기화
+
+        // 랜덤으로 11개의 카드 인덱스를 선택
+        while (selectedCardIndices.Count < 11)
+        {
+            int randomIndex = Random.Range(0, cardPrefabs.Count);
+            selectedCardIndices.Add(randomIndex);
         }
 
-        for (int i = 0; i < 11; i++) // 11장의 카드를 생성
+        // 선택된 카드 인덱스에 따라 카드 생성
+        int i = 0;
+        foreach (int index in selectedCardIndices)
         {
-            int randomIndex;
-            Card selectedCard;
-
-            do
-            {
-                randomIndex = Random.Range(0, cardList.Count);
-                selectedCard = cardList[randomIndex];
-            } while (selectedCards.Contains(selectedCard)); // 이미 선택된 카드인지 확인
-
-            selectedCards.Add(selectedCard); // 선택된 카드 리스트에 추가
-
-            GameObject cardInstance = Instantiate(cardPrefab, cardContainer);
-            cardInstance.GetComponent<Image>().sprite = selectedCard.cardImage; // 카드 이미지 설정
-            cardInstance.name = selectedCard.cardName; // 카드 이름 설정
-
+            GameObject cardInstance = Instantiate(cardPrefabs[index], cardContainer);
             RectTransform rectTransform = cardInstance.GetComponent<RectTransform>();
 
-            if (i == 0)
-            {
-                rectTransform.anchoredPosition = new Vector2(385, 142);
-            }
-            else
-            {
-                rectTransform.anchoredPosition = new Vector2(385 + (i * cardSpacing), 142);
-            }
+            // 카드 위치 설정
+            rectTransform.anchoredPosition = new Vector2(startPosition.x + (i * cardSpacing), startPosition.y);
 
-            Debug.Log($"Card Name: {selectedCard.cardName}, Card Image: {selectedCard.cardImage}");
+            // 카드의 스프라이트 설정은 이미 프리팹에 설정되어 있으므로 여기서는 필요 없음
+            // 카드 프리팹에서 앞면과 뒷면 스프라이트가 이미 설정되어 있어야 합니다.
+
+            displayedCards.Add(cardInstance); // 생성된 카드를 리스트에 추가
+            i++;
         }
     }
 }
