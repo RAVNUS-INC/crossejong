@@ -1,64 +1,34 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class Card : MonoBehaviour, IPointerClickHandler
+public class Card : MonoBehaviour
 {
-    public Sprite cardImage; // 카드 앞면 이미지
+    public Image cardImage; // Image 타입의 변수
+    public Sprite frontImage; // 카드 앞면 이미지
     public Sprite backImage; // 카드 뒷면 이미지
     private bool isFaceUp = false; // 카드의 현재 상태
 
-    private SpriteRenderer spriteRenderer; // SpriteRenderer 참조
-
     private void Start()
     {
-        // 카드의 초기 이미지 설정
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        spriteRenderer.sprite = cardImage; // 처음에는 앞면으로 초기화
+        // 시작할 때 뒷면 이미지로 설정
+        cardImage.sprite = backImage;
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    void OnMouseDown() // 마우스 클릭 시 호출됩니다.
     {
-        if (isFaceUp) // 카드가 앞면일 때 클릭하면 뒤집기
+        if (isFaceUp)
         {
-            StartCoroutine(FlipAnimation(backImage)); // 뒷면으로 뒤집기 애니메이션
+            // 카드가 기본 이미지일 때 뒷면 이미지로 전환
+            cardImage.sprite = backImage;
         }
-        else // 카드가 뒷면일 때 클릭하면 앞면으로 돌아가기
+        else
         {
-            StartCoroutine(FlipAnimation(cardImage)); // 앞면으로 뒤집기 애니메이션
-        }
-    }
-
-    private System.Collections.IEnumerator FlipAnimation(Sprite targetImage)
-    {
-        float duration = 0.5f; // 애니메이션 지속 시간
-        Vector3 originalScale = transform.localScale;
-        Vector3 flippedScale = new Vector3(-originalScale.x, originalScale.y, originalScale.z); // X축 반전
-
-        // 카드 뒤집기 애니메이션
-        float elapsed = 0f;
-        while (elapsed < duration)
-        {
-            float t = elapsed / duration; // 진행 비율
-            transform.localScale = Vector3.Lerp(originalScale, flippedScale, t); // 크기 보간
-            elapsed += Time.deltaTime;
-            yield return null;
+            // 카드가 뒷면 이미지일 때 기본 이미지로 전환
+            cardImage.sprite = frontImage;
         }
 
-        // 스프라이트 변경
-        spriteRenderer.sprite = targetImage; // 클릭에 따라 스프라이트 변경
-        isFaceUp = !isFaceUp; // 상태 변경
-
-        // 다시 원래 상태로 복귀
-        elapsed = 0f; // 시간 초기화
-        while (elapsed < duration)
-        {
-            float t = elapsed / duration; // 진행 비율
-            transform.localScale = Vector3.Lerp(flippedScale, originalScale, t); // 크기 보간
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        // 최종 상태 설정
-        transform.localScale = originalScale; // 원래 크기로 복귀
+        // 상태를 반전
+        isFaceUp = !isFaceUp;
     }
 }
