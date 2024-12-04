@@ -20,6 +20,8 @@ public class CardDeck : MonoBehaviour
 
     private void OnCreateCard()
     {
+        createCardButton.gameObject.SetActive(false); // 게임 시작 버튼 누르면 사라지게 하기
+
         CreateCards(); // 카드 생성 로직
     }
 
