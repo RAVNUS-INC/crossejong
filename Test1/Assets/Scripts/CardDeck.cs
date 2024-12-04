@@ -7,6 +7,8 @@ public class CardDeck : MonoBehaviour
     public List<GameObject> cardPrefabs; // 카드 프리팹 리스트
     public Transform cardContainer; // 카드를 배치할 컨테이너
     public Button createCardButton; // 카드 생성 버튼
+    public Button appealButton; // 이의신청 버튼
+    public Button changeCardButton; // 보유카드 바꾸기 버튼
     public float cardSpacing = 115f; // 카드 간격
     public Vector2 startPosition = new Vector2(385, 142); // 카드 시작 위치
 
@@ -16,11 +18,17 @@ public class CardDeck : MonoBehaviour
     void Start()
     {
         createCardButton.onClick.AddListener(OnCreateCard); // 버튼 클릭 이벤트에 카드 생성 메서드 추가
+
+        appealButton.gameObject.SetActive(false); // 이의신청 버튼 비활성화
+        changeCardButton.gameObject.SetActive(false); // 보유카드 바꾸기 버튼 비활성화
     }
 
     private void OnCreateCard()
     {
         createCardButton.gameObject.SetActive(false); // 게임 시작 버튼 누르면 사라지게 하기
+
+        appealButton.gameObject.SetActive(true); // 이의신청 버튼 활성화
+        changeCardButton.gameObject.SetActive(true); // 보유카드 바꾸기 버튼 활성화
 
         CreateCards(); // 카드 생성 로직
     }

@@ -279,7 +279,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 670, y: -280}
+  m_AnchoredPosition: {x: 680, y: -270}
   m_SizeDelta: {x: 80, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &226280148
@@ -465,6 +465,8 @@ MonoBehaviour:
   - {fileID: 4133135564310276744, guid: f4231c79231221640b82c956c86bdc48, type: 3}
   cardContainer: {fileID: 1365207126}
   createCardButton: {fileID: 667180245}
+  appealButton: {fileID: 95548857}
+  changeCardButton: {fileID: 226280148}
   cardSpacing: 115
   startPosition: {x: 385, y: 142}
 --- !u!1 &410113586
@@ -1240,8 +1242,8 @@ RectTransform:
   m_Children:
   - {fileID: 667180244}
   - {fileID: 251312121}
-  - {fileID: 226280147}
   - {fileID: 95548856}
+  - {fileID: 226280147}
   - {fileID: 1067484764}
   m_Father: {fileID: 1192646679}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
