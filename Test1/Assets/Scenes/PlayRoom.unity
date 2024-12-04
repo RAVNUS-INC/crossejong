@@ -467,6 +467,7 @@ MonoBehaviour:
   createCardButton: {fileID: 667180245}
   appealButton: {fileID: 95548857}
   changeCardButton: {fileID: 226280148}
+  optionButton: {fileID: 1067484765}
   cardSpacing: 115
   startPosition: {x: 385, y: 142}
 --- !u!1 &410113586

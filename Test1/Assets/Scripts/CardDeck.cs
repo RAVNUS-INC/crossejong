@@ -9,6 +9,7 @@ public class CardDeck : MonoBehaviour
     public Button createCardButton; // 카드 생성 버튼
     public Button appealButton; // 이의신청 버튼
     public Button changeCardButton; // 보유카드 바꾸기 버튼
+    public Button optionButton; // 옵션 버튼
     public float cardSpacing = 115f; // 카드 간격
     public Vector2 startPosition = new Vector2(385, 142); // 카드 시작 위치
 
