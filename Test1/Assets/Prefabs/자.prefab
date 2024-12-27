@@ -40,7 +40,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 960, y: 540}
-  m_SizeDelta: {x: 100, y: 148}
+  m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6646386601095576623
 CanvasRenderer:
@@ -70,7 +70,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -205354546, guid: 82de350ee0913af478dd692b3f1c8e47, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b49d31a58dd5e704f87cb8ce46ed0ecb, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -158,8 +158,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardImage: {fileID: 4720239883496721414}
-  frontImage: {fileID: -404268824, guid: 82de350ee0913af478dd692b3f1c8e47, type: 3}
-  backImage: {fileID: -205354546, guid: 82de350ee0913af478dd692b3f1c8e47, type: 3}
+  frontImage: {fileID: 21300000, guid: 1d9d65f4287ab2e4f9787f733daf35b5, type: 3}
+  backImage: {fileID: 21300000, guid: b49d31a58dd5e704f87cb8ce46ed0ecb, type: 3}
 --- !u!61 &-3523200652732629241
 BoxCollider2D:
   m_ObjectHideFlags: 0
