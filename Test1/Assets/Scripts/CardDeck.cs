@@ -9,6 +9,7 @@ public class CardDeck : MonoBehaviour
     public Button createCardButton; // 카드 생성 버튼
     public Button appealButton; // 이의신청 버튼
     public Button changeCardButton; // 보유카드 바꾸기 버튼
+    public Button chatingButton; // 채팅 버튼
     public OptionPopup optionPopup; //OptionPopup 스크립트 연결
 
     public float cardSpacing = 115f; // 카드 간격
@@ -25,6 +26,7 @@ public class CardDeck : MonoBehaviour
 
         appealButton.gameObject.SetActive(false); // 이의신청 버튼 비활성화
         changeCardButton.gameObject.SetActive(false); // 보유카드 바꾸기 버튼 비활성화
+        chatingButton.gameObject.SetActive(false); // 채팅 버튼 비활성화
         optionPopup.optionPopupPanel.SetActive(false); // 옵션 팝업 비활성화
         optionPopup.openOptionPopupButton.gameObject.SetActive(false); // 옵션 팝업 열기 버튼을 비활성화
         optionPopup.closeOptionPopupButton.gameObject.SetActive(false); // 옵션 팝업 닫기 버튼을 비활성화
@@ -38,6 +40,7 @@ public class CardDeck : MonoBehaviour
 
         appealButton.gameObject.SetActive(true); // 이의신청 버튼 활성화
         changeCardButton.gameObject.SetActive(true); // 보유카드 바꾸기 버튼 활성화
+        chatingButton.gameObject.SetActive(true); // 채팅 버튼 활성화
         optionPopup.openOptionPopupButton.gameObject.SetActive(true); // 옵션 팝업 열기 버튼을 활성화
     }
 
