@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 using System.Collections.Generic;
 
 public class UserCard : MonoBehaviour
@@ -8,15 +9,15 @@ public class UserCard : MonoBehaviour
     public Transform cardContainer; // Scroll View의 Content
     public Button createCardButton; // 카드 생성 버튼
 
-    private List<GameObject> displayedCards = new List<GameObject>(); // 화면에 표시된 카드 리스트
-    private HashSet<int> selectedCardIndices = new HashSet<int>(); // 선택된 카드 인덱스 집합
+    public List<GameObject> displayedCards = new List<GameObject>(); // 화면에 표시된 카드 리스트
+    public HashSet<int> selectedCardIndices = new HashSet<int>(); // 선택된 카드 인덱스 집합
 
     void Start()
     {
         createCardButton.onClick.AddListener(OnCreateCard); // 버튼 클릭 이벤트에 카드 생성 메서드 추가
     }
 
-    private void OnCreateCard()
+    void OnCreateCard()
     {
         createCardButton.gameObject.SetActive(false); // 게임 시작 버튼 누르면 사라지게 하기
 
@@ -49,9 +50,6 @@ public class UserCard : MonoBehaviour
 
             // 카드 크기 설정 (200x200)
             rectTransform.sizeDelta = new Vector2(200, 200);
-
-            // 카드의 스프라이트 설정은 이미 프리팹에 설정되어 있으므로 여기서는 필요 없음
-            // 카드 프리팹에서 앞면과 뒷면 스프라이트가 이미 설정되어 있어야 합니다.
 
             displayedCards.Add(cardInstance); // 생성된 카드를 리스트에 추가
             i++;
