@@ -57,4 +57,12 @@ public class UserCard : MonoBehaviour
             i++;
         }
     }
+
+    /*
+    // 선택된 카드 인덱스를 반환하는 메서드 추가
+    public HashSet<int> GetUsedCardIndices()
+    {
+        return selectedCardIndices;
+    }
+    */
 }

@@ -4,55 +4,44 @@ using DG.Tweening;
 
 public class StartCard : MonoBehaviour
 {
-    public Image cardImage; // 카드 이미지
-    public Sprite backSprite; // 뒷면 이미지
-    public Sprite[] frontSprites; // 앞면 이미지 배열
-    public Sprite selectedFrontSprite; // 선택된 앞면
-    public float flipDuration = 0.5f; // 뒤집기 시간
-
-    // 특수 카드 이름 리스트
-    public string[] specialCardNames = { "Asset9", "Asset10", "Asset11", "Asset65", "Asset66" };
+    /*
+    public UserCard userCard; // UserCard 참조
 
     void Start()
     {
-        ResetCard();
+        
     }
 
-    public void ResetCard()
+    public void CreateStartCard()
     {
-        cardImage.sprite = backSprite; // 뒷면 이미지로 초기화
-        selectedFrontSprite = GetRandomFrontSprite(); // 무작위 앞면 설정
-    }
-
-    Sprite GetRandomFrontSprite()
-    {
-        // 특수 카드를 제외한 무작위 카드 선택
-        Sprite randomSprite;
-        do
+        // 이미 표시된 카드가 있다면 제거
+        foreach (var card in displayedCards)
         {
-            randomSprite = frontSprites[Random.Range(0, frontSprites.Length)];
-        } while (IsSpecialCard(randomSprite.name));
-
-        return randomSprite;
-    }
-
-    bool IsSpecialCard(string spriteName)
-    {
-        // 특수 카드인지 확인
-        foreach (string specialName in specialCardNames)
-        {
-            if (spriteName == specialName) return true;
+            Destroy(card);
         }
-        return false;
-    }
+        displayedCards.Clear(); // 리스트 초기화
+        selectedCardIndices.Clear(); // 선택된 카드 인덱스 초기화
 
-    public void FlipCard()
-    {
-        // DOTween 애니메이션으로 뒤집기
-        transform.DOScaleX(0, flipDuration / 2).OnComplete(() =>
+        // 랜덤으로 11개의 카드 인덱스를 선택
+        while (selectedCardIndices.Count < 11)
         {
-            cardImage.sprite = selectedFrontSprite; // 앞면으로 변경
-            transform.DOScaleX(1, flipDuration / 2);
-        });
+            int randomIndex = Random.Range(0, cardPrefabs.Count);
+            selectedCardIndices.Add(randomIndex);
+        }
+
+        // 선택된 카드 인덱스에 따라 카드 생성
+        int i = 0;
+        foreach (int index in selectedCardIndices)
+        {
+            GameObject cardInstance = Instantiate(cardPrefabs[index], cardContainer);
+            RectTransform rectTransform = cardInstance.GetComponent<RectTransform>();
+
+            // 카드 크기 설정 (200x200)
+            rectTransform.sizeDelta = new Vector2(200, 200);
+
+            displayedCards.Add(cardInstance); // 생성된 카드를 리스트에 추가
+            i++;
+        }
     }
+    */
 }
