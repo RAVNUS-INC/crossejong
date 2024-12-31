@@ -121,7 +121,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
         Debug.Log("规 积己 己傍");
 
-        PhotonNetwork.LoadLevel("Scene C");
+        PhotonNetwork.LoadLevel("MakeRoom");
     }
     public void OnClickJoinRoom()
     {
@@ -135,7 +135,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
         Debug.Log("规 涝厘 己傍");
 
-        PhotonNetwork.LoadLevel("Scene C");
+        PhotonNetwork.LoadLevel("MakeRoom");
     }
 
     public override void OnJoinRoomFailed(short returnCode, string message)
