@@ -1,18 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using System.Collections.Generic;
+
 
 public class PlayRoom : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public UserCardFullPopup userCardFullPopup; //UserCardFullPopup 스크립트 연결
+
     void Start()
     {
-        
+        userCardFullPopup.UserCardFullPopupf();
     }
 
-    // Update is called once per frame
+
     void Update()
     {
-        
+
     }
 }
