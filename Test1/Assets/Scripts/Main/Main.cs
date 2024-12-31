@@ -13,8 +13,6 @@ public class Main : MonoBehaviour
         mainSettingsPopup.MainSettingsPopupf();
         makeRoomPopup.MakeRoomPopupf();
     }
-
-
     void Update()
     {
         
