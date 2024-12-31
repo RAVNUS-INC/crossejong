@@ -58,10 +58,10 @@ public class ConnectionManager : MonoBehaviourPunCallbacks
     {
         base.OnJoinedLobby();
 
-        //로비 씬으로 이동
-        PhotonNetwork.LoadLevel("Scene B");
+        //메인 씬으로 이동
+        PhotonNetwork.LoadLevel("Main");
 
-        print("로비 진입 성공");
+        print("메인 진입 성공");
 
     }
     public void OnClickConnect()

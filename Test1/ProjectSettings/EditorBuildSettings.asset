@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Scene B.unity
     guid: 940d9162da78a6e46b5d33b7e20294b6
   - enabled: 1
-    path: Assets/Scenes/Scene C.unity
+    path: Assets/Scenes/MakeRoom.unity
     guid: dc5c6f582d90b2744bf94438bffd584b
   - enabled: 1
     path: Assets/Scenes/Main.unity
