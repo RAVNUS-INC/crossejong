@@ -5,11 +5,8 @@ using System.Collections.Generic;
 public class UserCard : MonoBehaviour
 {
     public List<GameObject> cardPrefabs; // 카드 프리팹 리스트
-    public Transform cardContainer; // 카드를 배치할 컨테이너
+    public Transform cardContainer; // Scroll View의 Content
     public Button createCardButton; // 카드 생성 버튼
-
-    public float cardSpacing = 20f; // 카드 간격
-    public Vector2 startPosition = new Vector2(150, -150); // 카드 시작 위치
 
     private List<GameObject> displayedCards = new List<GameObject>(); // 화면에 표시된 카드 리스트
     private HashSet<int> selectedCardIndices = new HashSet<int>(); // 선택된 카드 인덱스 집합
@@ -50,8 +47,8 @@ public class UserCard : MonoBehaviour
             GameObject cardInstance = Instantiate(cardPrefabs[index], cardContainer);
             RectTransform rectTransform = cardInstance.GetComponent<RectTransform>();
 
-            // 카드 위치 설정
-            rectTransform.anchoredPosition = new Vector2(startPosition.x + (i * cardSpacing), startPosition.y);
+            // 카드 크기 설정 (200x200)
+            rectTransform.sizeDelta = new Vector2(200, 200);
 
             // 카드의 스프라이트 설정은 이미 프리팹에 설정되어 있으므로 여기서는 필요 없음
             // 카드 프리팹에서 앞면과 뒷면 스프라이트가 이미 설정되어 있어야 합니다.
