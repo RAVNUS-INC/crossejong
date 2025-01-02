@@ -880,8 +880,9 @@ MonoBehaviour:
   userCardFullPanel: {fileID: 259437064}
   openUserCardFullPopupButton: {fileID: 60336281}
   closeUserCardFullPopupButton: {fileID: 301406325}
-  userCardArea: {fileID: 939849007}
   fullPopupAreaContent: {fileID: 2110904094}
+  userCardArea: {fileID: 939849007}
+  userCard: {fileID: 738986998}
   displayedFullCards: []
 --- !u!1 &301406323
 GameObject:
@@ -3123,7 +3124,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: -531.5004, y: 0}
-  m_SizeDelta: {x: 1080, y: 331.38}
+  m_SizeDelta: {x: 1080, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2110904095
 MonoBehaviour:
@@ -3157,7 +3158,7 @@ MonoBehaviour:
     m_Top: 100
     m_Bottom: 100
   m_ChildAlignment: 4
-  m_Spacing: 120
+  m_Spacing: 10
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
