@@ -9,10 +9,17 @@ using static UnityEngine.EventSystems.PointerEventData;
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
     [SerializeField] InputField input_RoomName;
-    [SerializeField] InputField input_MaxPlayer;
-    [SerializeField] Button btn_CreateRoom;
-    [SerializeField] Button btn_JoinRoom;
-    [SerializeField] GameObject roomListItem;
+    [SerializeField] Button[] btn_MaxPlayers; // 3개의 버튼을 배열로 선언
+    [SerializeField] Button[] btn_Difficulty;
+    [SerializeField] Button[] btn_TimeLimit;
+
+    [SerializeField] Button btn_CreateRoom; // 방만들기 버튼
+    [SerializeField] Button btn_JoinRoom; // 방 참여 버튼
+    [SerializeField] GameObject roomListItem; // 방 목록을 보여주는 스크롤뷰
+
+    int selectedMaxPlayers = 0; // 선택된 MaxPlayers 값을 저장
+    int selectedDifficulty = 0;
+    int selectedTimeLimit = 0;
     public Transform rtContent;
 
     // 방 목록을 가지고 있는 Dictionaly 변수
@@ -21,9 +28,27 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     void Start()
     {
         input_RoomName.onValueChanged.AddListener(OnNameValueChanged);
-        input_MaxPlayer.onValueChanged.AddListener(OnPlayerValueChange);
         btn_CreateRoom.onClick.AddListener(OnClickCreateRoom);
         btn_JoinRoom.onClick.AddListener(OnClickJoinRoom);
+
+        // MaxPlayers 버튼에 리스너 추가
+        for (int i = 0; i < btn_MaxPlayers.Length; i++)
+        {
+            int index = i; // 클로저를 위해 로컬 변수 사용
+            btn_MaxPlayers[i].onClick.AddListener(() => OnMaxPlayersButtonClicked(index));
+        }
+
+        for (int i = 0; i < btn_Difficulty.Length; i++)
+        {
+            int index = i;
+            btn_Difficulty[i].onClick.AddListener(() => OnDifficultyButtonClicked(index));
+        }
+
+        for (int i = 0; i < btn_TimeLimit.Length; i++)
+        {
+            int index = i;
+            btn_TimeLimit[i].onClick.AddListener(() => OnTimeLimitButtonClicked(index));
+        }
     }
     //방 목록의 변화가 있을 때 호출되는 함수
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
@@ -83,22 +108,22 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     void OnNameValueChanged(string s)
     {
         btn_JoinRoom.interactable = s.Length > 0;
-        if (input_RoomName.text == "")
-            btn_CreateRoom.interactable = false;
+        UpdateCreateButtonInteractable();
     }
-    void OnPlayerValueChange(string s)
-    {
-        btn_CreateRoom.interactable = s.Length > 0;
-        if (input_MaxPlayer.text == "")
-            btn_CreateRoom.interactable = false;
-    }
+ 
 
     // 생성 버튼 클릭시 호출되는 함수
     public void OnClickCreateRoom()
     {
         //방 옵션
         RoomOptions options = new RoomOptions();
-        options.MaxPlayers = int.Parse(input_MaxPlayer.text);
+        options.MaxPlayers = (byte)selectedMaxPlayers;
+        options.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable()
+        {
+            {"difficulty", selectedDifficulty},
+            {"timeLimit", selectedTimeLimit}
+        };
+        options.CustomRoomPropertiesForLobby = new string[] { "difficulty", "timeLimit" };
 
         //방 목록에 보이게 할것인가?
         options.IsVisible = true;
@@ -121,7 +146,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
         Debug.Log("방 생성 성공");
 
-        PhotonNetwork.LoadLevel("Scene C");
+        PhotonNetwork.LoadLevel("MakeRoom");
     }
     public void OnClickJoinRoom()
     {
@@ -135,7 +160,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
         Debug.Log("방 입장 성공");
 
-        PhotonNetwork.LoadLevel("Scene C");
+        PhotonNetwork.LoadLevel("MakeRoom");
     }
 
     public override void OnJoinRoomFailed(short returnCode, string message)
@@ -147,7 +172,14 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         //방 옵션
         RoomOptions options = new RoomOptions();
-        options.MaxPlayers = int.Parse(input_MaxPlayer.text);
+        options.MaxPlayers = (byte)selectedMaxPlayers;
+        options.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable()
+        {
+            {"difficulty", selectedDifficulty},
+            {"timeLimit", selectedTimeLimit}
+        };
+
+        options.CustomRoomPropertiesForLobby = new string[] { "difficulty", "timeLimit" };
 
         //방 목록에 보이게 할것인가?
         options.IsVisible = true;
@@ -164,4 +196,50 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         base.OnJoinRandomFailed(returnCode, message);
     }
+
+    void OnMaxPlayersButtonClicked(int index)
+    {
+        selectedMaxPlayers = (index + 2); // 2, 3, 4 플레이어 옵션
+        UpdateMaxPlayersButtonUI();
+        UpdateCreateButtonInteractable();
+    }
+
+    void OnDifficultyButtonClicked(int index)
+    {
+        selectedDifficulty = index; // 0: 초급, 1: 중급, 2: 고급
+        UpdateButtonUI(btn_Difficulty, index);
+        UpdateCreateButtonInteractable();
+    }
+
+    void OnTimeLimitButtonClicked(int index)
+    {
+        selectedTimeLimit = (index + 1) * 15; // 15, 30, 45초 옵션
+        UpdateButtonUI(btn_TimeLimit, index);
+        UpdateCreateButtonInteractable();
+    }
+
+    void UpdateMaxPlayersButtonUI()
+    {
+        for (int i = 0; i < btn_MaxPlayers.Length; i++)
+        {
+            btn_MaxPlayers[i].interactable = (i + 2 != selectedMaxPlayers);
+        }
+    }
+    void UpdateButtonUI(Button[] buttons, int selectedIndex)
+    {
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            buttons[i].interactable = (i != selectedIndex);
+        }
+    }
+
+    void UpdateCreateButtonInteractable()
+    {
+        btn_CreateRoom.interactable = (input_RoomName.text.Length > 0 &&
+                                       selectedMaxPlayers > 0 &&
+                                       selectedDifficulty >= 0 &&
+                                       selectedTimeLimit > 0);
+    }
+
+
 }
