@@ -22,23 +22,17 @@ public class UserCardFullPopup : MonoBehaviour
     {
         openUserCardFullPopupButton.onClick.AddListener(OpenUserCardFullPopup);
         closeUserCardFullPopupButton.onClick.AddListener(CloseUserCardFullPopup);
-
     }
 
-    void OpenUserCardFullPopup()
+    public void OpenUserCardFullPopup()
     {
         SyncCardsFromUserCard(); // UserCard 데이터 동기화
         AddCardsToFullPopupArea(); // FullPopup에 카드 배치
-        userCardFullPanel.SetActive(true);
-        closeUserCardFullPopupButton.gameObject.SetActive(true);
-        userCardArea.SetActive(false);
     }
 
-    void CloseUserCardFullPopup()
+    public void CloseUserCardFullPopup()
     {
-        userCardFullPanel.SetActive(false);
-        closeUserCardFullPopupButton.gameObject.SetActive(false);
-        userCardArea.SetActive(true);
+
     }
 
     public void SyncCardsFromUserCard()

@@ -4,29 +4,37 @@ using System.Collections.Generic;
 
 public class OptionPopup : MonoBehaviour
 {
-    public GameObject optionPopupPanel; // ¿É¼Ç ÆË¾÷ ÆÐ³Î
-    public Button openOptionPopupButton; // ¿É¼Ç ÆË¾÷ ¿­±â ¹öÆ°
-    public Button closeOptionPopupButton; // ¿É¼Ç ÆË¾÷ ´Ý±â ¹öÆ°
-    public Button surrenderButton; // Ç×º¹ È®ÀÎ ¹öÆ°
+    public GameObject optionPopupPanel; // ï¿½É¼ï¿½ ï¿½Ë¾ï¿½ ï¿½Ð³ï¿½
+    public Button openOptionPopupButton; // ï¿½É¼ï¿½ ï¿½Ë¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ°
+    public Button closeOptionPopupButton; // ï¿½É¼ï¿½ ï¿½Ë¾ï¿½ ï¿½Ý±ï¿½ ï¿½ï¿½Æ°
+    public Button surrenderButton; // ï¿½×ºï¿½ È®ï¿½ï¿½ ï¿½ï¿½Æ°
+
+    private void Awake() {
+        
+    }
 
     void Start()
     {
-
+        // GameObject h = new GameObject();
+        // GameObject j = new GameObject();
+        // h.transform.SetParent(j.transform);
+        // h.SetActive(false);
+        // h.transform.position = h.transform.parent.position;
     }
 
-    public void OpenPopup() // ¿É¼Ç ÆË¾÷ ¿­±â ¸Þ¼­µå
+    public void OpenPopup() // ï¿½É¼ï¿½ ï¿½Ë¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½
     {
-        optionPopupPanel.SetActive(true); // ÆË¾÷ È°¼ºÈ­
-        openOptionPopupButton.gameObject.SetActive(false); // ¿É¼Ç ÆË¾÷ ¿­±â ¹öÆ° ºñÈ°¼ºÈ­
-        closeOptionPopupButton.gameObject.SetActive(true); // ¿É¼Ç ÆË¾÷ ´Ý±â ¹öÆ° È°¼ºÈ­
-        surrenderButton.gameObject.SetActive(true); // Ç×º¹ È®ÀÎ ¹öÆ° È°¼ºÈ­
+        optionPopupPanel.SetActive(true); // ï¿½Ë¾ï¿½ È°ï¿½ï¿½È­
+        openOptionPopupButton.gameObject.SetActive(false); // ï¿½É¼ï¿½ ï¿½Ë¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ° ï¿½ï¿½È°ï¿½ï¿½È­
+        closeOptionPopupButton.gameObject.SetActive(true); // ï¿½É¼ï¿½ ï¿½Ë¾ï¿½ ï¿½Ý±ï¿½ ï¿½ï¿½Æ° È°ï¿½ï¿½È­
+        surrenderButton.gameObject.SetActive(true); // ï¿½×ºï¿½ È®ï¿½ï¿½ ï¿½ï¿½Æ° È°ï¿½ï¿½È­
     }
 
-    public void ClosePopup() // ¿É¼Ç ÆË¾÷ ´Ý±â ¸Þ¼­µå
+    public void ClosePopup() // ï¿½É¼ï¿½ ï¿½Ë¾ï¿½ ï¿½Ý±ï¿½ ï¿½Þ¼ï¿½ï¿½ï¿½
     {
-        optionPopupPanel.SetActive(false); // ÆË¾÷ ºñÈ°¼ºÈ­
-        openOptionPopupButton.gameObject.SetActive(true); // ¿É¼Ç ÆË¾÷ ¿­±â ¹öÆ° È°¼ºÈ­
-        closeOptionPopupButton.gameObject.SetActive(false); // ¿É¼Ç ÆË¾÷ ´Ý±â ¹öÆ° ºñÈ°¼ºÈ­
-        surrenderButton.gameObject.SetActive(false); // Ç×º¹ È®ÀÎ ¹öÆ° ºñÈ°¼ºÈ­
+        optionPopupPanel.SetActive(false); // ï¿½Ë¾ï¿½ ï¿½ï¿½È°ï¿½ï¿½È­
+        openOptionPopupButton.gameObject.SetActive(true); // ï¿½É¼ï¿½ ï¿½Ë¾ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ° È°ï¿½ï¿½È­
+        closeOptionPopupButton.gameObject.SetActive(false); // ï¿½É¼ï¿½ ï¿½Ë¾ï¿½ ï¿½Ý±ï¿½ ï¿½ï¿½Æ° ï¿½ï¿½È°ï¿½ï¿½È­
+        surrenderButton.gameObject.SetActive(false); // ï¿½×ºï¿½ È®ï¿½ï¿½ ï¿½ï¿½Æ° ï¿½ï¿½È°ï¿½ï¿½È­
     }
 }

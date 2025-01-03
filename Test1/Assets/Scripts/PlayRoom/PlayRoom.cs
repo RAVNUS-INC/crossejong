@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class PlayRoom : MonoBehaviour
 {
-    public UserCardFullPopup userCardFullPopup; //UserCardFullPopup Ω∫≈©∏≥∆Æ ø¨∞·
+    public UserCardFullPopup userCardFullPopup; //UserCardFullPopup Ïä§ÌÅ¨Î¶ΩÌä∏ Ïó∞Í≤∞
 
     void Start()
     {

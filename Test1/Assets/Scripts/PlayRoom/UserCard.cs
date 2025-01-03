@@ -5,62 +5,52 @@ using System.Collections.Generic;
 
 public class UserCard : MonoBehaviour
 {
-    public List<GameObject> cardPrefabs; // Ä«µå ÇÁ¸®ÆÕ ¸®½ºÆ®
-    public Transform cardContainer; // Scroll ViewÀÇ Content
-    public Button createCardButton; // Ä«µå »ı¼º ¹öÆ°
+    public List<GameObject> cardPrefabs; // ì¹´ë“œ í”„ë¦¬íŒ¹ ëª©ë¡
+    public Transform cardContainer; // Scroll Viewì˜ Content
+    public Button createCardButton; // ì¹´ë“œ ìƒì„± ë²„íŠ¼
 
-    public List<GameObject> displayedCards = new List<GameObject>(); // È­¸é¿¡ Ç¥½ÃµÈ Ä«µå ¸®½ºÆ®
-    public HashSet<int> selectedCardIndices = new HashSet<int>(); // ¼±ÅÃµÈ Ä«µå ÀÎµ¦½º ÁıÇÕ
+    public List<GameObject> displayedCards = new List<GameObject>(); // í™”ë©´ì— í‘œì‹œëœ ì¹´ë“œ ë¦¬ìŠ¤íŠ¸
+    public HashSet<int> selectedCardIndices = new HashSet<int>(); // ì„ íƒëœ ì¹´ë“œ ì¸ë±ìŠ¤ ì§‘í•©
 
     void Start()
     {
-        createCardButton.onClick.AddListener(OnCreateCard); // ¹öÆ° Å¬¸¯ ÀÌº¥Æ®¿¡ Ä«µå »ı¼º ¸Ş¼­µå Ãß°¡
-    }
 
-    void OnCreateCard()
-    {
-        createCardButton.gameObject.SetActive(false); // °ÔÀÓ ½ÃÀÛ ¹öÆ° ´©¸£¸é »ç¶óÁö°Ô ÇÏ±â
-
-        CreateCards(); // Ä«µå »ı¼º ·ÎÁ÷
     }
 
     public void CreateCards()
     {
-        // ÀÌ¹Ì Ç¥½ÃµÈ Ä«µå°¡ ÀÖ´Ù¸é Á¦°Å
+        // ì´ë¯¸ í‘œì‹œëœ ì¹´ë“œê°€ ìˆë‹¤ë©´ ì œê±°
         foreach (var card in displayedCards)
         {
             Destroy(card);
         }
-        displayedCards.Clear(); // ¸®½ºÆ® ÃÊ±âÈ­
-        selectedCardIndices.Clear(); // ¼±ÅÃµÈ Ä«µå ÀÎµ¦½º ÃÊ±âÈ­
+        displayedCards.Clear(); // ë¦¬ìŠ¤íŠ¸ ì´ˆê¸°í™”
+        selectedCardIndices.Clear(); // ì„ íƒëœ ì¹´ë“œ ì¸ë±ìŠ¤ ì´ˆê¸°í™”
 
-        // ·£´ıÀ¸·Î 11°³ÀÇ Ä«µå ÀÎµ¦½º¸¦ ¼±ÅÃ
+        // ì¤‘ë³µë˜ì§€ ì•Šê²Œ 11ê°œì˜ ì¹´ë“œ ì¸ë±ìŠ¤ ì„ íƒ
         while (selectedCardIndices.Count < 11)
         {
             int randomIndex = Random.Range(0, cardPrefabs.Count);
             selectedCardIndices.Add(randomIndex);
         }
 
-        // ¼±ÅÃµÈ Ä«µå ÀÎµ¦½º¿¡ µû¶ó Ä«µå »ı¼º
-        int i = 0;
+        // ì„ íƒëœ ì¹´ë“œ ì¸ë±ìŠ¤ì— ë”°ë¼ ì¹´ë“œ ìƒì„±
         foreach (int index in selectedCardIndices)
         {
             GameObject cardInstance = Instantiate(cardPrefabs[index], cardContainer);
             RectTransform rectTransform = cardInstance.GetComponent<RectTransform>();
 
-            // Ä«µå Å©±â ¼³Á¤ (200x200)
+            // ì¹´ë“œ í¬ê¸° ì„¤ì • (200x200)
             rectTransform.sizeDelta = new Vector2(200, 200);
 
-            displayedCards.Add(cardInstance); // »ı¼ºµÈ Ä«µå¸¦ ¸®½ºÆ®¿¡ Ãß°¡
-            i++;
+            displayedCards.Add(cardInstance); // ìƒì„±ëœ ì¹´ë“œë¥¼ ë¦¬ìŠ¤íŠ¸ì— ì¶”ê°€
         }
     }
 
-    /*
-    // ¼±ÅÃµÈ Ä«µå ÀÎµ¦½º¸¦ ¹İÈ¯ÇÏ´Â ¸Ş¼­µå Ãß°¡
-    public HashSet<int> GetUsedCardIndices()
-    {
-        return selectedCardIndices;
-    }
-    */
+    // ì„ íƒëœ ì¹´ë“œ ì¸ë±ìŠ¤ë¥¼ ë°˜í™˜í•˜ëŠ” ë©”ì„œë“œ ì¶”ê°€
+    //public HashSet<int> GetUsedCardIndices()
+    //{
+    //    return selectedCardIndices;
+    //}
+
 }
