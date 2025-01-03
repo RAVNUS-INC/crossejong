@@ -9,10 +9,12 @@ public class ChatEditor : Editor
     ChatManager chatManager;
     string text;
 
+
     void OnEnable()
     {
         chatManager = target as ChatManager;
     }
+
 
     public override void OnInspectorGUI()
     {
@@ -32,9 +34,10 @@ public class ChatEditor : Editor
         {
             chatManager.Chat(false, text, "≈∏¿Œ", null);
             text = "";
-            GUI.FocusControl (null);
+            GUI.FocusControl(null);
         }
 
         EditorGUILayout.EndHorizontal();
     }
+
 }
