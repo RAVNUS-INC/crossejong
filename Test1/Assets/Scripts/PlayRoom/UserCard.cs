@@ -21,6 +21,7 @@ public class UserCard : MonoBehaviour
         foreach (var card in randomCards)
         {
             cardPool.MoveCardToParent(card, userCardContainer); // 각 카드를 UserCardArea로 이동
+            card.SetActive(true); // 카드가 보이도록 활성화
             displayedCards.Add(card); // 이동된 카드를 리스트에 추가
         }
     }
