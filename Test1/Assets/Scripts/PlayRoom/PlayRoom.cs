@@ -1,20 +1,19 @@
-//using UnityEngine;
-//using UnityEngine.UI;
-//using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using System.Collections.Generic;
 
 
-//public class PlayRoom : MonoBehaviour
-//{
-//    public UserCardFullPopup userCardFullPopup; //UserCardFullPopup 스크립트 연결
+public class PlayRoom : MonoBehaviour
+{
 
-//    void Start()
-//    {
-//        userCardFullPopup.UserCardFullPopupf();
-//    }
+    void Start()
+    {
+
+    }
 
 
-//    void Update()
-//    {
+    void Update()
+    {
 
-//    }
-//}
+    }
+}

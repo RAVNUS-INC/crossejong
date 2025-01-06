@@ -8,14 +8,15 @@ public class UserCard : MonoBehaviour
 {
     public CardPool cardPool; // CardPool 참조 
     public Transform userCardContainer; // UserCardArea의 Contents
-    public List<GameObject> displayedCards;
+    public List<GameObject> displayedCards; // UserCardArea에서 보여지는 카드 리스트
 
     void Start()
     {
-
+        // Optional: 초기화 작업
     }
 
-    public void MoveRandomCards()
+    // UserCardArea로 11개의 랜덤 카드 이동
+    public void MoveUserCardArea()
     {
         List<GameObject> randomCards = cardPool.GetRandomCards(11); // 11개의 랜덤 카드 얻기
         foreach (var card in randomCards)
@@ -26,4 +27,14 @@ public class UserCard : MonoBehaviour
         }
     }
 
+    // FullPopup에서 카드를 복귀시키는 메서드
+    public void MoveCardsBackToUserCardArea(List<GameObject> cardsToReturn)
+    {
+        foreach (var card in cardsToReturn)
+        {
+            cardPool.MoveCardToParent(card, userCardContainer); // 각 카드를 UserCardArea로 이동
+            card.SetActive(true); // 카드가 보이도록 활성화
+            displayedCards.Add(card); // UserCard의 리스트에 추가
+        }
+    }
 }
