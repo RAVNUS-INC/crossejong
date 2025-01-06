@@ -1,36 +1,56 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class Card : MonoBehaviour
 {
-    public Image cardImage; // Image 타입의 변수
-    public Sprite frontImage; // 카드 앞면 이미지
-    public Sprite backImage; // 카드 뒷면 이미지
-    //private bool isFaceUp = false; // 카드의 현재 상태
+    public Sprite frontSprite; // 카드 앞면 이미지 (Sprite)
+    public Sprite backSprite;  // 카드 뒷면 이미지 (Sprite)
 
-    private void Start()
+    public Image frontImage; // UI의 앞면 Image
+    public Image backImage;  // UI의 뒷면 Image
+
+    private bool isFrontVisible = false; // 카드 앞면/뒷면 상태
+
+    // InitializeCard 메서드에서 이미지를 초기화하고 기본적으로 뒷면을 보이도록 설정
+    public void InitializeCard(Sprite backSprite, Sprite frontSprite)
     {
-        // 시작할 때 뒷면 이미지로 설정
-        cardImage.sprite = frontImage;
+        this.backSprite = backSprite;
+        this.frontSprite = frontSprite;
+
+        // 뒷면 이미지를 기본으로 설정
+        backImage.sprite = this.backSprite;
+        frontImage.sprite = this.frontSprite;
+
+        // 처음에는 뒷면만 보이도록 설정
+        ShowBack();
     }
 
-    /*
-    void OnMouseDown() // 마우스 클릭 시 호출됩니다.
+    // 앞면을 보이도록 설정
+    public void ShowFront()
     {
-        if (isFaceUp)
+        isFrontVisible = true;
+        backImage.gameObject.SetActive(false);
+        frontImage.gameObject.SetActive(true);
+    }
+
+    // 뒷면을 보이도록 설정
+    public void ShowBack()
+    {
+        isFrontVisible = false;
+        backImage.gameObject.SetActive(true);
+        frontImage.gameObject.SetActive(false);
+    }
+
+    // 카드를 뒤집는 메서드
+    public void FlipCard()
+    {
+        if (isFrontVisible)
         {
-            // 카드가 기본 이미지일 때 뒷면 이미지로 전환
-            cardImage.sprite = backImage;
+            ShowBack();
         }
         else
         {
-            // 카드가 뒷면 이미지일 때 기본 이미지로 전환
-            cardImage.sprite = frontImage;
+            ShowFront();
         }
-
-        // 상태를 반전
-        isFaceUp = !isFaceUp;
     }
-    */
 }

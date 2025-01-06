@@ -2,65 +2,27 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using System.Collections.Generic;
+using Unity.Collections.LowLevel.Unsafe;
 
 public class UserCard : MonoBehaviour
 {
-    public List<GameObject> cardPrefabs; // Ä«µå ÇÁ¸®ÆÕ ¸®½ºÆ®
-    public Transform cardContainer; // Scroll ViewÀÇ Content
-    public Button createCardButton; // Ä«µå »ı¼º ¹öÆ°
-
-    public List<GameObject> displayedCards = new List<GameObject>(); // È­¸é¿¡ Ç¥½ÃµÈ Ä«µå ¸®½ºÆ®
-    public HashSet<int> selectedCardIndices = new HashSet<int>(); // ¼±ÅÃµÈ Ä«µå ÀÎµ¦½º ÁıÇÕ
+    public CardPool cardPool; // CardPool ì°¸ì¡° 
+    public Transform userCardContainer; // UserCardAreaì˜ Contents
+    public List<GameObject> displayedCards;
 
     void Start()
     {
-        createCardButton.onClick.AddListener(OnCreateCard); // ¹öÆ° Å¬¸¯ ÀÌº¥Æ®¿¡ Ä«µå »ı¼º ¸Ş¼­µå Ãß°¡
+
     }
 
-    void OnCreateCard()
+    public void MoveRandomCards()
     {
-        createCardButton.gameObject.SetActive(false); // °ÔÀÓ ½ÃÀÛ ¹öÆ° ´©¸£¸é »ç¶óÁö°Ô ÇÏ±â
-
-        CreateCards(); // Ä«µå »ı¼º ·ÎÁ÷
-    }
-
-    public void CreateCards()
-    {
-        // ÀÌ¹Ì Ç¥½ÃµÈ Ä«µå°¡ ÀÖ´Ù¸é Á¦°Å
-        foreach (var card in displayedCards)
+        List<GameObject> randomCards = cardPool.GetRandomCards(11); // 11ê°œì˜ ëœë¤ ì¹´ë“œ ì–»ê¸°
+        foreach (var card in randomCards)
         {
-            Destroy(card);
-        }
-        displayedCards.Clear(); // ¸®½ºÆ® ÃÊ±âÈ­
-        selectedCardIndices.Clear(); // ¼±ÅÃµÈ Ä«µå ÀÎµ¦½º ÃÊ±âÈ­
-
-        // ·£´ıÀ¸·Î 11°³ÀÇ Ä«µå ÀÎµ¦½º¸¦ ¼±ÅÃ
-        while (selectedCardIndices.Count < 11)
-        {
-            int randomIndex = Random.Range(0, cardPrefabs.Count);
-            selectedCardIndices.Add(randomIndex);
-        }
-
-        // ¼±ÅÃµÈ Ä«µå ÀÎµ¦½º¿¡ µû¶ó Ä«µå »ı¼º
-        int i = 0;
-        foreach (int index in selectedCardIndices)
-        {
-            GameObject cardInstance = Instantiate(cardPrefabs[index], cardContainer);
-            RectTransform rectTransform = cardInstance.GetComponent<RectTransform>();
-
-            // Ä«µå Å©±â ¼³Á¤ (200x200)
-            rectTransform.sizeDelta = new Vector2(200, 200);
-
-            displayedCards.Add(cardInstance); // »ı¼ºµÈ Ä«µå¸¦ ¸®½ºÆ®¿¡ Ãß°¡
-            i++;
+            cardPool.MoveCardToParent(card, userCardContainer); // ê° ì¹´ë“œë¥¼ UserCardAreaë¡œ ì´ë™
+            displayedCards.Add(card); // ì´ë™ëœ ì¹´ë“œë¥¼ ë¦¬ìŠ¤íŠ¸ì— ì¶”ê°€
         }
     }
 
-    /*
-    // ¼±ÅÃµÈ Ä«µå ÀÎµ¦½º¸¦ ¹İÈ¯ÇÏ´Â ¸Ş¼­µå Ãß°¡
-    public HashSet<int> GetUsedCardIndices()
-    {
-        return selectedCardIndices;
-    }
-    */
 }

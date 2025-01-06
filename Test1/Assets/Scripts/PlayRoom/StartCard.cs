@@ -1,47 +1,45 @@
-using UnityEngine;
-using UnityEngine.UI;
-using DG.Tweening;
+//using UnityEngine;
+//using UnityEngine.UI;
+//using DG.Tweening;
 
-public class StartCard : MonoBehaviour
-{
-    /*
-    public UserCard userCard; // UserCard ÂüÁ¶
+//public class StartCard : MonoBehaviour
+//{
+//    public UserCard userCard; // UserCard ì°¸ì¡°
 
-    void Start()
-    {
+//    void Start()
+//    {
         
-    }
+//    }
 
-    public void CreateStartCard()
-    {
-        // ÀÌ¹Ì Ç¥½ÃµÈ Ä«µå°¡ ÀÖ´Ù¸é Á¦°Å
-        foreach (var card in displayedCards)
-        {
-            Destroy(card);
-        }
-        displayedCards.Clear(); // ¸®½ºÆ® ÃÊ±âÈ­
-        selectedCardIndices.Clear(); // ¼±ÅÃµÈ Ä«µå ÀÎµ¦½º ÃÊ±âÈ­
+//    public void CreateStartCard()
+//    {
+//        // ì´ë¯¸ í‘œì‹œëœ ì¹´ë“œê°€ ìˆë‹¤ë©´ ì œê±°
+//        foreach (var card in displayedCards)
+//        {
+//            Destroy(card);
+//        }
+//        displayedCards.Clear(); // ë¦¬ìŠ¤íŠ¸ ì´ˆê¸°í™”
+//        selectedCardIndices.Clear(); // ì„ íƒëœ ì¹´ë“œ ì¸ë±ìŠ¤ ì´ˆê¸°í™”
 
-        // ·£´ıÀ¸·Î 11°³ÀÇ Ä«µå ÀÎµ¦½º¸¦ ¼±ÅÃ
-        while (selectedCardIndices.Count < 11)
-        {
-            int randomIndex = Random.Range(0, cardPrefabs.Count);
-            selectedCardIndices.Add(randomIndex);
-        }
+//        // ëœë¤ìœ¼ë¡œ 11ê°œì˜ ì¹´ë“œ ì¸ë±ìŠ¤ë¥¼ ì„ íƒ
+//        while (selectedCardIndices.Count < 11)
+//        {
+//            int randomIndex = Random.Range(0, cardPrefabs.Count);
+//            selectedCardIndices.Add(randomIndex);
+//        }
 
-        // ¼±ÅÃµÈ Ä«µå ÀÎµ¦½º¿¡ µû¶ó Ä«µå »ı¼º
-        int i = 0;
-        foreach (int index in selectedCardIndices)
-        {
-            GameObject cardInstance = Instantiate(cardPrefabs[index], cardContainer);
-            RectTransform rectTransform = cardInstance.GetComponent<RectTransform>();
+//        // ì„ íƒëœ ì¹´ë“œ ì¸ë±ìŠ¤ì— ë”°ë¼ ì¹´ë“œ ìƒì„±
+//        int i = 0;
+//        foreach (int index in selectedCardIndices)
+//        {
+//            GameObject cardInstance = Instantiate(cardPrefabs[index], cardContainer);
+//            RectTransform rectTransform = cardInstance.GetComponent<RectTransform>();
 
-            // Ä«µå Å©±â ¼³Á¤ (200x200)
-            rectTransform.sizeDelta = new Vector2(200, 200);
+//            // ì¹´ë“œ í¬ê¸° ì„¤ì • (200x200)
+//            rectTransform.sizeDelta = new Vector2(200, 200);
 
-            displayedCards.Add(cardInstance); // »ı¼ºµÈ Ä«µå¸¦ ¸®½ºÆ®¿¡ Ãß°¡
-            i++;
-        }
-    }
-    */
-}
+//            displayedCards.Add(cardInstance); // ìƒì„±ëœ ì¹´ë“œë¥¼ ë¦¬ìŠ¤íŠ¸ì— ì¶”ê°€
+//            i++;
+//        }
+//    }
+//}
