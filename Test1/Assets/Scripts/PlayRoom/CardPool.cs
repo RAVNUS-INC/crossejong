@@ -1,43 +1,62 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectPool : MonoBehaviour
+public class CardPool : MonoBehaviour
 {
-    public GameObject prefab; // 미리 생성할 오브젝트 프리팹
-    public int poolSize = 60; // 초기 풀 크기
+    public GameObject cardPrefab; // 카드 프리팹
+    public Transform cardContainer; // 카드 부모 오브젝트
+    public List<GameObject> cards = new List<GameObject>(); // 카드 목록
 
-    private Queue<GameObject> pool = new Queue<GameObject>();
+    public Sprite cardBackImage; // 카드 뒷면 이미지
+    public List<Sprite> cardFrontSprites; // 카드 앞면 이미지 목록
 
     void Start()
     {
-        // 초기 풀 생성
-        for (int i = 0; i < poolSize; i++)
-        {
-            GameObject obj = Instantiate(prefab);
-            obj.SetActive(false);
-            pool.Enqueue(obj);
-        }
+        // 카드 생성
+        CreateCard();
     }
 
-    public GameObject GetObject()
+
+    private void CreateCard()
     {
-        if (pool.Count > 0)
+        // 카드 1~54 생성
+        for (int i = 0; i < 54; i++)
         {
-            GameObject obj = pool.Dequeue();
-            obj.SetActive(true);
-            return obj;
+            GameObject card = Instantiate(cardPrefab, cardContainer);
+            Card cardComponent = card.GetComponent<Card>();
+
+            // 앞면과 뒷면 이미지 설정
+            cardComponent.InitializeCard(cardBackImage, cardFrontSprites[i]);
+
+            // 카드 리스트에 추가
+            cards.Add(card);
         }
-        else
-        {
-            // 풀에 남아있는 오브젝트가 없을 경우 새로 생성
-            GameObject obj = Instantiate(prefab);
-            return obj;
-        }
+
     }
 
-    public void ReturnObject(GameObject obj)
+    // 랜덤으로 11개의 카드 선택
+    public List<GameObject> GetRandomCards(int count)
     {
-        obj.SetActive(false);
-        pool.Enqueue(obj);
+        List<GameObject> randomCards = new List<GameObject>();
+        HashSet<int> usedIndices = new HashSet<int>();
+
+        while (randomCards.Count < count)
+        {
+            int randomIndex = Random.Range(0, cards.Count);
+            if (!usedIndices.Contains(randomIndex))
+            {
+                usedIndices.Add(randomIndex);
+                randomCards.Add(cards[randomIndex]);
+            }
+        }
+
+        return randomCards;
+    }
+
+
+    // 카드 이동
+    public void MoveCardToParent(GameObject card, Transform parent)
+    {
+        card.transform.SetParent(parent, false);
     }
 }

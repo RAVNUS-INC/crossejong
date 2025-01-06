@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 public class OptionPopup : MonoBehaviour
 {
-    public GameObject optionPopupPanel; // �ɼ� �˾� �г�
-    public Button openOptionPopupButton; // �ɼ� �˾� ���� ��ư
-    public Button closeOptionPopupButton; // �ɼ� �˾� �ݱ� ��ư
-    public Button surrenderButton; // �׺� Ȯ�� ��ư
+    public GameObject optionPopupPanel;
+    public Button openOptionPopupButton; 
+    public Button closeOptionPopupButton;
+    public Button surrenderButton; 
 
     private void Awake() {
         
@@ -22,19 +22,19 @@ public class OptionPopup : MonoBehaviour
         // h.transform.position = h.transform.parent.position;
     }
 
-    public void OpenPopup() // �ɼ� �˾� ���� �޼���
+    public void OpenPopup() 
     {
-        optionPopupPanel.SetActive(true); // �˾� Ȱ��ȭ
-        openOptionPopupButton.gameObject.SetActive(false); // �ɼ� �˾� ���� ��ư ��Ȱ��ȭ
-        closeOptionPopupButton.gameObject.SetActive(true); // �ɼ� �˾� �ݱ� ��ư Ȱ��ȭ
-        surrenderButton.gameObject.SetActive(true); // �׺� Ȯ�� ��ư Ȱ��ȭ
+        optionPopupPanel.SetActive(true); 
+        openOptionPopupButton.gameObject.SetActive(false);
+        closeOptionPopupButton.gameObject.SetActive(true); 
+        surrenderButton.gameObject.SetActive(true);
     }
 
-    public void ClosePopup() // �ɼ� �˾� �ݱ� �޼���
+    public void ClosePopup() 
     {
-        optionPopupPanel.SetActive(false); // �˾� ��Ȱ��ȭ
-        openOptionPopupButton.gameObject.SetActive(true); // �ɼ� �˾� ���� ��ư Ȱ��ȭ
-        closeOptionPopupButton.gameObject.SetActive(false); // �ɼ� �˾� �ݱ� ��ư ��Ȱ��ȭ
-        surrenderButton.gameObject.SetActive(false); // �׺� Ȯ�� ��ư ��Ȱ��ȭ
+        optionPopupPanel.SetActive(false);
+        openOptionPopupButton.gameObject.SetActive(true); 
+        closeOptionPopupButton.gameObject.SetActive(false); 
+        surrenderButton.gameObject.SetActive(false); 
     }
 }
