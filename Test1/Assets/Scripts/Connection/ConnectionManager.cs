@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-
+// 초기 유저 설정 화면에서 로비로 넘어갈때 작동하는 코드
 public class ConnectionManager : MonoBehaviourPunCallbacks
 {
     private ConnectionManager s_instance;
@@ -34,13 +34,13 @@ public class ConnectionManager : MonoBehaviourPunCallbacks
         inputButton.onClick.AddListener(OnClickConnect);
     }
 
-    void OnValueChanged(string s)
+    void OnValueChanged(string s) // s는 문자열
     {
-        inputButton.interactable = s.Length > 0;
+        inputButton.interactable = s.Length > 0; // input에 뭐라도 입력했으면 확인버튼 활성화
     }
-    void OnSubmit(string s)
+    void OnSubmit(string s) // s는 문자열
     {
-        Debug.Log("OnSubmit " + s);
+        Debug.Log("OnSubmit " + s); // 닉네임을 입력하고 제출했음을 알림
     }
 
     public override void OnConnectedToMaster()
@@ -53,7 +53,7 @@ public class ConnectionManager : MonoBehaviourPunCallbacks
         //로비진입
         PhotonNetwork.JoinLobby();
     }
-    //Lobby 진입을 성공했으면 호출되는 함수
+    //Lobby 진입에 성공했으면 호출되는 함수
     public override void OnJoinedLobby()
     {
         base.OnJoinedLobby();
@@ -61,7 +61,7 @@ public class ConnectionManager : MonoBehaviourPunCallbacks
         //메인 씬으로 이동
         PhotonNetwork.LoadLevel("Main");
 
-        print("메인 진입 성공");
+        print("로비 진입 성공");
 
     }
     public void OnClickConnect()
