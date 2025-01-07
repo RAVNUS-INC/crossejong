@@ -8,11 +8,11 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-// 초기 유저 설정 화면에서 로비로 넘어갈때 작동하는 코드
-public class ConnectionManager : MonoBehaviourPunCallbacks
+// 첫 유저 프로필 설정 화면에서 작동하는 코드(닉네임, 유저프로필사진 설정)
+public class UserSetManager : MonoBehaviourPunCallbacks
 {
-    private ConnectionManager s_instance;
-    public ConnectionManager Instance { get { return s_instance; } }
+    private UserSetManager s_instance;
+    public UserSetManager Instance { get { return s_instance; } }
 
     [SerializeField]
     InputField inputText; //닉네임 입력
