@@ -15,6 +15,7 @@ using NativeGalleryNamespace;
 // 유저 프로필 설정 화면에서 작동하는 코드(닉네임, 유저프로필사진 변경 저장)
 public class UserSetManager : MonoBehaviourPunCallbacks
 {
+
     private UserSetManager s_instance;
     public UserSetManager Instance { get { return s_instance; } }
 
@@ -22,12 +23,13 @@ public class UserSetManager : MonoBehaviourPunCallbacks
     [SerializeField] Button confirmButton; //제출(저장) 버튼
     [SerializeField] Text warningText; // 경고 메시지를 출력할 UI 텍스트
     [SerializeField] Text saveText; // 저장완료 메시지를 출력할 UI 텍스트
-
-    [SerializeField] private RawImage rawImage;  // 선택된 이미지를 표시할 UI
-    [SerializeField] private GameObject imagePrefab; // 프로필사진 프리팹 (UI > Image 형태)
-    [SerializeField] private Transform canvasTransform; // Canvas의 Transform
-
+    
     private const int MaxLength = 8; // 최대 입력 길이(변동가능)
+
+    public Image centralImage; // 중앙에 표시되는 프로필이미지
+    public Sprite[] profileImages; // 3가지 기본 제공 이미지
+    private int currentIndex = 0; // 현재 선택된 이미지 인덱스
+
 
     void Awake()
     {
@@ -55,7 +57,107 @@ public class UserSetManager : MonoBehaviourPunCallbacks
 
         //확인 버튼 누르면 이름 저장
         confirmButton.onClick.AddListener(DisplayName);
+        confirmButton.onClick.AddListener(SaveProfileImageToPlayFab);
 
+        LoadSavedImage();  // 게임 시작 시 저장된 이미지 인덱스를 불러오기
+
+    }
+
+
+    public void SaveProfileImageToPlayFab()
+    {
+        // PlayerPrefs에서 저장된 이미지 인덱스를 가져오기
+        if (PlayerPrefs.HasKey("ProfileImageIndex"))
+        {
+            int profileImageIndex = PlayerPrefs.GetInt("ProfileImageIndex");
+
+            // PlayFab에 저장할 데이터를 준비
+            var request = new UpdateUserDataRequest()
+            {
+                Data = new Dictionary<string, string>()
+            {
+                { "ProfileImageIndex", profileImageIndex.ToString() }
+            }
+            };
+
+            // PlayFab에 데이터 업데이트 요청
+            PlayFabClientAPI.UpdateUserData(request,
+                result => {
+                    Debug.Log("Successfully saved ProfileImageIndex to PlayFab.");
+                },
+                error => {
+                    Debug.LogError("Error saving ProfileImageIndex to PlayFab: " + error.GenerateErrorReport());
+                });
+        }
+        else
+        {
+            Debug.LogWarning("ProfileImageIndex not found in PlayerPrefs.");
+        }
+    }
+
+    // 좌측 화살표 클릭 시
+    public void OnLeftArrowClicked()
+    {
+        currentIndex = (currentIndex - 1 + profileImages.Length) % profileImages.Length;
+        UpdateCentralImage();
+    }
+
+    // 우측 화살표 클릭 시
+    public void OnRightArrowClicked()
+    {
+        currentIndex = (currentIndex + 1) % profileImages.Length;
+        UpdateCentralImage();
+    }
+
+    // 중앙 이미지를 업데이트
+    private void UpdateCentralImage()
+    {
+        if (centralImage == null)
+        {
+            Debug.LogError("centralImage is not initialized!");
+            return;
+        }
+
+        if (profileImages == null || profileImages.Length == 0)
+        {
+            Debug.LogError("profileImages array is not initialized or is empty!");
+            return;
+        }
+
+        // currentIndex가 profileImages 배열의 유효한 범위 내에 있는지 확인
+        if (currentIndex < 0 || currentIndex >= profileImages.Length)
+        {
+            Debug.LogError("currentIndex is out of range!");
+            return;
+        }
+
+        // 이미지 업데이트
+        centralImage.sprite = profileImages[currentIndex];
+
+        // 선택한 이미지 인덱스를 저장
+        SaveSelectedImageIndex(currentIndex);
+    }
+
+    // 이미지 인덱스를 PlayerPrefs에 저장
+    private void SaveSelectedImageIndex(int index)
+    {
+        PlayerPrefs.SetInt("ProfileImageIndex", index);
+        PlayerPrefs.Save();
+    }
+
+    // 시작 시 저장된 이미지 인덱스를 불러오기
+    public void LoadSavedImage()
+    {
+        if (PlayerPrefs.HasKey("ProfileImageIndex"))
+        {
+            currentIndex = PlayerPrefs.GetInt("ProfileImageIndex");
+            UpdateCentralImage();
+        }
+        else
+        {
+            // 기본 이미지 설정 (첫 시작 시 인덱스 0, 한번 변경했다면 변경한 이미지에서 시작)
+            UpdateCentralImage();
+        }
     }
 
     //이름 변경 버튼 클릭할 때 -> 이름 입력 인풋 활성화
@@ -145,79 +247,6 @@ public class UserSetManager : MonoBehaviourPunCallbacks
            });
     }
 
-    // 갤러리에서 이미지 선택
-    public void OpenGallery()
-    {
-        if (NativeGallery.IsMediaPickerBusy())
-            return;
-
-        NativeGallery.Permission permission = NativeGallery.GetImageFromGallery((path) =>
-        {
-            if (path != null)
-            {
-                StartCoroutine(LoadImage(path)); // 이미지를 로드하여 표시
-            }
-        });
-
-        Debug.Log("Gallery permission: " + permission);
-    }
-
-    // 이미지 로드 및 적용
-    private IEnumerator LoadImage(string path)
-    {
-        // 갤러리에서 선택한 이미지를 Texture2D로 로드
-        Texture2D texture = NativeGallery.LoadImageAtPath(path);
-        if (texture == null)
-        {
-            Debug.LogError("Failed to load image.");
-            yield break;
-        }
-
-        // 선택된 이미지를 RawImage에 적용 (Texture2D)
-        if (rawImage != null)
-        {
-            rawImage.texture = texture;
-
-            // RawImage의 RectTransform을 사용하여 1:1 비율로 유지
-            float aspectRatio = (float)texture.width / texture.height;
-            if (aspectRatio > 1)
-            {
-                rawImage.rectTransform.sizeDelta = new Vector2(texture.width, texture.width); // 너비 기준으로 크기 설정
-            }
-            else
-            {
-                rawImage.rectTransform.sizeDelta = new Vector2(texture.height, texture.height); // 높이 기준으로 크기 설정
-            }
-        }
-
-        // 이미지 프리팹에 적용
-        if (imagePrefab != null)
-        {
-            GameObject newImageObject = Instantiate(imagePrefab, canvasTransform);
-            Image imageComponent = newImageObject.GetComponent<Image>();
-            Sprite newSprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-            imageComponent.sprite = newSprite;
-
-            // 이미지 비율 유지
-            imageComponent.preserveAspect = true; // 비율을 유지하도록 설정
-
-            // 프리팹의 크기 설정 (이미지 비율에 맞게)
-            float imageAspectRatio = (float)texture.width / texture.height;
-            if (imageAspectRatio > 1)
-            {
-                newImageObject.GetComponent<RectTransform>().sizeDelta = new Vector2(texture.width, texture.width); // 너비 기준
-            }
-            else
-            {
-                newImageObject.GetComponent<RectTransform>().sizeDelta = new Vector2(texture.height, texture.height); // 높이 기준
-            }
-        }
-
-        Debug.Log("Image successfully applied!");
-    }
-
-
-
 
     public override void OnConnectedToMaster()
     {
@@ -254,5 +283,7 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         inputText.onValueChanged.RemoveListener(ValidateNickname);
     }
 
-    
+
 }
+
+
