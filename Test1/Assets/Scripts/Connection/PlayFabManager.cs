@@ -5,6 +5,7 @@ using PlayFab.ClientModels;
 using UnityEngine.UI;
 using UnityEngine;
 using System.Text.RegularExpressions;
+using Unity.VisualScripting;
 
 // 이메일로 로그인/회원가입을 진행할 때
 
@@ -12,7 +13,7 @@ public class PlayFabManager : MonoBehaviour
 {
     public LoginManager LoginManager; // 로그인 매니저 스크립트에서 일부 변수 사용을 위해 선언(별도)
 
-    public InputField EmailInput, PasswordInput; // 이메일, 비밀번호 입력 필드
+    public InputField EmailInput, PasswordInput, UseridInput; // 이메일, 비밀번호, 유저ID 입력 필드
     public Text popupText; // 팝업창에 표시할 알림 내용
 
     // LoginManager에서 가져온 변수들
@@ -35,6 +36,10 @@ public class PlayFabManager : MonoBehaviour
     public Text EmailErrorText;      // 이메일 오류 메시지 텍스트
     public UserSetManager userSetManager;
 
+    //신규회원 구분
+    public Toggle isNewMemberToggle;  // 신규 회원 토글
+    public GameObject playerIDInputField;  // PlayerID 입력영역
+
     private void Start()
     {
         // LoginManager에서에서 패널들을 가져옴
@@ -54,7 +59,30 @@ public class PlayFabManager : MonoBehaviour
         // Toggle의 onValueChanged 이벤트에 함수 등록
         PasswordToggle.onValueChanged.AddListener(TogglePasswordVisibility);
 
+        // 토글 상태가 변경될 때마다 호출될 리스너 추가
+        isNewMemberToggle.onValueChanged.AddListener(OnToggleValueChanged);
+
+        // 초기 상태에 따라 PlayerID 입력란을 설정
+        OnToggleValueChanged(isNewMemberToggle.isOn);
+
     }
+
+    // 토글 값이 변경되면 호출되는 함수
+    void OnToggleValueChanged(bool isNewMember)
+    {
+        if (isNewMember)
+        {
+            // 신규 회원일 때 PlayerID 입력란 표시
+            playerIDInputField.SetActive(true);
+        }
+        else
+        {
+            // 기존 회원일 때 PlayerID 입력란 숨기기
+            playerIDInputField.SetActive(false);
+        }
+    }
+
+
 
 
     // 이메일 형식 확인 함수
@@ -119,7 +147,7 @@ public class PlayFabManager : MonoBehaviour
     // 회원가입 버튼 클릭 시
     public void RegisterBtn()
     {
-        var request = new RegisterPlayFabUserRequest { Email = EmailInput.text, Password = PasswordInput.text };
+        var request = new RegisterPlayFabUserRequest { Email = EmailInput.text, Password = PasswordInput.text, Username = UseridInput.text};
         PlayFabClientAPI.RegisterPlayFabUser(request, OnRegisterSuccess, OnRegisterFailure);
     }
 

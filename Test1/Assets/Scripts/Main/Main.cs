@@ -12,17 +12,32 @@ public class Main : MonoBehaviour
 
     public GameObject profilePanel; // 프로필 패널
     public InputField profileInputField; //프로필 이름 입력란
+    [SerializeField] private Image centralImage;  // 이미지 컴포넌트
+    [SerializeField] private Sprite[] profileImages;  // 이미지 배열
 
 
     void Start()
     {
-        mainSettingsPopup.MainSettingsPopupf();
-        makeRoomPopup.MakeRoomPopupf();
+        // 저장된 프로필 이미지 인덱스를 불러옵니다.
+        int savedIndex = PlayerPrefs.GetInt("ProfileImageIndex", 0);  // 기본값 0 (첫 번째 이미지)
+
+        // 인덱스가 유효한지 확인하고 이미지 업데이트
+        if (savedIndex >= 0 && savedIndex < profileImages.Length)
+        {
+            centralImage.sprite = profileImages[savedIndex];  // 해당 인덱스에 맞는 이미지로 설정
+        }
+        else
+        {
+            Debug.LogError("Invalid ProfileImageIndex.");
+        }
+
         GetUserDisplayName(); //유저 네임 불러와서 텍스트로 표시
 
         profilePanel.SetActive(false);
         profileInputField.interactable = false; //프로필 이름 초기 비활성화
-        
+
+        mainSettingsPopup.MainSettingsPopupf();
+        makeRoomPopup.MakeRoomPopupf();
     }
 
 
