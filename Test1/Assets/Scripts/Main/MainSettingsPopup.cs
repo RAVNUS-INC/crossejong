@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
+// 모든 설정에 관련된 코드
 public class MainSettingsPopup : MonoBehaviour
 {
     public GameObject settingsPopupPanel; // 설정 팝업 패널
@@ -10,7 +11,7 @@ public class MainSettingsPopup : MonoBehaviour
 
     void Start()
     {
-
+        
     }
 
     public void MainSettingsPopupf()
@@ -34,4 +35,7 @@ public class MainSettingsPopup : MonoBehaviour
         settingsPopupPanel.SetActive(false); // 팝업 비활성화
         closeSettingsPopupButton.gameObject.SetActive(false); // 설정 팝업 닫기 버튼 비활성화
     }
+
+    
+
 }

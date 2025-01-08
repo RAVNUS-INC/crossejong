@@ -19,8 +19,11 @@ public class PlayFabManager : MonoBehaviour
     private GameObject EmailPanel; // 이메일 로그인 화면 패널
     private GameObject AlarmPanel; // 알람 패널
     private GameObject PlayerSetPanel; // 유저 프로필 설정 패널
-    public Button nextBtn; // 다음 확인 버튼
-    public Button retryBtn; // 재시도 확인 버튼
+
+    //버튼들
+    private Button nextBtn; // 다음 확인 버튼
+    private Button retryBtn; // 재시도 확인 버튼
+    private Button okBtn; // 로그인 성공 확인 버튼
 
     //비밀번호 관련 선언
     public Text PasswordErrorText;   // 비밀번호 오류 메시지 텍스트
@@ -30,7 +33,7 @@ public class PlayFabManager : MonoBehaviour
     //이메일 관련 선언
     private string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"; // 이메일 형식 확인을 위한 정규식
     public Text EmailErrorText;      // 이메일 오류 메시지 텍스트
-
+    public UserSetManager userSetManager;
 
     private void Start()
     {
@@ -42,6 +45,7 @@ public class PlayFabManager : MonoBehaviour
         // AlarmPanel 안에 있는 버튼을 찾아서 사용
         retryBtn = AlarmPanel.transform.Find("Retrybtn").GetComponent<Button>();
         nextBtn = AlarmPanel.transform.Find("Nextbtn").GetComponent<Button>();
+        okBtn = AlarmPanel.transform.Find("OKbtn").GetComponent<Button>();
 
         // 이메일 입력 시 형식 확인
         EmailInput.onValueChanged.AddListener(ValidateEmail);
@@ -126,18 +130,20 @@ public class PlayFabManager : MonoBehaviour
         UpdateText("로그인에 실패하였습니다.");
         AlarmPanel.SetActive(true);
         nextBtn.gameObject.SetActive(false);
-        retryBtn.gameObject.SetActive(true);
+        okBtn.gameObject.SetActive(false);
+        retryBtn.gameObject.SetActive(true); //재시도 활성화
         EmailPanel.SetActive(false);
     }
 
-    // 로그인 성공 시
+    // 로그인 성공 시->세팅 넘기고 로비로 넘어가야지
     public void OnLoginSuccess(LoginResult result)
     {
         print("로그인 성공");
         UpdateText("로그인에 성공하였습니다.");
         AlarmPanel.SetActive(true);
         retryBtn.gameObject.SetActive(false);
-        nextBtn.gameObject.SetActive(true);
+        okBtn.gameObject.SetActive(true); //성공->메인 활성화
+        nextBtn.gameObject.SetActive(false);
         EmailPanel.SetActive(false);
     }
 
@@ -148,7 +154,8 @@ public class PlayFabManager : MonoBehaviour
         UpdateText("회원가입에 실패하였습니다.");
         AlarmPanel.SetActive(true);
         nextBtn.gameObject.SetActive(false);
-        retryBtn.gameObject.SetActive(true);
+        okBtn.gameObject.SetActive(false);
+        retryBtn.gameObject.SetActive(true); //재시도 활성화
         EmailPanel.SetActive(false);
     }
 
@@ -158,8 +165,9 @@ public class PlayFabManager : MonoBehaviour
         print("회원가입 성공");
         UpdateText("회원가입에 성공하였습니다.");
         AlarmPanel.SetActive(true);
+        nextBtn.gameObject.SetActive(true); //다음 활성화
         retryBtn.gameObject.SetActive(false);
-        nextBtn.gameObject.SetActive(true);
+        okBtn.gameObject.SetActive(false);
         EmailPanel.SetActive(false);
     }
 
@@ -175,10 +183,15 @@ public class PlayFabManager : MonoBehaviour
         EmailPanel.SetActive(true); //이메일 로그인 다시 시도하기
     }
 
-    public void NextBtn() //통과를 했고 확인 버튼
+    public void NextBtn() //회원가입 통과를 했고 확인 버튼
     {
         PlayerSetPanel.SetActive(true); //유저 세팅으로 넘어가기
         AlarmPanel.SetActive(false);
+    }
+
+    public void OkBtn() //로그인 성공을 했고 메인으로 넘어가며 서버요청(닉네임 정보 받아오기)
+    {
+        userSetManager.OnClickConnect();
     }
 
 
