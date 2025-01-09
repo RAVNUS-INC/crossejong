@@ -15,9 +15,7 @@ using NativeGalleryNamespace;
 // 유저 프로필 설정 화면에서 작동하는 코드(닉네임, 유저프로필사진 변경 저장)
 public class UserSetManager : MonoBehaviourPunCallbacks
 {
-
-    private UserSetManager s_instance;
-    public UserSetManager Instance { get { return s_instance; } }
+    public static UserSetManager Instance { get; private set; }
 
     [SerializeField] InputField inputText; //닉네임 입력(나중에 바꿀 수 있는 Displayname)
     [SerializeField] Button confirmButton; //제출(저장) 버튼
@@ -29,25 +27,20 @@ public class UserSetManager : MonoBehaviourPunCallbacks
     public Image centralImage; // 중앙에 표시되는 프로필이미지
     public Sprite[] profileImages; // 3가지 기본 제공 이미지
     private int currentIndex = 0; // 현재 선택된 이미지 인덱스
+    private const string PROFILE_IMAGE_INDEX_KEY = "ProfileImageIndex";  // 저장 키
+    private string displayName; //디스플레이 이름
 
-
-    void Awake()
-    {
-        // 싱글톤 인스턴스를 설정
-        if (s_instance == null)
-        {
-            s_instance = this;
-        }
-        else if (s_instance != this)
-        {
-            Destroy(gameObject);
-        }
-
-        DontDestroyOnLoad(gameObject); // 씬이 변경되더라도 객체가 파괴되지 않도록 설정
-    }
+    public GameObject profilePanel; //프로필 설정 패널(메인패널에서 미리 준비해야 작동)
+    public GameObject usersetPanel; //유저 초기 설정 패널
 
     void Start()
     {
+        if ((usersetPanel.activeSelf || profilePanel.activeSelf))
+        {
+            DisplayName(); // 기존 이름 정보 불러와 변수에 저장
+            CheckAndSaveDefaultImageIndex(); // 게임 시작 시 저장된 이미지 인덱스를 불러와 변수에 저장 및 이미지 업데이트
+        }
+
         confirmButton.interactable = false; // 기본적으로 버튼 비활성화
         warningText.text = ""; // 초기 경고 메시지 비우기
         saveText.text = ""; // 초기 저장 메시지 비우기
@@ -56,116 +49,189 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         inputText.onValueChanged.AddListener(ValidateNickname);
 
         //확인 버튼 누르면 이름 저장
-        confirmButton.onClick.AddListener(DisplayName);
-        confirmButton.onClick.AddListener(SaveProfileImageToPlayFab);
-
-        LoadSavedImage();  // 게임 시작 시 저장된 이미지 인덱스를 불러오기
+        confirmButton.onClick.AddListener(OnClickSaveDisplayName);
 
     }
 
-
-    public void SaveProfileImageToPlayFab()
+    // 이름 닉네임 관련 함수들
+    // 설정한 이름 저장 함수
+    public void DisplayName() //DisplayName: 고유하지 않음
     {
-        // PlayerPrefs에서 저장된 이미지 인덱스를 가져오기
-        if (PlayerPrefs.HasKey("ProfileImageIndex"))
-        {
-            int profileImageIndex = PlayerPrefs.GetInt("ProfileImageIndex");
-
-            // PlayFab에 저장할 데이터를 준비
-            var request = new UpdateUserDataRequest()
+        var request = new GetAccountInfoRequest();
+        PlayFabClientAPI.GetAccountInfo(request,
+             result =>
+             {
+                 // displayName이 없는 경우 null을 반환
+                 if (string.IsNullOrEmpty(result.AccountInfo.TitleInfo.DisplayName))
+                 {
+                     displayName = null; // displayName이 없으면 null 할당
+                     Debug.Log("displayName이 없습니다.");
+                 }
+                 else
+                 {
+                     // displayName 값을 전역 변수에 저장
+                     displayName = result.AccountInfo.TitleInfo.DisplayName;
+                     Debug.Log($"불러온 displayName: {displayName}");
+                 }
+             },
+            error =>
             {
-                Data = new Dictionary<string, string>()
+                Debug.LogError($"유저 정보 불러오기 실패: {error.GenerateErrorReport()}");
+            });
+    }
+
+
+    // 유저 프로필 이미지 관련 함수들
+    // 저장된 이미지 인덱스를 불러오기
+
+    private void CheckAndSaveDefaultImageIndex()
+    {
+        var request = new GetUserDataRequest();
+        PlayFabClientAPI.GetUserData(request,
+            result =>
             {
-                { "ProfileImageIndex", profileImageIndex.ToString() }
-            }
-            };
+                // PROFILE_IMAGE_INDEX_KEY가 존재하는지 확인
+                if (result.Data.ContainsKey(PROFILE_IMAGE_INDEX_KEY))
+                {
+                    Debug.Log("KEY가 존재합니다. 값을 불러옵니다.");
+                    string value = result.Data[PROFILE_IMAGE_INDEX_KEY].Value;
 
-            // PlayFab에 데이터 업데이트 요청
-            PlayFabClientAPI.UpdateUserData(request,
-                result => {
-                    Debug.Log("Successfully saved ProfileImageIndex to PlayFab.");
-                },
-                error => {
-                    Debug.LogError("Error saving ProfileImageIndex to PlayFab: " + error.GenerateErrorReport());
-                });
-        }
-        else
-        {
-            Debug.LogWarning("ProfileImageIndex not found in PlayerPrefs.");
-        }
+                    if (!string.IsNullOrEmpty(value)) 
+                    {
+                        currentIndex = int.Parse(value); 
+                    }
+                    else 
+                    {
+                        Debug.LogWarning("KEY의 값이 비어 있습니다. 기본값(0)으로 저장합니다.");
+                        currentIndex = 0; // 기본값 설정
+                        SaveSelectedImageIndex(currentIndex); // PlayFab에 저장
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("KEY가 존재하지 않습니다. 기본값(0)을 생성합니다.");
+                    currentIndex = 0; // 기본값 설정
+                    SaveSelectedImageIndex(currentIndex); // PlayFab에 새로운 키 생성 및 값 저장
+                }
+
+                UpdateCentralImage(); // 이미지 업데이트
+            },
+            error =>
+            {
+                Debug.LogError($"유저 데이터 불러오기 실패: {error.GenerateErrorReport()}");
+            });
     }
 
-    // 좌측 화살표 클릭 시
-    public void OnLeftArrowClicked()
-    {
-        currentIndex = (currentIndex - 1 + profileImages.Length) % profileImages.Length;
-        UpdateCentralImage();
-    }
 
-    // 우측 화살표 클릭 시
-    public void OnRightArrowClicked()
-    {
-        currentIndex = (currentIndex + 1) % profileImages.Length;
-        UpdateCentralImage();
-    }
-
-    // 중앙 이미지를 업데이트
+    // 이미지 업데이트 함수
     private void UpdateCentralImage()
     {
-        if (centralImage == null)
+        if (profileImages.Length > 0 && currentIndex >= 0 && currentIndex < profileImages.Length)
         {
-            Debug.LogError("centralImage is not initialized!");
-            return;
-        }
-
-        if (profileImages == null || profileImages.Length == 0)
-        {
-            Debug.LogError("profileImages array is not initialized or is empty!");
-            return;
-        }
-
-        // currentIndex가 profileImages 배열의 유효한 범위 내에 있는지 확인
-        if (currentIndex < 0 || currentIndex >= profileImages.Length)
-        {
-            Debug.LogError("currentIndex is out of range!");
-            return;
-        }
-
-        // 이미지 업데이트
-        centralImage.sprite = profileImages[currentIndex];
-
-        // 선택한 이미지 인덱스를 저장
-        SaveSelectedImageIndex(currentIndex);
-    }
-
-    // 이미지 인덱스를 PlayerPrefs에 저장
-    private void SaveSelectedImageIndex(int index)
-    {
-        PlayerPrefs.SetInt("ProfileImageIndex", index);
-        PlayerPrefs.Save();
-    }
-
-    // 시작 시 저장된 이미지 인덱스를 불러오기
-    public void LoadSavedImage()
-    {
-        if (PlayerPrefs.HasKey("ProfileImageIndex"))
-        {
-            currentIndex = PlayerPrefs.GetInt("ProfileImageIndex");
-            UpdateCentralImage();
+            centralImage.sprite = profileImages[currentIndex];  // 인덱스에 해당하는 이미지로 업데이트
+            SaveSelectedImageIndex(currentIndex);                // 선택된 이미지 인덱스 저장
         }
         else
         {
-            // 기본 이미지 설정 (첫 시작 시 인덱스 0, 한번 변경했다면 변경한 이미지에서 시작)
-            UpdateCentralImage();
+            Debug.LogWarning("Invalid profile image index.");
         }
     }
+
+    // 선택된 이미지 인덱스를 저장
+    private void SaveSelectedImageIndex(int index)
+    {
+        // 선택된 이미지 인덱스를 PlayFab 타이틀 데이터에 저장
+        var request = new UpdateUserDataRequest
+        {
+            Data = new Dictionary<string, string>
+        {
+            { PROFILE_IMAGE_INDEX_KEY, index.ToString() }
+        }
+        };
+
+        PlayFabClientAPI.UpdateUserData(request,
+            result =>
+            {
+                Debug.Log($"프로필 데이터 저장 성공: {index}");
+            },
+            error =>
+            {
+                Debug.LogError($"유저 데이터 저장 실패: {error.GenerateErrorReport()}");
+            });
+    }
+
+
+
+
+    // 왼쪽 버튼 클릭 시 호출
+    public void OnLeftButtonClicked()
+    {
+        currentIndex--;
+        if (currentIndex < 0) currentIndex = profileImages.Length - 1;  // 순환 (맨 처음으로 돌아감)
+        UpdateCentralImage();  // 이미지 업데이트
+    }
+
+    // 오른쪽 버튼 클릭 시 호출
+    public void OnRightButtonClicked()
+    {
+        currentIndex++;
+        if (currentIndex >= profileImages.Length) currentIndex = 0;  // 순환 (맨 마지막에서 처음으로 돌아감)
+        UpdateCentralImage();  // 이미지 업데이트
+    }
+
+
+
+
+
+    
+
+    public void OnClickSaveDisplayName()
+    {
+        // displayName이 존재하는지 확인(첫 유저인지 아닌지를 확인)
+        if (string.IsNullOrEmpty(displayName))
+        {
+            // displayName이 없을 경우 (첫 유저일 경우)
+            Debug.Log("첫 displayName이 설정되었습니다.");
+            SaveDisplayName(); //닉네임을 저장하고
+            OnClickConnect(); //메인으로 서버접속을 요청한다
+        }
+        else //displayname이 이미 존재할 경우(재접속 유저일 경우)
+        {
+            // 전역 변수로 displayName에 저장
+            Debug.Log("새로운 displayName이 설정되었습니다.");
+            SaveDisplayName(); //기존의 이름을 새 이름으로 덮어씌워 저장한다
+            saveText.text = "저장되었습니다"; //저장 메시지 알림
+        }
+    }
+    public void SaveDisplayName() //단순히 이름 저장하기
+    {
+        string displayName = inputText.text.Trim();
+
+        var request = new UpdateUserTitleDisplayNameRequest
+        {
+            DisplayName = displayName
+        };
+
+        PlayFabClientAPI.UpdateUserTitleDisplayName(request,
+           result =>
+           {
+               Debug.Log($"닉네임 저장 성공: {result.DisplayName}");
+           },
+
+           error =>
+           {
+               Debug.LogError($"닉네임 저장 실패: {error.GenerateErrorReport()}");
+           });
+    }
+
 
     //이름 변경 버튼 클릭할 때 -> 이름 입력 인풋 활성화
     public void ChangeNameBtn() 
     {
         inputText.interactable = true; //이름 변경 활성화
     }
-     
+
+
     //이름 설정 규칙
     public void ValidateNickname(string input)
     {
@@ -191,6 +257,11 @@ public class UserSetManager : MonoBehaviourPunCallbacks
             warningText.text = "닉네임을 입력해주세요.";
             confirmButton.interactable = false; 
         }
+        else if (displayName == inputText.text && (inputText.isActiveAndEnabled)) //입력란이 기존 닉네임과 같으면서 활성화되어있는 경우
+        {
+            warningText.text = "기존 닉네임과 달라야 합니다.";
+            confirmButton.interactable = false;
+        }
         else
         {
             warningText.text = ""; // 규칙에 맞으면 경고 메시지 제거
@@ -199,53 +270,7 @@ public class UserSetManager : MonoBehaviourPunCallbacks
 
     }
 
-    //설정한 이름 저장
-    public void DisplayName() //DisplayName: 고유하지 않음
-    {
-        var request = new GetAccountInfoRequest();
-        PlayFabClientAPI.GetAccountInfo(request,
-             result =>
-             {
-                 // displayName이 존재하는지 확인(첫 유저인지 아닌지를 확인)
-                 if (string.IsNullOrEmpty(result.AccountInfo.TitleInfo.DisplayName))
-                 {
-                     // displayName이 없을 경우 (첫 유저일 경우)
-                     Debug.Log("displayName이 설정되지 않았습니다. 설정 중...");
-                     SaveDisplayName(); //닉네임을 저장하고
-                     OnClickConnect(); //메인으로 서버접속을 요청한다
-                 }
-                 else //displayname이 이미 존재할 경우(재접속 유저일 경우)
-                 {
-                     SaveDisplayName(); //기존의 이름을 새 이름으로 덮어씌워 저장한다
-                     saveText.text = "저장되었습니다"; //저장 메시지 알림
-                 }
-             },
-            error =>
-            {
-                Debug.LogError($"유저 정보 불러오기 실패: {error.GenerateErrorReport()}");
-            });
-    }
-
-    public void SaveDisplayName() //단순히 이름 저장하기
-    {
-        string displayName = inputText.text.Trim();
-
-        var request = new UpdateUserTitleDisplayNameRequest
-        {
-            DisplayName = displayName
-        };
-
-        PlayFabClientAPI.UpdateUserTitleDisplayName(request,
-           result =>
-           {
-               Debug.Log($"닉네임 저장 성공: {result.DisplayName}");
-           },
-
-           error =>
-           {
-               Debug.LogError($"닉네임 저장 실패: {error.GenerateErrorReport()}");
-           });
-    }
+    
 
 
     public override void OnConnectedToMaster()
