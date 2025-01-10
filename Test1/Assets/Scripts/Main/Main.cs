@@ -8,18 +8,28 @@ public class Main : MonoBehaviour
 {
     public MainSettingsPopup mainSettingsPopup; //MainSettingsPopup 스크립트 연결
     public MakeRoomPopup makeRoomPopup; //MakeRoomPopup 스크립트 연결
+
+    private InputField inputField; //프로필 패널 안의 이름입력필드
+    private Text SaveText; //프로필 패널 안의 저장메시지
+
     public Text displayNameText; // DisplayName을 표시할 UI 텍스트
-    public InputField profileInputField; //프로필 이름 입력란
+    public InputField profileInputField; //메인의 프로필 이름 입력란
 
     public Sprite[] profileImages; // 3가지 기본 제공 이미지
-    public GameObject profilePanel; // 프로필 패널
+    public GameObject profilePanel; // 프로필 수정 패널
     public Image centralImage;  // 프로필 이미지
+
+    public GameObject friendPanel; // 친구 추가 패널
 
     private const string PROFILE_IMAGE_INDEX_KEY = "ProfileImageIndex";  // 저장 키
 
     void Start()
     {
-
+        // UserSetManager 컴포넌트 참조
+        UserSetManager userSetManager = FindObjectOfType<UserSetManager>();
+        // UserSetManager에서 InputField를 가져옴
+        inputField = userSetManager.inputText;
+        SaveText = userSetManager.saveText;
 
         // PlayFab에서 저장된 이미지 인덱스를 불러와 이미지 업데이트
         LoadProfileImageIndex();
@@ -102,18 +112,30 @@ public class Main : MonoBehaviour
     public void ProfileBtn() //프로필 버튼 클릭하면 
     {
         profilePanel.SetActive(true); //프로필 패널 띄우기
-
     }
 
     public void ExitBtn() //프로필 패널의 닫기 버튼을 누르면
     {
         profilePanel.SetActive(false); //패널 비활성화
+        inputField.interactable = false; //이름입력란 비활성화
+        SaveText.text = ""; //저장 메시지 초기화
 
         //유저 프로필 이미지 재로드, 이름 재로드 텍스트 보여주기
-
         GetUserDisplayName();
         LoadProfileImageIndex();
 
     }
+
+    //public void FriendBtn() //친구 추가 버튼 클릭하면 
+    //{
+    //    friendPanel.SetActive(true); //프로필 패널 띄우기
+    //}
+
+    //public void ExitFriendBtn()
+    //{
+    //    friendPanel.SetActive(false); //프로필 패널 띄우기
+    //}
+
+
 
 }
