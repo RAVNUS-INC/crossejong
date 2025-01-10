@@ -562,7 +562,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 738987000}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UserCardFullPopup, Assembly-CSharp
         m_MethodName: MoveFullPopupArea
         m_Mode: 1
@@ -1031,7 +1031,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 738987000}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: UserCardFullPopup, Assembly-CSharp
         m_MethodName: MoveCardsBackToUserCardArea
         m_Mode: 1
@@ -1532,7 +1532,6 @@ GameObject:
   - component: {fileID: 738986996}
   - component: {fileID: 738986998}
   - component: {fileID: 738986999}
-  - component: {fileID: 738987000}
   m_Layer: 0
   m_Name: PlayRoom
   m_TagString: Untagged
@@ -1641,22 +1640,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: e3f62f1946a539548b30086931172d8e, type: 3}
   - {fileID: 21300000, guid: 9aaf025e0cc1d4f4fb061cf6d1f19877, type: 3}
   - {fileID: 21300000, guid: 28f13659f2386fe48b8607f9f6a6caf4, type: 3}
---- !u!114 &738987000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 738986995}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 57e406eb50742cf479ce912c5f996abc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cardPool: {fileID: 738986999}
-  userCard: {fileID: 738986998}
-  fullCardContainer: {fileID: 2110904094}
-  fullDisplayedCards: []
 --- !u!1 &780001724
 GameObject:
   m_ObjectHideFlags: 0
