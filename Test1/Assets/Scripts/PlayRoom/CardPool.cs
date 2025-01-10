@@ -23,7 +23,7 @@ public class CardPool : MonoBehaviour
         for (int i = 0; i < 54; i++)
         {
             GameObject card = Instantiate(cardPrefab, cardContainer);
-            Card cardComponent = card.GetComponent<Card>();
+            BeforeCard cardComponent = card.GetComponent<BeforeCard>();
 
             // 앞면과 뒷면 이미지 설정
             cardComponent.InitializeCard(cardBackImage, cardFrontSprites[i]);
