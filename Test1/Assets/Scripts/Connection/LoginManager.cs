@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Windows;
+//using UnityEngine.UIElements;
 
 // 로그인 화면 전체를 구성하는 코드
 // 일반 이메일 로그인 방법일 경우에만 뒤로 돌아갈 수 있도록 하는 코드
@@ -14,21 +17,29 @@ public class LoginManager : MonoBehaviour
     [SerializeField] private GameObject naverLoginPanel; //네이버 로그인 선택 시 화면
     [SerializeField] private GameObject appleLoginPanel; //애플 로그인 선택 시 화면
     [SerializeField] public GameObject emailLoginPanel; //일반 이메일 로그인 선택 시 화면
+    [SerializeField] public GameObject registerPanel; //회원가입 선택 시 화면
     [SerializeField] public GameObject playersetPanel; // 유저 세팅 패널
     [SerializeField] public GameObject AlarmPanel; // 알람 패널
 
     public PlayFabManager playFabManager; // PlayFabManager에서 할당
     private InputField emailInput;
     private InputField passwordInput;
+    private InputField idInput;
+
     private Toggle passwordToggle;
+
     private Text emailWarningText;
     private Text passwordWarningText;
+
+    private Button loginButton;
+    private Button newuserButton;
 
     public void Start()
     {
         // PlayFabManager의 EmailInput과 PasswordInput에 접근
         emailInput = playFabManager.EmailInput;
         passwordInput = playFabManager.PasswordInput;
+        idInput = playFabManager.playerIDInputField;
         passwordToggle = playFabManager.PasswordToggle;
         emailWarningText = playFabManager.EmailErrorText;
         passwordWarningText = playFabManager.PasswordErrorText;
@@ -36,11 +47,16 @@ public class LoginManager : MonoBehaviour
         // 초기 상태 설정
         ResetPasswordToggle();
         ResetWarningTexts();
+
+        // 이메일 로그인 패널의 버튼들을 찾아오기(이름이 정확해야 함)
+        loginButton = GameObject.Find("LoginBtn").GetComponent<Button>();
+        newuserButton = GameObject.Find("NewUserBtn").GetComponent<Button>();
     }
 
     public GameObject GetEmailLoginPanel() => emailLoginPanel;
     public GameObject GetPlayerSetPanel() => playersetPanel;
     public GameObject GetAlarmPanel() => AlarmPanel;
+    public GameObject GetRegisterPanel() => registerPanel;
 
     public void ShowLoginPanel(string method)
     {
@@ -52,6 +68,7 @@ public class LoginManager : MonoBehaviour
         naverLoginPanel.SetActive(false);
         appleLoginPanel.SetActive(false);
         emailLoginPanel.SetActive(false);
+        registerPanel.SetActive(false);
         playersetPanel.SetActive(false);
         AlarmPanel.SetActive(false);
 
@@ -74,19 +91,51 @@ public class LoginManager : MonoBehaviour
 
     }
 
-    public void EmailBtn() //이메일 로그인 버튼을 눌렀을 때
+    public void IfNewUserBtn() //신규 회원인 경우 버튼 클릭을 하면
     {
+        registerPanel.SetActive(true);
         emailLoginPanel.SetActive(true);
-        loginMethodsPanel.SetActive(false);
+        loginButton.gameObject.SetActive(false);
+        newuserButton.gameObject.SetActive(false);
+        //이메일 패널의 로그인 버튼과 신규회원 버튼만 비활성화 시킨다
+
+        //emailInput.interactable = true; //인풋 활성화
+        //passwordInput.interactable = true; //인풋 활성화
+
     }
 
-    public void BackBtn() //뒤로가기 버튼을 눌렀을 때
+    public void EmailBtn() //이메일 로그인 버튼을 눌렀을 때
     {
-        emailLoginPanel.SetActive(false);
-        loginMethodsPanel.SetActive(true);
+        emailLoginPanel.SetActive(true); //이메일 패널 활성화
+        loginMethodsPanel.SetActive(false); //로그인 패널 비활성화
+    }
 
-        if (emailInput != null) emailInput.text = "";
-        if (passwordInput != null) passwordInput.text = "";
+    public void BackBtn1() //뒤로가기 버튼을 눌렀을 때 ->로그인 홈화면으로 이동
+    {
+        emailLoginPanel.SetActive(false); //이메일 패널 비활성화
+        loginMethodsPanel.SetActive(true); //로그인 패널 활성화
+
+        if (emailInput != null) emailInput.text = ""; //값 초기화
+        if (passwordInput != null) passwordInput.text = ""; //값 초기화
+
+        // PasswordToggle을 초기 상태로 설정
+        ResetPasswordToggle();
+
+        // 경고 텍스트 숨기기
+        ResetWarningTexts();
+
+    }
+
+    public void BackBtn2() //뒤로가기 버튼을 눌렀을 때 ->로그인 홈화면으로 이동
+    {
+        registerPanel.SetActive(false); //회원가입 화면 비활성화
+
+        loginButton.gameObject.SetActive(true); //회원가입>로그인 버튼 활성화
+        newuserButton.gameObject.SetActive(true); //회원가입>신규버튼 활성화
+
+        if (emailInput != null) emailInput.text = ""; //값 초기화
+        if (passwordInput != null) passwordInput.text = ""; //값 초기화
+        if (idInput != null) idInput.text = ""; //값 초기화
 
         // PasswordToggle을 초기 상태로 설정
         ResetPasswordToggle();
