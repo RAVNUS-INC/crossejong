@@ -5,7 +5,7 @@ using System.Collections;
 public class Countdown : MonoBehaviour
 {
     public TMP_Text countDownText; // TextMeshPro 사용
-    //public UserCard userCard;  // UserCard 참조
+    public UserCard userCard;  // UserCard 참조
     public float startDelay = 1f; // 시작 딜레이
 
     private void Start()
@@ -36,6 +36,6 @@ public class Countdown : MonoBehaviour
 
     private void StartGame()
     {
-        //userCard.MoveRandomCards();
+        userCard.MoveUserCardArea();
     }
 }
