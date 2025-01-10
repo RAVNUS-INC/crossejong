@@ -1,14 +1,21 @@
 using UnityEngine;
 using TMPro; // TextMeshPro를 사용하기 위한 네임스페이스
 using System.Collections;
+using UnityEngine.UI;
 
 public class Countdown : MonoBehaviour
 {
     public TMP_Text countDownText; // TextMeshPro 사용
     public UserCard userCard;  // UserCard 참조
     public float startDelay = 1f; // 시작 딜레이
+    public Button startGameButton; //게임 시작버튼
 
     private void Start()
+    {
+        startGameButton.onClick.AddListener(StartCountDown);
+    }
+
+    private void StartCountDown()
     {
         StartCoroutine(CountDownRoutine());
     }
