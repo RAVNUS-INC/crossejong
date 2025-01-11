@@ -38,14 +38,13 @@ public class PlayFabManager : MonoBehaviour
     private string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"; // 이메일 형식 확인을 위한 정규식
     public Text EmailErrorText;      // 이메일 오류 메시지 텍스트
 
-    //public UserSetManager userSetManager; //usersetmanager 스크립트 참조
-
     //유저ID 관련 선언
     public InputField playerIDInputField;  // PlayerID 입력영역
     public Text IDErrorText; //PlayerID 오류 메시지 텍스트
 
     private void Start()
     {
+
         // LoginManager에서에서 패널들을 가져옴
         EmailPanel = LoginManager.GetEmailLoginPanel();
         RegisterPanel = LoginManager.GetRegisterPanel();
@@ -57,20 +56,12 @@ public class PlayFabManager : MonoBehaviour
         nextBtn = AlarmPanel.transform.Find("Nextbtn").GetComponent<Button>();
         okBtn = AlarmPanel.transform.Find("OKbtn").GetComponent<Button>();
 
-        // 이메일 입력에 직접 할당 
-        EmailInput.onValueChanged.AddListener(ValidateEmail);
-
-        // 비밀번호 입력에 직접 할당
-        PasswordInput.onValueChanged.AddListener(ValidatePassword);
-
-        // ID 입력에 직접 할당
-        UseridInput.onValueChanged.AddListener(ValidateUserID);
-
         // 비밀번호 토글 체크하면 문자 볼 수 있음
         PasswordToggle.onValueChanged.AddListener(TogglePasswordVisibility);
 
 
     }
+
 
 
 
@@ -258,19 +249,6 @@ public class PlayFabManager : MonoBehaviour
     {
         popupText.text = message;
     }
-
-    public void RetryBtn() //통과를 못했고 확인 버튼
-    {
-        AlarmPanel.SetActive(false);
-        EmailPanel.SetActive(true); //이메일 로그인 다시 시도하기
-    }
-
-    public void NextBtn() //회원가입 통과를 했고 확인 버튼
-    {
-        PlayerSetPanel.SetActive(true); //유저 세팅으로 넘어가기
-        AlarmPanel.SetActive(false);
-    }
-
 
     public void OkBtn() //로그인 성공을 했고 메인으로 넘어가며 서버요청(닉네임 정보 받아오기)
     {

@@ -9,7 +9,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using NativeGalleryNamespace;
 
 
 // 유저 프로필 설정 화면에서 작동하는 코드(닉네임, 유저프로필사진 변경 저장)

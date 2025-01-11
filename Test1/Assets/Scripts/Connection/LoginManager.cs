@@ -11,11 +11,11 @@ using UnityEngine.Windows;
 // 나머지 로그인 방법의 경우, 버튼 클릭 시 바로 로그인 시도
 public class LoginManager : MonoBehaviour
 {
-    [SerializeField] private GameObject loginMethodsPanel; //로그인 방법들을 보여주는 첫 화면
+    //[SerializeField] private GameObject loginMethodsPanel; //로그인 방법들을 보여주는 첫 화면
 
-    [SerializeField] private GameObject googleLoginPanel; //구글 로그인 선택 시 화면
-    [SerializeField] private GameObject naverLoginPanel; //네이버 로그인 선택 시 화면
-    [SerializeField] private GameObject appleLoginPanel; //애플 로그인 선택 시 화면
+    //[SerializeField] private GameObject googleLoginPanel; //구글 로그인 선택 시 화면
+    //[SerializeField] private GameObject naverLoginPanel; //네이버 로그인 선택 시 화면
+    //[SerializeField] private GameObject appleLoginPanel; //애플 로그인 선택 시 화면
     [SerializeField] public GameObject emailLoginPanel; //일반 이메일 로그인 선택 시 화면
     [SerializeField] public GameObject registerPanel; //회원가입 선택 시 화면
     [SerializeField] public GameObject playersetPanel; // 유저 세팅 패널
@@ -31,9 +31,6 @@ public class LoginManager : MonoBehaviour
     private Text emailWarningText;
     private Text passwordWarningText;
 
-    private Button loginButton;
-    private Button newuserButton;
-
     public void Start()
     {
         // PlayFabManager의 EmailInput과 PasswordInput에 접근
@@ -48,9 +45,7 @@ public class LoginManager : MonoBehaviour
         ResetPasswordToggle();
         ResetWarningTexts();
 
-        // 이메일 로그인 패널의 버튼들을 찾아오기(이름이 정확해야 함)
-        loginButton = GameObject.Find("LoginBtn").GetComponent<Button>();
-        newuserButton = GameObject.Find("NewUserBtn").GetComponent<Button>();
+        
     }
 
     public GameObject GetEmailLoginPanel() => emailLoginPanel;
@@ -58,63 +53,8 @@ public class LoginManager : MonoBehaviour
     public GameObject GetAlarmPanel() => AlarmPanel;
     public GameObject GetRegisterPanel() => registerPanel;
 
-    public void ShowLoginPanel(string method)
-    {
-        // 처음 로그인 방법 보여주는 화면은 활성화
-        loginMethodsPanel.SetActive(true); 
-
-        // 모든 로그인 및 유저세팅, 알람 패널 비활성화
-        googleLoginPanel.SetActive(false);
-        naverLoginPanel.SetActive(false);
-        appleLoginPanel.SetActive(false);
-        emailLoginPanel.SetActive(false);
-        registerPanel.SetActive(false);
-        playersetPanel.SetActive(false);
-        AlarmPanel.SetActive(false);
-
-        // 선택된 로그인 패널 활성화
-        switch (method)
-        {
-            case "Google":
-                googleLoginPanel.SetActive(true);
-                break;
-            case "Naver":
-                naverLoginPanel.SetActive(true);
-                break;
-            case "Apple":
-                appleLoginPanel.SetActive(true);
-                break;
-            case "Email":
-                emailLoginPanel.SetActive(true);
-                break;
-        }
-
-    }
-
-    public void IfNewUserBtn() //신규 회원인 경우 버튼 클릭을 하면
-    {
-        registerPanel.SetActive(true);
-        emailLoginPanel.SetActive(true);
-        loginButton.gameObject.SetActive(false);
-        newuserButton.gameObject.SetActive(false);
-        //이메일 패널의 로그인 버튼과 신규회원 버튼만 비활성화 시킨다
-
-        //emailInput.interactable = true; //인풋 활성화
-        //passwordInput.interactable = true; //인풋 활성화
-
-    }
-
-    public void EmailBtn() //이메일 로그인 버튼을 눌렀을 때
-    {
-        emailLoginPanel.SetActive(true); //이메일 패널 활성화
-        loginMethodsPanel.SetActive(false); //로그인 패널 비활성화
-    }
-
     public void BackBtn1() //뒤로가기 버튼을 눌렀을 때 ->로그인 홈화면으로 이동
     {
-        emailLoginPanel.SetActive(false); //이메일 패널 비활성화
-        loginMethodsPanel.SetActive(true); //로그인 패널 활성화
-
         if (emailInput != null) emailInput.text = ""; //값 초기화
         if (passwordInput != null) passwordInput.text = ""; //값 초기화
 
@@ -128,10 +68,6 @@ public class LoginManager : MonoBehaviour
 
     public void BackBtn2() //뒤로가기 버튼을 눌렀을 때 ->로그인 홈화면으로 이동
     {
-        registerPanel.SetActive(false); //회원가입 화면 비활성화
-
-        loginButton.gameObject.SetActive(true); //회원가입>로그인 버튼 활성화
-        newuserButton.gameObject.SetActive(true); //회원가입>신규버튼 활성화
 
         if (emailInput != null) emailInput.text = ""; //값 초기화
         if (passwordInput != null) passwordInput.text = ""; //값 초기화
@@ -144,6 +80,8 @@ public class LoginManager : MonoBehaviour
         ResetWarningTexts();
 
     }
+
+
 
     // 비밀번호보기 토글의 초기화
     private void ResetPasswordToggle()
