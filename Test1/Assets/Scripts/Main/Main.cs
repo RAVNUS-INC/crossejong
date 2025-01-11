@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using PlayFab;
 using PlayFab.ClientModels;
 
+// 메인에 존재하는 기능에 관한 스크립트
 public class Main : MonoBehaviour
 {
-    public MainSettingsPopup mainSettingsPopup; //MainSettingsPopup 스크립트 연결
-    public MakeRoomPopup makeRoomPopup; //MakeRoomPopup 스크립트 연결
-
     private InputField inputField; //프로필 패널 안의 이름입력필드
     private Text SaveText; //프로필 패널 안의 저장메시지
 
@@ -19,7 +17,7 @@ public class Main : MonoBehaviour
     public GameObject profilePanel; // 프로필 수정 패널
     public Image centralImage;  // 프로필 이미지
 
-    public GameObject friendPanel; // 친구 추가 패널
+    //public GameObject friendPanel; // 친구 추가 패널
 
     private const string PROFILE_IMAGE_INDEX_KEY = "ProfileImageIndex";  // 저장 키
 
@@ -39,9 +37,6 @@ public class Main : MonoBehaviour
         profilePanel.SetActive(false);
 
         profileInputField.interactable = false; //프로필 이름 초기 비활성화
-
-        mainSettingsPopup.MainSettingsPopupf();
-        makeRoomPopup.MakeRoomPopupf();
     }
 
 
@@ -109,10 +104,6 @@ public class Main : MonoBehaviour
         Debug.LogError($"DisplayName 가져오기 실패: {error.GenerateErrorReport()}");
     }
 
-    public void ProfileBtn() //프로필 버튼 클릭하면 
-    {
-        profilePanel.SetActive(true); //프로필 패널 띄우기
-    }
 
     public void ExitBtn() //프로필 패널의 닫기 버튼을 누르면
     {
@@ -125,17 +116,5 @@ public class Main : MonoBehaviour
         LoadProfileImageIndex();
 
     }
-
-    //public void FriendBtn() //친구 추가 버튼 클릭하면 
-    //{
-    //    friendPanel.SetActive(true); //프로필 패널 띄우기
-    //}
-
-    //public void ExitFriendBtn()
-    //{
-    //    friendPanel.SetActive(false); //프로필 패널 띄우기
-    //}
-
-
 
 }
