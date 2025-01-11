@@ -871,7 +871,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -900}
+  m_AnchoredPosition: {x: 0, y: -899.99994}
   m_SizeDelta: {x: 0, y: -1800}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &259437066
@@ -1584,9 +1584,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardContainer: {fileID: 1978031715}
+  cardFrontImage: {fileID: 21300000, guid: 15043c98fba3dbd4aafdc40975b899ee, type: 3}
   cardBackImage: {fileID: 21300000, guid: 6d4e7a8bb7ffc104bb6fbe8600d9b3ce, type: 3}
-  cardFrontColorImage: {fileID: 21300000, guid: 9aaf025e0cc1d4f4fb061cf6d1f19877, type: 3}
-  cardFrontBlackImage: {fileID: 21300000, guid: 28f13659f2386fe48b8607f9f6a6caf4, type: 3}
+  specialCardFrontColorImage: {fileID: 21300000, guid: 031ded77b82799d4cbba62c693165240, type: 3}
+  specialCardFrontBlackImage: {fileID: 21300000, guid: 36315cbb127af214b86fdee757f5e138, type: 3}
   newCard: {fileID: 738987000}
   tmpText: {fileID: 0}
   newFont: {fileID: 11400000, guid: b628b8af7e2297b44afd8e9727f533e1, type: 2}

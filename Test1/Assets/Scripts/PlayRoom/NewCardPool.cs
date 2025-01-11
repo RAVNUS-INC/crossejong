@@ -7,9 +7,10 @@ using System.Linq;
 public class NewCardPool : MonoBehaviour
 {
     public Transform cardContainer; // 카드 부모 오브젝트
+    public Sprite cardFrontImage; // 카드 앞면 이미지
     public Sprite cardBackImage; // 카드 뒷면 이미지
-    public Sprite cardFrontColorImage; // 카드 앞면 이미지
-    public Sprite cardFrontBlackImage; // 카드 앞면 이미지
+    public Sprite specialCardFrontColorImage; // 카드 앞면 이미지
+    public Sprite specialCardFrontBlackImage; // 카드 앞면 이미지
     public NewCard newCard; // NewCard 참조
 
     public TextMeshProUGUI tmpText; // TextMeshProUGUI 컴포넌트 참조
@@ -23,12 +24,12 @@ public class NewCardPool : MonoBehaviour
         CreateCard();
     }
 
-    public void CreateCardRed()
+    public void CreateCards(List<string> cardList, Color color)
     {
-        for (int i = 0; i < newCard.cardFrontRed.Count; i++)
+        for (int i = 0; i < cardList.Count; i++)
         {
             // 카드 GameObject 생성
-            GameObject card = new GameObject(newCard.cardFrontRed[i]);
+            GameObject card = new GameObject(cardList[i]);
             card.transform.SetParent(cardContainer, false);
 
             // RectTransform 설정
@@ -38,129 +39,40 @@ public class NewCardPool : MonoBehaviour
             // Button 컴포넌트 추가
             Button button = card.AddComponent<Button>();
 
-            // 카드 배경 이미지 추가
-            Image cardBackground = card.AddComponent<Image>();
-            cardBackground.sprite = cardBackImage; // 카드 뒷면 이미지 설정
-            cardBackground.type = Image.Type.Sliced;
+            if (cardList != newCard.cardFrontSpecial)
+            {
+                // 카드 배경 이미지 추가
+                Image cardFrontFeature = card.AddComponent<Image>();
+                cardFrontFeature.sprite = cardFrontImage; // 카드 앞면 이미지 설정
+                cardFrontFeature.type = Image.Type.Sliced;
 
-            // 텍스트 오브젝트 생성 (앞면용)
-            GameObject textObject = new GameObject("CardText");
-            textObject.transform.SetParent(card.transform, false);
-            RectTransform textRect = textObject.AddComponent<RectTransform>();
-            textRect.anchorMin = Vector2.zero;
-            textRect.anchorMax = Vector2.one;
-            textRect.offsetMin = Vector2.zero;
-            textRect.offsetMax = Vector2.zero;
+                // 텍스트 오브젝트 생성 (앞면용)
+                GameObject textObject = new GameObject("CardText");
+                textObject.transform.SetParent(card.transform, false);
+                RectTransform textRect = textObject.AddComponent<RectTransform>();
+                textRect.anchorMin = Vector2.zero;
+                textRect.anchorMax = Vector2.one;
+                textRect.offsetMin = Vector2.zero;
+                textRect.offsetMax = Vector2.zero;
 
-            TextMeshProUGUI tmpText = textObject.AddComponent<TextMeshProUGUI>();
-            tmpText.font = newFont;
-            tmpText.text = newCard.cardFrontRed[i]; // 텍스트 설정
-            tmpText.fontSize = 120;
-            tmpText.alignment = TextAlignmentOptions.Center;
-            tmpText.color = Color.red;
-
-            // 카드 리스트에 추가
-            cards.Add(card);
-        }
-    }
-
-    public void CreateCardBlack()
-    {
-        for (int i = 0; i < newCard.cardFrontBlack.Count; i++)
-        {
-            // 카드 GameObject 생성
-            GameObject card = new GameObject(newCard.cardFrontBlack[i]);
-            card.transform.SetParent(cardContainer, false);
-
-            // RectTransform 설정
-            RectTransform rectTransform = card.AddComponent<RectTransform>();
-            rectTransform.sizeDelta = new Vector2(200, 200); // 카드 크기 설정
-
-            // Button 컴포넌트 추가
-            Button button = card.AddComponent<Button>();
-
-            // 카드 배경 이미지 추가
-            Image cardBackground = card.AddComponent<Image>();
-            cardBackground.sprite = cardBackImage; // 카드 뒷면 이미지 설정
-            cardBackground.type = Image.Type.Sliced;
-
-            // 텍스트 오브젝트 생성 (앞면용)
-            GameObject textObject = new GameObject("CardText");
-            textObject.transform.SetParent(card.transform, false);
-            RectTransform textRect = textObject.AddComponent<RectTransform>();
-            textRect.anchorMin = Vector2.zero;
-            textRect.anchorMax = Vector2.one;
-            textRect.offsetMin = Vector2.zero;
-            textRect.offsetMax = Vector2.zero;
-
-            TextMeshProUGUI tmpText = textObject.AddComponent<TextMeshProUGUI>();
-            tmpText.font = newFont;
-            tmpText.text = newCard.cardFrontBlack[i]; // 텍스트 설정
-            tmpText.fontSize = 120;
-            tmpText.alignment = TextAlignmentOptions.Center;
-            tmpText.color = Color.black;
+                TextMeshProUGUI tmpText = textObject.AddComponent<TextMeshProUGUI>();
+                tmpText.font = newFont;
+                tmpText.text = cardList[i]; // 텍스트 설정
+                tmpText.fontSize = 120;
+                tmpText.alignment = TextAlignmentOptions.Center;
+                tmpText.color = color;
+            }
+            else
+            {
+                // 카드 배경 이미지 추가
+                Image cardFrontFeature = card.AddComponent<Image>();
+                cardFrontFeature.sprite = specialCardFrontColorImage; // 카드 앞면 이미지 설정
+                cardFrontFeature.type = Image.Type.Sliced;
+            }
 
             // 카드 리스트에 추가
             cards.Add(card);
         }
-    }
-
-    public void CreateCardSpecialColor()
-    {
-        // 카드 GameObject 생성
-        GameObject card = new GameObject("컬러");
-        card.transform.SetParent(cardContainer, false);
-
-        // RectTransform 설정
-        RectTransform rectTransform = card.AddComponent<RectTransform>();
-        rectTransform.sizeDelta = new Vector2(200, 200); // 카드 크기 설정
-
-        // Button 컴포넌트 추가
-        Button button = card.AddComponent<Button>();
-
-        // 카드 배경 이미지 추가 (parent object에 추가)
-        Image cardBackground = card.AddComponent<Image>();
-        cardBackground.sprite = cardBackImage; // 카드 뒷면 이미지 설정
-        cardBackground.type = Image.Type.Sliced;
-
-        // 앞면 이미지를 자식 GameObject에 추가
-        GameObject frontImageObject = new GameObject("FrontImage");
-        frontImageObject.transform.SetParent(card.transform, false);
-        Image cardFrontground = frontImageObject.AddComponent<Image>();
-        cardFrontground.sprite = cardFrontColorImage; // 카드 앞면 이미지 설정
-        cardFrontground.type = Image.Type.Sliced;
-
-        // 카드 리스트에 추가
-        cards.Add(card);
-    }
-
-    public void CreateCardSpecialBlack()
-    {
-        // 카드 GameObject 생성
-        GameObject card = new GameObject("흑백");
-        card.transform.SetParent(cardContainer, false);
-
-        // RectTransform 설정
-        RectTransform rectTransform = card.AddComponent<RectTransform>();
-        rectTransform.sizeDelta = new Vector2(200, 200); // 카드 크기 설정
-
-        // Button 컴포넌트 추가
-        Button button = card.AddComponent<Button>();
-
-        // 카드 배경 이미지 추가 (parent object에 추가)
-        Image cardBackground = card.AddComponent<Image>();
-        cardBackground.sprite = cardBackImage; // 카드 뒷면 이미지 설정
-        cardBackground.type = Image.Type.Sliced;
-
-        // 앞면 이미지를 자식 GameObject에 추가
-        GameObject frontImageObject = new GameObject("FrontImage");
-        frontImageObject.transform.SetParent(card.transform, false);
-        Image cardFrontground = frontImageObject.AddComponent<Image>();
-        cardFrontground.sprite = cardFrontBlackImage; // 카드 앞면 이미지 설정
-        cardFrontground.type = Image.Type.Sliced;
-
-        // 카드 리스트에 추가
-        cards.Add(card);
     }
 
     public void ChangeCardColor(Button button)
@@ -188,13 +100,25 @@ public class NewCardPool : MonoBehaviour
         }
     }
 
+    public void FlipCard(Image CardFrontFeature)
+    {
+        Sprite savedCardFrontImage = CardFrontFeature.sprite;
+
+        if (CardFrontFeature.sprite != cardBackImage) 
+        { 
+            CardFrontFeature.sprite = cardBackImage;
+        }
+        else
+        {
+            CardFrontFeature.sprite = savedCardFrontImage;
+        }
+    }
 
     private void CreateCard()
     {
-        CreateCardRed();
-        CreateCardBlack();
-        CreateCardSpecialColor();
-        CreateCardSpecialBlack();
+        CreateCards(newCard.cardFrontRed, Color.red);
+        CreateCards(newCard.cardFrontBlack, Color.black);
+        CreateCards(newCard.cardFrontSpecial, Color.white);
 
         // 모든 카드에 대해 ChangeCardColor 연결
         foreach (var card in cards)
