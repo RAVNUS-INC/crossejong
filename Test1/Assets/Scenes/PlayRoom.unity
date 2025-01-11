@@ -1221,7 +1221,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   countDownText: {fileID: 453961800}
-  userCard: {fileID: 0}
+  userCard: {fileID: 11155626}
   startDelay: 1
   startGameButton: {fileID: 1284291088}
 --- !u!1 &526707535
