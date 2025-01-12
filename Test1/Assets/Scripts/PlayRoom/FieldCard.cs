@@ -4,13 +4,17 @@ using TMPro;
 using System.Collections.Generic;
 using System.Xml;
 using PlayFab.DataModels;
+using JetBrains.Annotations;
 
 public class FieldCard : MonoBehaviour
 {
     public Transform FieldContainer; // FieldArea의 Contents
     public CardPool cardPool; // CardPool 참조
     public List<string> shownCardData; // 필드에 놓인 카드 데이터 리스트
-    public List<GameObject> displayedFieldCard; 
+    public List<GameObject> displayedFieldCard;
+    public int col;
+    public int row;
+
     void Start()
     {
 
@@ -26,18 +30,23 @@ public class FieldCard : MonoBehaviour
             displayedFieldCard.Add(card); // 이동된 카드를 리스트에 추가
             RectTransform rectTransform = card.GetComponent<RectTransform>();
             rectTransform.anchoredPosition = Vector2.zero;
+            // 카드의 TextMeshProUGUI 컴포넌트 가져오기
+            TextMeshProUGUI textComponent = card.GetComponentInChildren<TextMeshProUGUI>();
+            // 텍스트 읽기
+            string currentText = textComponent.text;
+            SaveCardData(currentText);
         }
     }
 
 
-    void ShowCapableCardArea()
+    public void ShowCapableCardArea()
     {
 
     }
 
-    void SaveCardData()
+    public void SaveCardData(string CardText)
     {
-
+        
     }
 
 }

@@ -2322,6 +2322,8 @@ MonoBehaviour:
   cardPool: {fileID: 1342198615}
   shownCardData: []
   displayedFieldCard: []
+  col: 0
+  row: 0
 --- !u!1 &939849007
 GameObject:
   m_ObjectHideFlags: 0
