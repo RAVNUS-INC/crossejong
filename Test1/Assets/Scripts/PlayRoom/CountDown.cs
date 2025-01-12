@@ -17,13 +17,11 @@ public class Countdown : MonoBehaviour
 
     private void StartCountDown()
     {
-        StartCoroutine(CountDownRoutine());
+        StartCoroutine(CountDownRoutine(3));
     }
 
-    private IEnumerator CountDownRoutine()
+    private IEnumerator CountDownRoutine(int count)
     {
-        int count = 3;
-
         // 카운트다운 표시
         while (count > 0)
         {
