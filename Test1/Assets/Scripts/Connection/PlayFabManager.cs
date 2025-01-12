@@ -250,10 +250,10 @@ public class PlayFabManager : MonoBehaviour
         popupText.text = message;
     }
 
-    public void OkBtn() //로그인 성공을 했고 메인으로 넘어가며 서버요청(닉네임 정보 받아오기)
-    {
-        UserSetManager.OnClickConnect();
-    }
+    //public void OkBtn() //로그인 성공을 했고 메인으로 넘어가며 서버요청(닉네임 정보 받아오기)
+    //{
+    //    UserSetManager.OnClickConnect();
+    //}
 
 
 }

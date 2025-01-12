@@ -5,7 +5,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 using static UnityEngine.EventSystems.PointerEventData;
@@ -15,6 +17,7 @@ using Image = UnityEngine.UI.Image;
 //방 생성 및 방 참여에 관한 코드
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
+
     // 방 생성 관련 UI
     [SerializeField] InputField input_RoomName; //방 이름
     [SerializeField] Button[] btn_MaxPlayers; // 최대인원 버튼
@@ -29,57 +32,104 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     [SerializeField] Button btn_JoinRoom; // 방 참여 버튼
     [SerializeField] GameObject roomListItem; // 방 목록 프리팹
 
-    // 방 생성 시 필요한 변수 선언
-    int selectedMaxPlayers = 0; // 최대인원(2, 3, 4명)
-    int selectedDifficulty = 0; // 난이도(초급, 중급, 고급)
-    int selectedTimeLimit = 0; // 카드 놓기까지 제한시간(15초, 30초, 45초)
-    public Transform rtContent;
+    // 방 생성 시 옵션들
+    private int selectedMaxPlayers; // 최대인원(2, 3, 4명)
+    private int selectedDifficulty; // 난이도(초급, 중급, 고급)
+    private int selectedTimeLimit; // 카드 놓기까지 제한시간(15초, 30초, 45초)
+
+    private int selectedMaxPlayersIndex; // 인원 선택 인덱스
+    private int selectedDifficultyIndex; // 난이도 선택 인덱스
+    private int selectedTimeLimitIndex; // 제한시간 인덱스
+
+    public Transform rtContent; // 콘텐츠 영역
     private const int MaxLength = 12; // 방이름 최대 입력 길이
 
     // 방 목록을 가지고 있는 Dictionaly 변수
     Dictionary<string, RoomInfo> dicRoomInfo = new Dictionary<string, RoomInfo>();
 
-    void Start()
-    {
-        SetDefaultSelection(btn_MaxPlayers, 0, out selectedMaxPlayers);
-        SetDefaultSelection(btn_Difficulty, 0, out selectedDifficulty);
-        SetDefaultSelection(btn_TimeLimit, 0, out selectedTimeLimit);
+    
 
+    public static LobbyManager Instance { get; private set; } //씬 전환시에도 정보가 남아있게
+    private void Awake() //필요
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject); // 오브젝트를 씬 전환 시 제거하지 않음
+        }
+        else
+        {
+            Destroy(gameObject); // 중복된 인스턴스 방지
+        }
+        //main으로 돌아오면 무조건 실행해야 하는 초기화 함수
+        ResetRoomSetPanel();
+        CreateRoomListItem();
+
+    }
+
+    private void OnDestroy()
+    {
+        // input_RoomName이 null이 아닐 경우에만 RemoveListener를 호출
+        if (input_RoomName != null)
+        {
+            input_RoomName.onValueChanged.RemoveListener(ValidateRoomName);
+        }
+
+    }
+
+    void Start() 
+    {
         // 방 이름 입력 필드 초기화
         input_RoomName.text = ""; //방 이름 기본 공백 상태
         btn_CreateRoom.interactable = false; // 처음에는 방 생성 버튼 비활성화
         warningText.text = ""; // 초기 경고 메시지 비우기
-
         input_RoomName.onValueChanged.AddListener(ValidateRoomName); //방 이름 작성할 시, 방 이름 규칙 검사
-        btn_CreateRoom.onClick.AddListener(OnClickCreateRoom); //방 생성 버튼 클릭 시, 방 생성 수행
-        btn_JoinRoom.onClick.AddListener(OnClickJoinRoom); //방 참여 버튼 클릭 시, 방 참여 수행
-
-        // MaxPlayers 버튼에 리스너 추가
-        for (int i = 0; i < btn_MaxPlayers.Length; i++)
-        {
-            int index = i; // 클로저를 위해 로컬 변수 사용
-            btn_MaxPlayers[i].onClick.AddListener(() => OnMaxPlayersButtonClicked(index));
-        }
-
-        // Difficulty 버튼에 리스너 추가
-        for (int i = 0; i < btn_Difficulty.Length; i++)
-        {
-            int index = i;
-            btn_Difficulty[i].onClick.AddListener(() => OnDifficultyButtonClicked(index));
-        }
-
-        // TimeLimit 버튼에 리스너 추가
-        for (int i = 0; i < btn_TimeLimit.Length; i++)
-        {
-            int index = i;
-            btn_TimeLimit[i].onClick.AddListener(() => OnTimeLimitButtonClicked(index));
-        }
-
-        UpdateButtonColors(btn_MaxPlayers, -1); // 초기화
-        UpdateButtonColors(btn_Difficulty, -1); // 초기화
-        UpdateButtonColors(btn_TimeLimit, -1); // 초기화
     }
 
+
+    // 방 만들 때 선택 옵션 버튼과 방이름 규칙에 관한 초기화
+    public void ResetRoomSetPanel()
+    {
+        // 기본 버튼 설정값 (0,0,0) 노란색으로 표시
+        SetDefaultSelection(btn_MaxPlayers, 0);
+        SetDefaultSelection(btn_Difficulty, 0);
+        SetDefaultSelection(btn_TimeLimit, 0);
+
+        // 옵션 버튼 선택하면 노란색으로 바뀌도록 하는 코드
+        MaxPlayerSet(btn_MaxPlayers);
+        DifficultySet(btn_Difficulty);
+        TimeLimitSet(btn_TimeLimit);
+    }
+
+    private void MaxPlayerSet(Button[] buttons)
+    {
+        // MaxPlayers 버튼에 리스너 추가
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            int index = i;
+            buttons[i].onClick.AddListener(() => OnMaxPlayersButtonClicked(index,buttons)); //선택한 버튼의 색상 변경
+        }
+    }
+
+    public void DifficultySet(Button[] buttons)
+    {
+        // Difficulty 버튼에 리스너 추가
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            int index = i;
+            buttons[i].onClick.AddListener(() => OnDifficultyButtonClicked(index, buttons));
+        }
+    }
+
+    public void TimeLimitSet(Button[] buttons)
+    {
+        // TimeLimit 버튼에 리스너 추가
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            int index = i;
+            buttons[i].onClick.AddListener(() => OnTimeLimitButtonClicked(index, buttons));
+        }
+    }
 
     private void ValidateRoomName(string input) //방 이름의 규칙에 관한 코드
     {
@@ -109,11 +159,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             btn_CreateRoom.interactable = true; // 방 생성 버튼 활성화
         }
     }
-    private void OnDestroy()
-    {
-        // 이벤트 해제
-        input_RoomName.onValueChanged.RemoveListener(ValidateRoomName);
-    }
+
 
     
 
@@ -210,8 +256,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                             Convert.ToInt32(info.CustomProperties["timeLimit"]) :
                             0;
 
-            /// 가져온 컴포넌트가 가지고 있는 SetInfo 함수 실행
-            item.SetInfo(info.Name, info.PlayerCount, info.MaxPlayers, difficulty, timeLimit);
+            // 가져온 컴포넌트가 가지고 있는 SetInfo 함수 실행(출력 형태 설정)
+            item.SetInfo(info.Name, info.PlayerCount, info.MaxPlayers, difficulty, timeLimit);  //난이도와 제한시간만 custom properties에 선언, 나머지는 photon에서 기본제공
 
             // item 클릭되었을 때 호출되는 함수 등록
             item.onDelegate = (roomName) =>
@@ -223,7 +269,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     }
 
 
-    // 방 생성 할 때
+    // 방 생성 할 때(변수고정불변)
     public void OnClickCreateRoom()
     {
         //방 옵션
@@ -234,13 +280,14 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         //커스텀 룸 프로퍼티 설정(중요)
         options.CustomRoomProperties = new ExitGames.Client.Photon.Hashtable()
         {
-            {"maxPlayers", selectedMaxPlayers},   // 최대 플레이어 수 설정
-            {"difficulty", difficultyText},
-            {"timeLimit", selectedTimeLimit}
-        };
+            //{"PlayersIndex", selectedMaxPlayersIndex},  // 플레이어 index
 
-        //로비에서도 보여줄 프로퍼티 설정
-        options.CustomRoomPropertiesForLobby = new string[] { "maxPlayers", "difficulty", "timeLimit" };
+            {"DifficultyIndex", selectedDifficultyIndex},  // 난이도 index
+            {"TimeLimitIndex", selectedTimeLimitIndex},  // 제한시간 index
+            {"difficultyInt", selectedDifficulty},  // 난이도 int값(2,3,4)
+            {"difficulty", difficultyText},   // 난이도 str값(초급,중급,고급)
+            {"timeLimit", selectedTimeLimit}  // 제한시간 int값(15,30,45)
+        };
 
         //방 목록에 보이게 할것인가?
         options.IsVisible = true;
@@ -255,7 +302,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         base.OnCreatedRoom();
 
         UnityEngine.Debug.Log("방 생성 성공");
-
         PhotonNetwork.LoadLevel("MakeRoom");
     }
 
@@ -289,7 +335,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
 
     // 방 생성을 위한 옵션 선택 시 이뤄지는 ui의 변화와 index 업데이트에 관한 코드
-    void OnMaxPlayersButtonClicked(int index)
+    void OnMaxPlayersButtonClicked(int index, Button[] PlayBtn)
     {
         switch (index) // 2, 3, 4 플레이어 옵션
         {
@@ -303,11 +349,11 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                 selectedMaxPlayers = 4;
                 break; 
         }
-        UpdateButtonColors(btn_MaxPlayers, index);
-        UnityEngine.Debug.Log("Selected Max Players: " + selectedMaxPlayers);
+        UpdateButtonColors(PlayBtn, index);
+        UnityEngine.Debug.Log("Selected Max Players: " + selectedMaxPlayers); //메시지 출력
     }
 
-    void OnDifficultyButtonClicked(int index)
+    public void OnDifficultyButtonClicked(int index, Button[] difBtn)
     {
         switch (index) // 0: 초급, 1: 중급, 2: 고급
         {
@@ -321,14 +367,14 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                 selectedDifficulty = 4;
                 break;
         }
-        // selectedDifficulty 값을 기반으로 실제 문자열로 반환
-        string difficultyText = GetDifficultyText(selectedDifficulty);
-        UpdateButtonColors(btn_Difficulty, index);
-        UnityEngine.Debug.Log("Selected Difficulty: " + difficultyText);
+        selectedDifficultyIndex = index;
+        string difficultyText = GetDifficultyText(selectedDifficulty); // selectedDifficulty 값을 기반으로 실제 문자열로 반환
+        UpdateButtonColors(difBtn, index); //색상 업데이트
+        UnityEngine.Debug.Log("Selected Difficulty: " + difficultyText); //메시지 출력
     }
 
     // selectedDifficulty의 값이 2, 3, 4일 때 각각 "초급", "중급", "고급"이라는 문자열을 출력
-    string GetDifficultyText(int difficulty) 
+    public string GetDifficultyText(int difficulty) 
     {
         switch (difficulty)
         {
@@ -343,7 +389,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         }
     }
 
-    void OnTimeLimitButtonClicked(int index)
+    public void OnTimeLimitButtonClicked(int index, Button[] TimBtn)
     {
         switch (index) // 0: 15초, 1: 30초, 2: 45초
         {
@@ -358,47 +404,47 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                 break;
 
         }
-        UpdateButtonColors(btn_TimeLimit, index);
+        selectedTimeLimitIndex = index;
+        UpdateButtonColors(TimBtn, index);
         UnityEngine.Debug.Log("Selected Time Limit: " + selectedTimeLimit);
     }
 
-    private void SetDefaultSelection(Button[] buttons, int defaultIndex, out int selectedValue)
+    public void SetDefaultSelection(Button[] buttons, int defaultIndex)
     {
-        selectedValue = defaultIndex;
 
-        for (int i = 0; i < buttons.Length; i++)
+        for (int i = 0; i < buttons.Length; i++) //세번 반복(각 버튼 배열 길이)
         {
             int index = i;
 
             ColorBlock colorBlock = buttons[i].colors;
             colorBlock.normalColor = Color.white; // 기본 색상 화이트
-            colorBlock.selectedColor = Color.yellow; //선택된 색상 싸이언
+            colorBlock.selectedColor = Color.yellow; //선택된 색상 노란색
             buttons[i].colors = colorBlock;
 
-            buttons[i].onClick.AddListener(() =>
-            {
-                UpdateButtonColors(buttons, index); //버튼 색상 갱신
-            });
+            //buttons[i].onClick.AddListener(() =>
+            //{
+            //    UpdateButtonColors(buttons, index); //버튼 색상 갱신
+            //});
         }
-
-        UpdateButtonColors(buttons, defaultIndex);
+        UpdateButtonColors(buttons, defaultIndex);  //기본값 버튼 색상을 노란색으로
     }
 
-    // 버튼 배열의 색상 업데이트 함수
-    void UpdateButtonColors(Button[] buttons, int selectedIndex)
+    // 버튼을 실제로 색칠하는 함수
+    private void UpdateButtonColors(Button[] buttons, int selectedIndex)
     {
         for (int i = 0; i < buttons.Length; i++)
         {
-            ColorBlock colorBlock = buttons[i].colors;
-            if (i == selectedIndex)
+            ColorBlock colorBlock = buttons[i].colors; //colorBlock에 색상 정보 넘겨주기
+
+            if (i == selectedIndex) //현재 선택한 인덱스와 i값이 같을때
             {
-                colorBlock.normalColor = Color.yellow;
+                colorBlock.normalColor = Color.yellow; //노란색
             }
-            else
+            else //현재 선택한 인덱스와 i값이 다를때
             {
-                colorBlock.normalColor = Color.white;
+                colorBlock.normalColor = Color.white; //하얀색
             }
-            buttons[i].colors = colorBlock;
+            buttons[i].colors = colorBlock; //버튼에 색상 업데이트
         }
     }
 }
