@@ -9,6 +9,7 @@ public class Countdown : MonoBehaviour
     public UserCard userCard;  // UserCard 참조
     public float startDelay = 1f; // 시작 딜레이
     public Button startGameButton; //게임 시작버튼
+    public FieldCard fieldCard; 
 
     private void Start()
     {
@@ -17,13 +18,11 @@ public class Countdown : MonoBehaviour
 
     private void StartCountDown()
     {
-        StartCoroutine(CountDownRoutine());
+        StartCoroutine(CountDownRoutine(3));
     }
 
-    private IEnumerator CountDownRoutine()
+    private IEnumerator CountDownRoutine(int count)
     {
-        int count = 3;
-
         // 카운트다운 표시
         while (count > 0)
         {
@@ -44,5 +43,6 @@ public class Countdown : MonoBehaviour
     private void StartGame()
     {
         userCard.MoveUserCardArea();
+        fieldCard.StartCardShown();
     }
 }

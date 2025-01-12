@@ -6,7 +6,7 @@ using Unity.Collections.LowLevel.Unsafe;
 
 public class UserCard : MonoBehaviour
 {
-    public NewCardPool newCardPool; // CardPool 참조 
+    public CardPool cardPool; // CardPool 참조 
     public Transform userCardContainer; // UserCardArea의 Contents
     public List<GameObject> displayedCards; // UserCardArea에서 보여지는 카드 리스트
 
@@ -18,10 +18,10 @@ public class UserCard : MonoBehaviour
     // UserCardArea로 11개의 랜덤 카드 이동
     public void MoveUserCardArea()
     {
-        List<GameObject> randomCards = newCardPool.GetRandomCards(11); // 11개의 랜덤 카드 얻기
+        List<GameObject> randomCards = cardPool.GetRandomCards(11); // 11개의 랜덤 카드 얻기
         foreach (var card in randomCards)
         {
-            newCardPool.MoveCardToParent(card, userCardContainer); // 각 카드를 UserCardArea로 이동
+            cardPool.MoveCardToParent(card, userCardContainer); // 각 카드를 UserCardArea로 이동
             card.SetActive(true); // 카드가 보이도록 활성화
             displayedCards.Add(card); // 이동된 카드를 리스트에 추가
         }
@@ -32,7 +32,7 @@ public class UserCard : MonoBehaviour
     {
         foreach (var card in cardsToReturn)
         {
-            newCardPool.MoveCardToParent(card, userCardContainer); // 각 카드를 UserCardArea로 이동
+            cardPool.MoveCardToParent(card, userCardContainer); // 각 카드를 UserCardArea로 이동
             card.SetActive(true); // 카드가 보이도록 활성화
             displayedCards.Add(card); // UserCard의 리스트에 추가
         }
