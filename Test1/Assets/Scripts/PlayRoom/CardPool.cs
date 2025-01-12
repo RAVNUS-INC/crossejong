@@ -87,9 +87,7 @@ public class CardPool : MonoBehaviour
                 // 기본 색상 변경
                 colorBlock.normalColor = Color.white;
                 // 클릭했을 때 색상 변경
-                colorBlock.highlightedColor = Color.grey;
-                // 클릭했을 때 색상 변경
-                colorBlock.pressedColor = Color.grey;
+                colorBlock.selectedColor = Color.grey;
                 // 비활성화된 상태 색상 변경
                 colorBlock.disabledColor = Color.red;
 

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Xml;
 using PlayFab.DataModels;
 using JetBrains.Annotations;
+using System;
 
 public class FieldCard : MonoBehaviour
 {
@@ -12,8 +13,11 @@ public class FieldCard : MonoBehaviour
     public CardPool cardPool; // CardPool 참조
     public List<string> shownCardData; // 필드에 놓인 카드 데이터 리스트
     public List<GameObject> displayedFieldCard;
-    public int col;
     public int row;
+    public int col;
+    public string[,] savedCardData;
+    public int cardDataRowIndex;
+    public int cardDataColIndex;
 
     void Start()
     {
@@ -44,9 +48,25 @@ public class FieldCard : MonoBehaviour
 
     }
 
+    public void InitializeSavedCardData(int rows, int columns)
+    {
+        savedCardData = new string[rows, columns]; // 동적으로 배열 크기 설정
+    }
+
     public void SaveCardData(string CardText)
     {
-        
+        if (savedCardData == null)
+        {
+            InitializeSavedCardData(3, 3);
+            savedCardData[1, 1] = CardText;
+            cardDataRowIndex = 1;
+            cardDataColIndex = 1;
+            ShowCapableCardArea();
+        }
+        else
+        {
+
+        }
     }
 
 }
