@@ -8,8 +8,10 @@ using System.Text.RegularExpressions;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
+//using static UnityEditor.Progress;
 using static UnityEngine.EventSystems.PointerEventData;
 using Button = UnityEngine.UI.Button;
 using Image = UnityEngine.UI.Image;
@@ -43,47 +45,44 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     public Transform rtContent; // 콘텐츠 영역
     private const int MaxLength = 12; // 방이름 최대 입력 길이
-
     // 방 목록을 가지고 있는 Dictionaly 변수
     Dictionary<string, RoomInfo> dicRoomInfo = new Dictionary<string, RoomInfo>();
 
-    
 
-    public static LobbyManager Instance { get; private set; } //씬 전환시에도 정보가 남아있게
+    //public static LobbyManager Instance { get; private set; } //씬 전환시에도 정보가 남아있게
+
+
     private void Awake() //필요
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject); // 오브젝트를 씬 전환 시 제거하지 않음
-        }
-        else
-        {
-            Destroy(gameObject); // 중복된 인스턴스 방지
-        }
-        //main으로 돌아오면 무조건 실행해야 하는 초기화 함수
-        ResetRoomSetPanel();
-        CreateRoomListItem();
+        //if (Instance == null)
+        //{
+        //    Instance = this;
+        //    DontDestroyOnLoad(gameObject); // 오브젝트를 씬 전환 시 제거하지 않음
+        //}
+        //else
+        //{
+        //    Destroy(gameObject); // 중복된 인스턴스 방지
+        //}
+        ResetRoomSetPanel(); // 첫 메인 접속 시 최초 실행
 
     }
+
 
     private void OnDestroy()
     {
-        // input_RoomName이 null이 아닐 경우에만 RemoveListener를 호출
-        if (input_RoomName != null)
-        {
-            input_RoomName.onValueChanged.RemoveListener(ValidateRoomName);
-        }
 
+        //// input_RoomName이 null이 아닐 경우에만 RemoveListener를 호출
+        //if (input_RoomName != null)
+        //{
+        //    input_RoomName.onValueChanged.RemoveListener(ValidateRoomName);
+        //}
     }
+    
+
 
     void Start() 
     {
-        // 방 이름 입력 필드 초기화
-        input_RoomName.text = ""; //방 이름 기본 공백 상태
-        btn_CreateRoom.interactable = false; // 처음에는 방 생성 버튼 비활성화
-        warningText.text = ""; // 초기 경고 메시지 비우기
-        input_RoomName.onValueChanged.AddListener(ValidateRoomName); //방 이름 작성할 시, 방 이름 규칙 검사
+        
     }
 
 
@@ -99,6 +98,12 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         MaxPlayerSet(btn_MaxPlayers);
         DifficultySet(btn_Difficulty);
         TimeLimitSet(btn_TimeLimit);
+
+        // 방 이름 입력 필드 초기화
+        input_RoomName.text = ""; //방 이름 기본 공백 상태
+        btn_CreateRoom.interactable = false; // 처음에는 방 생성 버튼 비활성화
+        warningText.text = ""; // 초기 경고 메시지 비우기
+        input_RoomName.onValueChanged.AddListener(ValidateRoomName); //방 이름 작성할 시, 방 이름 규칙 검사
     }
 
     private void MaxPlayerSet(Button[] buttons)
@@ -218,23 +223,20 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
 
     // 스크롤 뷰에 보여지는 방 목록을 갱신 할 때
-    void UpdateRoomListItem(List<RoomInfo> roomList) 
+    void UpdateRoomListItem(List<RoomInfo> roomList)
+{
+    foreach (RoomInfo info in roomList)
     {
-        foreach (RoomInfo info in roomList)
+        if (info.RemovedFromList)
         {
-            // dicRoomInfo에 info 의 방이름으로 되어있는 key값이 존재하는가
-            if (dicRoomInfo.ContainsKey(info.Name))
-            {
-                // 이미 삭제된 방이라면?
-                if (info.RemovedFromList)
-                {
-                    dicRoomInfo.Remove(info.Name); // 방 정보를 삭제
-                    continue;
-                }
-            }
-            dicRoomInfo[info.Name] = info; // 방 정보를 추가, 업데이트
+            dicRoomInfo.Remove(info.Name); // 방 정보 삭제
+        }
+        else
+        {
+            dicRoomInfo[info.Name] = info; // 방 정보 추가 또는 업데이트
         }
     }
+}
 
 
     // 생성된 방 목록을 스크롤 뷰에 보여줄 때
@@ -256,6 +258,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                             Convert.ToInt32(info.CustomProperties["timeLimit"]) :
                             0;
 
+
+
             // 가져온 컴포넌트가 가지고 있는 SetInfo 함수 실행(출력 형태 설정)
             item.SetInfo(info.Name, info.PlayerCount, info.MaxPlayers, difficulty, timeLimit);  //난이도와 제한시간만 custom properties에 선언, 나머지는 photon에서 기본제공
 
@@ -265,6 +269,9 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                 // SelectRoomItem을 바로 호출
                 SelectRoomItem(roomName, go); // roomName과 현재 버튼(GameObject)을 전달 -> 선택된 방목록의 색상이 변경되도록
             };
+
+            
+
         }
     }
 
@@ -284,16 +291,29 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
             {"DifficultyIndex", selectedDifficultyIndex},  // 난이도 index
             {"TimeLimitIndex", selectedTimeLimitIndex},  // 제한시간 index
+
             {"difficultyInt", selectedDifficulty},  // 난이도 int값(2,3,4)
-            {"difficulty", difficultyText},   // 난이도 str값(초급,중급,고급)
-            {"timeLimit", selectedTimeLimit}  // 제한시간 int값(15,30,45)
+
+            {"timeLimit", selectedTimeLimit},  // 제한시간 int값(15,30,45)
+            {"difficulty", difficultyText}   // 난이도 str값(초급,중급,고급)
+
         };
+
+        //로비에도 보이게 할 것인가?(목록에)->건드리면 X
+        options.CustomRoomPropertiesForLobby = new string[] { "difficulty", "timeLimit" };
 
         //방 목록에 보이게 할것인가?
         options.IsVisible = true;
 
         //방 생성
         PhotonNetwork.CreateRoom(input_RoomName.text, options);
+
+        foreach (var key in options.CustomRoomProperties.Keys)
+        {
+            UnityEngine.Debug.Log($"Key: {key}, Value: {options.CustomRoomProperties[key]}");
+        }
+
+
     }
 
 
@@ -409,7 +429,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         UnityEngine.Debug.Log("Selected Time Limit: " + selectedTimeLimit);
     }
 
-    public void SetDefaultSelection(Button[] buttons, int defaultIndex)
+    private void SetDefaultSelection(Button[] buttons, int defaultIndex)
     {
 
         for (int i = 0; i < buttons.Length; i++) //세번 반복(각 버튼 배열 길이)
