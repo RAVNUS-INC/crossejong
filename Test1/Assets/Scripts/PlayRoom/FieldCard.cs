@@ -12,9 +12,10 @@ public class FieldCard : MonoBehaviour
 {
     public Transform fieldContainer; // FieldArea의 Contents
     public CardPool cardPool; // CardPool 참조
+    public CapableAreaPopup capableAreaPopup;
     public List<string> shownCardData; // 필드에 놓인 카드 데이터 리스트
     public List<GameObject> fieldDisplayedCards;
-    public GameObject capableAreaPopup;
+    public GameObject capableAreaPopupPanel;
     public int row;
     public int col;
     public string[,] savedCardData;
@@ -52,15 +53,15 @@ public class FieldCard : MonoBehaviour
             Button cardButton = card.GetComponent<Button>();
             if (cardButton != null)
             {
-                // 버튼 클릭 시 ChangeCardColor 함수 실행
                 cardButton.onClick.AddListener(() => ShowCapableAreaPopup(cardButton));
+                cardButton.onClick.AddListener(() => capableAreaPopup.MoveCardsToCapableArea());
             }
         }
     }
 
     public void ShowCapableAreaPopup(Button cardButton)
     {
-        capableAreaPopup.SetActive(true);
+        capableAreaPopupPanel.SetActive(true);
     }
 
     public void InitializeSavedCardData(int rows, int columns)
