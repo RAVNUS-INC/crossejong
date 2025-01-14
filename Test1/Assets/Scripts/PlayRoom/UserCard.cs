@@ -12,7 +12,7 @@ public class UserCard : MonoBehaviour
 
     void Start()
     {
-        // Optional: 초기화 작업
+
     }
 
     // UserCardArea로 11개의 랜덤 카드 이동
@@ -37,4 +37,5 @@ public class UserCard : MonoBehaviour
             displayedCards.Add(card); // UserCard의 리스트에 추가
         }
     }
+
 }
