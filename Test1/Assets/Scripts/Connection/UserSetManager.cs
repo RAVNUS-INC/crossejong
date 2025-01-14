@@ -9,7 +9,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using NativeGalleryNamespace;
 
 
 // À¯Àú ÇÁ·ÎÇÊ ¼³Á¤ È­¸é¿¡¼­ ÀÛµ¿ÇÏ´Â ÄÚµå(´Ð³×ÀÓ, À¯ÀúÇÁ·ÎÇÊ»çÁø º¯°æ ÀúÀå)
@@ -17,10 +16,10 @@ public class UserSetManager : MonoBehaviourPunCallbacks
 {
     public static UserSetManager Instance { get; private set; }
 
-    [SerializeField] InputField inputText; //´Ð³×ÀÓ ÀÔ·Â(³ªÁß¿¡ ¹Ù²Ü ¼ö ÀÖ´Â Displayname)
+    [SerializeField] public InputField inputText; //´Ð³×ÀÓ ÀÔ·Â(³ªÁß¿¡ ¹Ù²Ü ¼ö ÀÖ´Â Displayname)
     [SerializeField] Button confirmButton; //Á¦Ãâ(ÀúÀå) ¹öÆ°
     [SerializeField] Text warningText; // °æ°í ¸Þ½ÃÁö¸¦ Ãâ·ÂÇÒ UI ÅØ½ºÆ®
-    [SerializeField] Text saveText; // ÀúÀå¿Ï·á ¸Þ½ÃÁö¸¦ Ãâ·ÂÇÒ UI ÅØ½ºÆ®
+    [SerializeField] public Text saveText; // ÀúÀå¿Ï·á ¸Þ½ÃÁö¸¦ Ãâ·ÂÇÒ UI ÅØ½ºÆ®
     
     private const int MaxLength = 8; // ÃÖ´ë ÀÔ·Â ±æÀÌ(º¯µ¿°¡´É)
 
@@ -28,7 +27,7 @@ public class UserSetManager : MonoBehaviourPunCallbacks
     public Sprite[] profileImages; // 3°¡Áö ±âº» Á¦°ø ÀÌ¹ÌÁö
     private int currentIndex = 0; // ÇöÀç ¼±ÅÃµÈ ÀÌ¹ÌÁö ÀÎµ¦½º
     private const string PROFILE_IMAGE_INDEX_KEY = "ProfileImageIndex";  // ÀúÀå Å°
-    private string displayName; //µð½ºÇÃ·¹ÀÌ ÀÌ¸§
+    private string displayName; //µð½ºÇÃ·¹ÀÌ ÀÌ¸§(ÀÓ½ÃÀúÀåÀ» À§ÇÑ º¯¼ö)
 
     public GameObject profilePanel; //ÇÁ·ÎÇÊ ¼³Á¤ ÆÐ³Î(¸ÞÀÎÆÐ³Î¿¡¼­ ¹Ì¸® ÁØºñÇØ¾ß ÀÛµ¿)
     public GameObject usersetPanel; //À¯Àú ÃÊ±â ¼³Á¤ ÆÐ³Î
@@ -50,7 +49,6 @@ public class UserSetManager : MonoBehaviourPunCallbacks
 
         //È®ÀÎ ¹öÆ° ´©¸£¸é ÀÌ¸§ ÀúÀå
         confirmButton.onClick.AddListener(OnClickSaveDisplayName);
-
     }
 
     // ÀÌ¸§ ´Ð³×ÀÓ °ü·Ã ÇÔ¼öµé
@@ -181,10 +179,6 @@ public class UserSetManager : MonoBehaviourPunCallbacks
 
 
 
-
-
-    
-
     public void OnClickSaveDisplayName()
     {
         // displayNameÀÌ Á¸ÀçÇÏ´ÂÁö È®ÀÎ(Ã¹ À¯ÀúÀÎÁö ¾Æ´ÑÁö¸¦ È®ÀÎ)
@@ -225,6 +219,7 @@ public class UserSetManager : MonoBehaviourPunCallbacks
     }
 
 
+
     //ÀÌ¸§ º¯°æ ¹öÆ° Å¬¸¯ÇÒ ¶§ -> ÀÌ¸§ ÀÔ·Â ÀÎÇ² È°¼ºÈ­
     public void ChangeNameBtn() 
     {
@@ -239,25 +234,26 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         string validPattern = @"^[°¡-ÆR¤¡-¤¾¤¿-¤Ó0-9]*$";
 
         // °ø¹é Á¦°Å
-        input = input.Replace(" ", ""); //°ø¹éÀ» Çã¿ëÇÏÁö ¾Ê´Â´Ù
+        string inputname = input.Replace(" ", ""); //°ø¹éÀ» Çã¿ëÇÏÁö ¾Ê´Â´Ù
 
         // ÀÔ·Â °ªÀÌ ÆÐÅÏ¿¡ ¸ÂÁö ¾ÊÀ¸¸é ¼öÁ¤
-        if (!Regex.IsMatch(input, validPattern))
+        if (!Regex.IsMatch(inputname, validPattern))
         {
             warningText.text = "ÇÑ±Û°ú ¼ýÀÚ¸¸ ÀÔ·Â °¡´ÉÇÕ´Ï´Ù.";
             confirmButton.interactable = false; 
         }
-        else if (input.Length > MaxLength) // ±æÀÌ Á¦ÇÑ ÃÊ°ú °Ë»ç
+        // ±æÀÌ Á¦ÇÑ ÃÊ°ú °Ë»ç
+        else if (GetKoreanCharCount(inputname) > MaxLength) // ÇÑ±Û ÀÚÀ½, ¸ðÀ½À» Æ÷ÇÔÇÑ ÃÖ´ë ±æÀÌ °Ë»ç
         {
             warningText.text = $"ÃÖ´ë {MaxLength}ÀÚ±îÁö¸¸ ÀÔ·Â °¡´ÉÇÕ´Ï´Ù.";
             confirmButton.interactable = false; 
         }
-        else if (input.Length == 0) // ºó ¹®ÀÚ¿­ °Ë»ç
+        else if (inputname.Length == 0) // ºó ¹®ÀÚ¿­ °Ë»ç
         {
             warningText.text = "´Ð³×ÀÓÀ» ÀÔ·ÂÇØÁÖ¼¼¿ä.";
             confirmButton.interactable = false; 
         }
-        else if (displayName == inputText.text && (inputText.isActiveAndEnabled)) //ÀÔ·Â¶õÀÌ ±âÁ¸ ´Ð³×ÀÓ°ú °°À¸¸é¼­ È°¼ºÈ­µÇ¾îÀÖ´Â °æ¿ì
+        else if (displayName == inputname && (inputText.isActiveAndEnabled)) //ÀÔ·Â¶õÀÌ ±âÁ¸ ´Ð³×ÀÓ°ú °°À¸¸é¼­ È°¼ºÈ­µÇ¾îÀÖ´Â °æ¿ì
         {
             warningText.text = "±âÁ¸ ´Ð³×ÀÓ°ú ´Þ¶ó¾ß ÇÕ´Ï´Ù.";
             confirmButton.interactable = false;
@@ -267,10 +263,30 @@ public class UserSetManager : MonoBehaviourPunCallbacks
             warningText.text = ""; // ±ÔÄ¢¿¡ ¸ÂÀ¸¸é °æ°í ¸Þ½ÃÁö Á¦°Å
             confirmButton.interactable = true; // È®ÀÎ ¹öÆ° È°¼ºÈ­
         }
-
+        // ÀÔ·Â¶õ¿¡ °ø¹éÀ» Á¦°ÅÇÑ °ª ¹Ý¿µ
+        inputText.text = inputname;
     }
 
-    
+
+    // ÇÑ±Û À½Àý ÀÚÀ½, ¸ðÀ½À» Æ÷ÇÔÇÏ¿© ±ÛÀÚ ¼ö¸¦ °è»êÇÏ´Â ÇÔ¼ö
+    private int GetKoreanCharCount(string input)
+    {
+        int count = 0;
+        foreach (char c in input)
+        {
+            // ÇÑ±Û À½ÀýÀÎÁö Ã¼Å© (°¡-ÆR ¹üÀ§)
+            if (c >= '°¡' && c <= 'ÆR')
+            {
+                count++;
+            }
+            // ÇÑ±Û ÀÚÀ½/¸ðÀ½ÀÎÁö Ã¼Å© (¤¡-¤¾, ¤¿-¤Ó ¹üÀ§)
+            else if ((c >= '¤¡' && c <= '¤¾') || (c >= '¤¿' && c <= '¤Ó'))
+            {
+                count++;
+            }
+        }
+        return count;
+    }
 
 
     public override void OnConnectedToMaster()
