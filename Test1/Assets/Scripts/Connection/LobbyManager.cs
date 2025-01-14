@@ -258,8 +258,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                             Convert.ToInt32(info.CustomProperties["timeLimit"]) :
                             0;
 
-
-
             // 가져온 컴포넌트가 가지고 있는 SetInfo 함수 실행(출력 형태 설정)
             item.SetInfo(info.Name, info.PlayerCount, info.MaxPlayers, difficulty, timeLimit);  //난이도와 제한시간만 custom properties에 선언, 나머지는 photon에서 기본제공
 
@@ -269,9 +267,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                 // SelectRoomItem을 바로 호출
                 SelectRoomItem(roomName, go); // roomName과 현재 버튼(GameObject)을 전달 -> 선택된 방목록의 색상이 변경되도록
             };
-
-            
-
         }
     }
 
@@ -307,13 +302,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
         //방 생성
         PhotonNetwork.CreateRoom(input_RoomName.text, options);
-
-        foreach (var key in options.CustomRoomProperties.Keys)
-        {
-            UnityEngine.Debug.Log($"Key: {key}, Value: {options.CustomRoomProperties[key]}");
-        }
-
-
     }
 
 
