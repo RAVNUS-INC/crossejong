@@ -9,6 +9,7 @@ public class UserCard : MonoBehaviour
     public CardPool cardPool; // CardPool 참조 
     public Transform userCardContainer; // UserCardArea의 Contents
     public List<GameObject> displayedCards; // UserCardArea에서 보여지는 카드 리스트
+    public CapableAreaPopup capableAreaPopup;
 
     void Start()
     {
@@ -38,4 +39,17 @@ public class UserCard : MonoBehaviour
         }
     }
 
+    public void SelectedUserCard()
+    {
+        // 모든 카드에 대해 ChangeCardColor 연결
+        foreach (var card in displayedCards)
+        {
+            Button cardButton = card.GetComponent<Button>();
+            if (cardButton != null)
+            {
+                // 버튼 클릭 시 ChangeCardColor 함수 실행
+                cardButton.onClick.AddListener(() => capableAreaPopup.CapableVisible(cardButton));
+            }
+        }
+    }
 }
