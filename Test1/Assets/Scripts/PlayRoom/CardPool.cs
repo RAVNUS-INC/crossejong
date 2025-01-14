@@ -154,4 +154,15 @@ public class CardPool : MonoBehaviour
     {
         card.transform.SetParent(parent, false);
     }
+
+    public void MoveCardsToTarGetArea(List<GameObject> startList, Transform targetArea, List<GameObject> targetList)
+    {
+        foreach (var card in startList)
+        {
+
+            MoveCardToParent(card, targetArea); // 각 카드를 TargetArea로 이동
+            card.SetActive(true); // 카드가 보이도록 활성화
+            targetList.Add(card); // 보여지는 리스트에 추가
+        }
+    }
 }

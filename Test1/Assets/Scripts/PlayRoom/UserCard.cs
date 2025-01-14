@@ -17,27 +17,13 @@ public class UserCard : MonoBehaviour
     }
 
     // UserCardArea로 11개의 랜덤 카드 이동
-    public void MoveUserCardArea()
+    public void FirstUserCardArea()
     {
         List<GameObject> randomCards = cardPool.GetRandomCards(11); // 11개의 랜덤 카드 얻기
-        foreach (var card in randomCards)
-        {
-            cardPool.MoveCardToParent(card, userCardContainer); // 각 카드를 UserCardArea로 이동
-            card.SetActive(true); // 카드가 보이도록 활성화
-            displayedCards.Add(card); // 이동된 카드를 리스트에 추가
-        }
+        cardPool.MoveCardsToTarGetArea(randomCards, userCardContainer, displayedCards);
     }
 
-    // FullPopup에서 카드를 복귀시키는 메서드
-    public void MoveCardsBackToUserCardArea(List<GameObject> cardsToReturn)
-    {
-        foreach (var card in cardsToReturn)
-        {
-            cardPool.MoveCardToParent(card, userCardContainer); // 각 카드를 UserCardArea로 이동
-            card.SetActive(true); // 카드가 보이도록 활성화
-            displayedCards.Add(card); // UserCard의 리스트에 추가
-        }
-    }
+
 
     public void SelectedUserCard()
     {
@@ -48,7 +34,7 @@ public class UserCard : MonoBehaviour
             if (cardButton != null)
             {
                 // 버튼 클릭 시 ChangeCardColor 함수 실행
-                cardButton.onClick.AddListener(() => capableAreaPopup.CapableVisible(cardButton));
+                cardButton.onClick.AddListener(() => capableAreaPopup.MoveCardsToCapableArea());
             }
         }
     }

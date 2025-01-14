@@ -10,10 +10,10 @@ using Unity.Collections.LowLevel.Unsafe;
 
 public class FieldCard : MonoBehaviour
 {
-    public Transform FieldContainer; // FieldArea의 Contents
+    public Transform fieldContainer; // FieldArea의 Contents
     public CardPool cardPool; // CardPool 참조
     public List<string> shownCardData; // 필드에 놓인 카드 데이터 리스트
-    public List<GameObject> displayedFieldCard;
+    public List<GameObject> fieldDisplayedCards;
     public GameObject capableAreaPopup;
     public int row;
     public int col;
@@ -31,9 +31,9 @@ public class FieldCard : MonoBehaviour
         List<GameObject> randomCards = cardPool.GetRandomCards(1); // 1개의 랜덤 카드 얻기
         foreach (var card in randomCards)
         {
-            cardPool.MoveCardToParent(card, FieldContainer); // 각 카드를 FieldArea로 이동
+            cardPool.MoveCardToParent(card, fieldContainer); // 각 카드를 FieldArea로 이동
             card.SetActive(true); // 카드가 보이도록 활성화
-            displayedFieldCard.Add(card); // 이동된 카드를 리스트에 추가
+            fieldDisplayedCards.Add(card); // 이동된 카드를 리스트에 추가
             RectTransform rectTransform = card.GetComponent<RectTransform>();
             rectTransform.anchoredPosition = Vector2.zero;
             // 카드의 TextMeshProUGUI 컴포넌트 가져오기
@@ -47,7 +47,7 @@ public class FieldCard : MonoBehaviour
     public void OnClickFieldCard()
     {
         // 모든 카드에 대해 ChangeCardColor 연결
-        foreach (var card in displayedFieldCard)
+        foreach (var card in fieldDisplayedCards)
         {
             Button cardButton = card.GetComponent<Button>();
             if (cardButton != null)

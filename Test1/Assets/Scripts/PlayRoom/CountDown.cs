@@ -42,7 +42,7 @@ public class Countdown : MonoBehaviour
 
     private void StartGame()
     {
-        userCard.MoveUserCardArea();
+        userCard.FirstUserCardArea();
         fieldCard.StartCardShown();
     }
 }
