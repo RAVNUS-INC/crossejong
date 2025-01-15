@@ -36,9 +36,7 @@ public class UserCard : MonoBehaviour
             {
                 // 버튼 클릭 시 ChangeCardColor 함수 실행
                 cardButton.onClick.AddListener(() => capableAreaPopup.MoveCardsToCapableArea());
-                cardButton.onClick.AddListener(() => fieldCard.CreateCapableArea(cardButton));
             }
         }
     }
-    
 }

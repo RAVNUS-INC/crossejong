@@ -161,9 +161,10 @@ public class CardPool : MonoBehaviour
 
     public void MoveCardsToTarGetArea(List<GameObject> startList, Transform targetArea, List<GameObject> targetList)
     {
+        targetList.Clear();
+
         foreach (var card in startList)
         {
-
             MoveCardToParent(card, targetArea); // 각 카드를 TargetArea로 이동
             card.SetActive(true); // 카드가 보이도록 활성화
             targetList.Add(card); // 보여지는 리스트에 추가

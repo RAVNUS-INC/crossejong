@@ -15,8 +15,6 @@ public class FieldCard : MonoBehaviour
     public CapableAreaPopup capableAreaPopup;
     public List<string> shownCardData; // 필드에 놓인 카드 데이터 리스트
     public List<GameObject> fieldDisplayedCards;
-    public GameObject capableAreaPopupPanel;
-    public List<string> blockList = new List<string>{"", "", "", ""};
     public int row;
     public int col;
     public string[,] savedCardData;
@@ -50,52 +48,11 @@ public class FieldCard : MonoBehaviour
             Button cardButton = card.GetComponent<Button>();
             if (cardButton != null)
             {
-                cardButton.onClick.AddListener(() => ShowCapableAreaPopup(cardButton));
+                cardButton.onClick.AddListener(() => capableAreaPopup.CapableAreaPopupf(cardButton));
                 cardButton.onClick.AddListener(() => capableAreaPopup.MoveCardsToCapableArea());
-                cardButton.onClick.AddListener(() => CreateCapableArea(cardButton));
+                cardButton.onClick.AddListener(() => capableAreaPopup.MoveBlocksToCapableArea());
             }
         }
-    }
-
-    public void CreateCapableArea(Button cardButton)
-    {
-        // 카드 배치 좌표 리스트
-        Vector2[] positions = new Vector2[]
-        {
-            new Vector2(210, 0),
-            new Vector2(0, 210),
-            new Vector2(-210, 0),
-            new Vector2(0, -210)
-        };
-
-        for (int i = 0; i < blockList.Count; i++)
-        {
-            // 카드 GameObject 생성
-            GameObject block = new GameObject(blockList[i]);
-            block.transform.SetParent(capableAreaPopup.capableContainer, false);
-
-            // RectTransform 설정
-            RectTransform rectTransform = block.AddComponent<RectTransform>();
-            rectTransform.sizeDelta = new Vector2(200, 200); // 카드 크기 설정
-            rectTransform.anchoredPosition = positions[i]; // UI 좌표 설정
-
-            // Button 컴포넌트 추가
-            Button blockButton = block.AddComponent<Button>();
-            cardPool.ChangeCardColor(blockButton);
-
-            // 카드 배경 이미지 추가
-            Image cardFrontFeature = block.AddComponent<Image>();
-            cardFrontFeature.sprite = cardPool.cardFrontImage; // 카드 앞면 이미지 설정
-            cardFrontFeature.type = Image.Type.Sliced;
-
-
-            block.SetActive(true);
-        }
-    }
-
-    public void ShowCapableAreaPopup(Button cardButton)
-    {
-        capableAreaPopupPanel.SetActive(true);
     }
 
     public void InitializeSavedCardData(int rows, int columns)
