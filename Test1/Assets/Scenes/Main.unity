@@ -1766,12 +1766,12 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1578942094}
+  - {fileID: 654490932}
   - {fileID: 1799459439}
   - {fileID: 814615067}
   - {fileID: 699396358}
   - {fileID: 1137187858}
   - {fileID: 2057538301}
-  - {fileID: 654490932}
   - {fileID: 1798665134}
   - {fileID: 1331131038}
   - {fileID: 2060435193}
@@ -6864,7 +6864,6 @@ MonoBehaviour:
   btn_JoinRoom: {fileID: 1558134587}
   roomListItem: {fileID: 7191587757092830597, guid: b777921f93a85af429b5dde24c3591b5, type: 3}
   rtContent: {fileID: 507353501}
-  objectToClone: {fileID: 1582562254}
 --- !u!4 &1582562256
 Transform:
   m_ObjectHideFlags: 0

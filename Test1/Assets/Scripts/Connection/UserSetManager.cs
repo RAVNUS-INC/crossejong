@@ -1,4 +1,5 @@
 using Photon.Pun;
+using Photon.Realtime; // AuthenticationValues 및 기타 실시간 기능 사용
 using PlayFab;
 using PlayFab.ClientModels;
 using System;
@@ -49,7 +50,32 @@ public class UserSetManager : MonoBehaviourPunCallbacks
 
         //확인 버튼 누르면 이름 저장
         confirmButton.onClick.AddListener(OnClickSaveDisplayName);
+
     }
+
+    // 로그인 완료 확인 버튼/회원가입 완료 확인 버튼 누르면 -> playfab에서 유저 고유ID 불러와 photon에 저장
+    //public void GetUserPlayfabID()
+    //{
+    //    // PlayFab에 로그인된 상태에서 ID만 요청
+    //    PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest(),
+    //        static result =>
+    //        {
+    //            // 유저 정보 받아오기 성공
+    //            string playFabId = result.AccountInfo.PlayFabId;
+
+    //            // Photon의 Custom Properties에 PlayFabId 저장
+    //            Hashtable playerProperties = new Hashtable();
+    //            playerProperties.Add("PlayFabId", playFabId);
+
+    //            PhotonNetwork.LocalPlayer.SetCustomProperties(playerProperties);  // 현재 플레이어에 대한 정보 저장
+
+    //        },
+    //    error =>
+    //    {
+    //        // 유저 정보 받아오기 실패
+    //        Debug.LogError($"PlayFab ID 가져오기 실패: {error.GenerateErrorReport()}");
+    //    });
+    //}
 
     // 이름 닉네임 관련 함수들
     // 설정한 이름 저장 함수
@@ -296,6 +322,9 @@ public class UserSetManager : MonoBehaviourPunCallbacks
 
         //나의 이름을 포톤에 설정
         PhotonNetwork.NickName = inputText.text;
+
+        // 포톤 유저 ID 출력
+        //Debug.Log($"Photon UserId: {PhotonNetwork.AuthValues.UserId}");
 
         //로비진입
         PhotonNetwork.JoinLobby();
