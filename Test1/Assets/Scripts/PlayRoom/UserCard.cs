@@ -7,6 +7,7 @@ using Unity.Collections.LowLevel.Unsafe;
 public class UserCard : MonoBehaviour
 {
     public CardPool cardPool; // CardPool 참조 
+    public FieldCard fieldCard;
     public Transform userCardContainer; // UserCardArea의 Contents
     public List<GameObject> displayedCards; // UserCardArea에서 보여지는 카드 리스트
     public CapableAreaPopup capableAreaPopup;
@@ -35,7 +36,9 @@ public class UserCard : MonoBehaviour
             {
                 // 버튼 클릭 시 ChangeCardColor 함수 실행
                 cardButton.onClick.AddListener(() => capableAreaPopup.MoveCardsToCapableArea());
+                cardButton.onClick.AddListener(() => fieldCard.CreateCapableArea(cardButton));
             }
         }
     }
+    
 }

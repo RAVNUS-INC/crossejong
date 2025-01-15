@@ -167,6 +167,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardPool: {fileID: 1342198615}
+  fieldCard: {fileID: 910563715}
   userCardContainer: {fileID: 1145204212}
   displayedCards: []
   capableAreaPopup: {fileID: 1706957239}
@@ -719,7 +720,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -900.00006}
+  m_AnchoredPosition: {x: 0, y: -899.99994}
   m_SizeDelta: {x: 0, y: -1800}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &259437066
@@ -1188,9 +1189,8 @@ GameObject:
   - component: {fileID: 453961799}
   - component: {fileID: 453961801}
   - component: {fileID: 453961800}
-  - component: {fileID: 453961802}
   m_Layer: 5
-  m_Name: CountDown
+  m_Name: CountDownText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1312,23 +1312,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 453961798}
   m_CullTransparentMesh: 1
---- !u!114 &453961802
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 453961798}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f7a623ec2f7d3d4d84a22ee51e11a16, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  countDownText: {fileID: 453961800}
-  userCard: {fileID: 11155626}
-  startDelay: 1
-  startGameButton: {fileID: 1284291088}
-  fieldCard: {fileID: 910563715}
 --- !u!1 &526707535
 GameObject:
   m_ObjectHideFlags: 0
@@ -1947,12 +1930,13 @@ Transform:
   m_LocalScale: {x: 60.800724, y: 60.800724, z: 60.800724}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 11155625}
-  - {fileID: 1342198614}
+  - {fileID: 1304853455}
   - {fileID: 1745286026}
+  - {fileID: 1342198614}
+  - {fileID: 11155625}
   - {fileID: 910563714}
-  - {fileID: 1768101436}
   - {fileID: 1706957240}
+  - {fileID: 1768101436}
   m_Father: {fileID: 1590252816}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &746054139
@@ -2507,6 +2491,11 @@ MonoBehaviour:
   shownCardData: []
   fieldDisplayedCards: []
   capableAreaPopupPanel: {fileID: 749620247}
+  blockList:
+  - 
+  - 
+  - 
+  - 
   row: 0
   col: 0
   cardDataRowIndex: 0
@@ -3414,6 +3403,55 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1284291086}
   m_CullTransparentMesh: 1
+--- !u!1 &1304853454
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1304853455}
+  - component: {fileID: 1304853456}
+  m_Layer: 0
+  m_Name: CountDown
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1304853455
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1304853454}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 738986996}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1304853456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1304853454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f7a623ec2f7d3d4d84a22ee51e11a16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  countDownText: {fileID: 453961800}
+  userCard: {fileID: 11155626}
+  startDelay: 1
+  startGameButton: {fileID: 1284291088}
+  fieldCard: {fileID: 910563715}
 --- !u!1 &1310410829
 GameObject:
   m_ObjectHideFlags: 0

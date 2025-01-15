@@ -116,9 +116,13 @@ public class CardPool : MonoBehaviour
         CreateCards(cardLists.cardFrontRed, Color.red);
         CreateCards(cardLists.cardFrontBlack, Color.black);
         CreateCards(cardLists.cardFrontSpecial, Color.white);
+        ButtonColor(cards);
+    }
 
+    public void ButtonColor(List<GameObject> targetList)
+    {
         // 모든 카드에 대해 ChangeCardColor 연결
-        foreach (var card in cards)
+        foreach (var card in targetList)
         {
             Button cardButton = card.GetComponent<Button>();
             if (cardButton != null)
