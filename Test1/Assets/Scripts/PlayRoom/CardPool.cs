@@ -87,9 +87,7 @@ public class CardPool : MonoBehaviour
                 // 기본 색상 변경
                 colorBlock.normalColor = Color.white;
                 // 클릭했을 때 색상 변경
-                colorBlock.highlightedColor = Color.grey;
-                // 클릭했을 때 색상 변경
-                colorBlock.pressedColor = Color.grey;
+                colorBlock.selectedColor = Color.grey;
                 // 비활성화된 상태 색상 변경
                 colorBlock.disabledColor = Color.red;
 
@@ -118,9 +116,13 @@ public class CardPool : MonoBehaviour
         CreateCards(cardLists.cardFrontRed, Color.red);
         CreateCards(cardLists.cardFrontBlack, Color.black);
         CreateCards(cardLists.cardFrontSpecial, Color.white);
+        ButtonColor(cards);
+    }
 
+    public void ButtonColor(List<GameObject> targetList)
+    {
         // 모든 카드에 대해 ChangeCardColor 연결
-        foreach (var card in cards)
+        foreach (var card in targetList)
         {
             Button cardButton = card.GetComponent<Button>();
             if (cardButton != null)
@@ -155,5 +157,17 @@ public class CardPool : MonoBehaviour
     public void MoveCardToParent(GameObject card, Transform parent)
     {
         card.transform.SetParent(parent, false);
+    }
+
+    public void MoveCardsToTarGetArea(List<GameObject> startList, Transform targetArea, List<GameObject> targetList)
+    {
+        targetList.Clear();
+
+        foreach (var card in startList)
+        {
+            MoveCardToParent(card, targetArea); // 각 카드를 TargetArea로 이동
+            card.SetActive(true); // 카드가 보이도록 활성화
+            targetList.Add(card); // 보여지는 리스트에 추가
+        }
     }
 }

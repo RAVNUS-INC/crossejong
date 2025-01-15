@@ -7,34 +7,36 @@ using Unity.Collections.LowLevel.Unsafe;
 public class UserCard : MonoBehaviour
 {
     public CardPool cardPool; // CardPool 참조 
+    public FieldCard fieldCard;
     public Transform userCardContainer; // UserCardArea의 Contents
     public List<GameObject> displayedCards; // UserCardArea에서 보여지는 카드 리스트
+    public CapableAreaPopup capableAreaPopup;
 
     void Start()
     {
-        // Optional: 초기화 작업
+
     }
 
     // UserCardArea로 11개의 랜덤 카드 이동
-    public void MoveUserCardArea()
+    public void FirstUserCardArea()
     {
         List<GameObject> randomCards = cardPool.GetRandomCards(11); // 11개의 랜덤 카드 얻기
-        foreach (var card in randomCards)
-        {
-            cardPool.MoveCardToParent(card, userCardContainer); // 각 카드를 UserCardArea로 이동
-            card.SetActive(true); // 카드가 보이도록 활성화
-            displayedCards.Add(card); // 이동된 카드를 리스트에 추가
-        }
+        cardPool.MoveCardsToTarGetArea(randomCards, userCardContainer, displayedCards);
     }
 
-    // FullPopup에서 카드를 복귀시키는 메서드
-    public void MoveCardsBackToUserCardArea(List<GameObject> cardsToReturn)
+
+
+    public void SelectedUserCard()
     {
-        foreach (var card in cardsToReturn)
+        // 모든 카드에 대해 ChangeCardColor 연결
+        foreach (var card in displayedCards)
         {
-            cardPool.MoveCardToParent(card, userCardContainer); // 각 카드를 UserCardArea로 이동
-            card.SetActive(true); // 카드가 보이도록 활성화
-            displayedCards.Add(card); // UserCard의 리스트에 추가
+            Button cardButton = card.GetComponent<Button>();
+            if (cardButton != null)
+            {
+                // 버튼 클릭 시 ChangeCardColor 함수 실행
+                cardButton.onClick.AddListener(() => capableAreaPopup.MoveCardsToCapableArea());
+            }
         }
     }
 }
