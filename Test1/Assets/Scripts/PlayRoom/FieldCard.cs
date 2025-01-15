@@ -30,18 +30,15 @@ public class FieldCard : MonoBehaviour
     public void StartCardShown()
     {
         List<GameObject> randomCards = cardPool.GetRandomCards(1); // 1개의 랜덤 카드 얻기
+        cardPool.MoveCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
         foreach (var card in randomCards)
         {
-            cardPool.MoveCardToParent(card, fieldContainer); // 각 카드를 FieldArea로 이동
-            card.SetActive(true); // 카드가 보이도록 활성화
-            fieldDisplayedCards.Add(card); // 이동된 카드를 리스트에 추가
             RectTransform rectTransform = card.GetComponent<RectTransform>();
             rectTransform.anchoredPosition = Vector2.zero;
-            // 카드의 TextMeshProUGUI 컴포넌트 가져오기
             TextMeshProUGUI textComponent = card.GetComponentInChildren<TextMeshProUGUI>();
-            // 텍스트 읽기
             string currentText = textComponent.text;
             SaveCardData(currentText);
+            OnClickFieldCard();
         }
     }
 
@@ -86,6 +83,6 @@ public class FieldCard : MonoBehaviour
 
     void Update()
     {
-        OnClickFieldCard();
+        
     }
 }
