@@ -1,10 +1,12 @@
 using Photon.Pun;
+using Photon.Realtime; // AuthenticationValues 및 기타 실시간 기능 사용
 using PlayFab;
 using PlayFab.ClientModels;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -25,6 +27,7 @@ public class UserSetManager : MonoBehaviourPunCallbacks
 
     public Image centralImage; // 중앙에 표시되는 프로필이미지
     public Sprite[] profileImages; // 3가지 기본 제공 이미지
+
     private int currentIndex = 0; // 현재 선택된 이미지 인덱스
     private const string PROFILE_IMAGE_INDEX_KEY = "ProfileImageIndex";  // 저장 키
     private string displayName; //디스플레이 이름(임시저장을 위한 변수)
@@ -49,27 +52,31 @@ public class UserSetManager : MonoBehaviourPunCallbacks
 
         //확인 버튼 누르면 이름 저장
         confirmButton.onClick.AddListener(OnClickSaveDisplayName);
+
     }
+
 
     // 이름 닉네임 관련 함수들
     // 설정한 이름 저장 함수
     public void DisplayName() //DisplayName: 고유하지 않음
     {
-        var request = new GetAccountInfoRequest();
+        var request = new GetAccountInfoRequest(); //이름 정보 불러오기
         PlayFabClientAPI.GetAccountInfo(request,
              result =>
              {
-                 // displayName이 없는 경우 null을 반환
+                 // 기존 displayName이 없는 경우 null을 반환
                  if (string.IsNullOrEmpty(result.AccountInfo.TitleInfo.DisplayName))
                  {
                      displayName = null; // displayName이 없으면 null 할당
                      Debug.Log("displayName이 없습니다.");
                  }
-                 else
+                 else // 기존 값이 존재하는 경우
                  {
                      // displayName 값을 전역 변수에 저장
                      displayName = result.AccountInfo.TitleInfo.DisplayName;
-                     Debug.Log($"불러온 displayName: {displayName}");
+
+                     SaveCustomProperty("Displayname", displayName); //프로필패널에 업데이트-해당 이름을 커스텀프로퍼티에 저장
+                     Debug.Log($"displayName: {displayName}을 프로퍼티에 저장했습니다");
                  }
              },
             error =>
@@ -81,7 +88,6 @@ public class UserSetManager : MonoBehaviourPunCallbacks
 
     // 유저 프로필 이미지 관련 함수들
     // 저장된 이미지 인덱스를 불러오기
-
     private void CheckAndSaveDefaultImageIndex()
     {
         var request = new GetUserDataRequest();
@@ -91,28 +97,29 @@ public class UserSetManager : MonoBehaviourPunCallbacks
                 // PROFILE_IMAGE_INDEX_KEY가 존재하는지 확인
                 if (result.Data.ContainsKey(PROFILE_IMAGE_INDEX_KEY))
                 {
-                    Debug.Log("KEY가 존재합니다. 값을 불러옵니다.");
+                    Debug.Log("프로필이미지 KEY가 존재합니다. 값을 불러옵니다.");
                     string value = result.Data[PROFILE_IMAGE_INDEX_KEY].Value;
 
-                    if (!string.IsNullOrEmpty(value)) 
+                    if (!string.IsNullOrEmpty(value))  //값이 존재한다면
                     {
-                        currentIndex = int.Parse(value); 
+                        currentIndex = int.Parse(value);
+                        
                     }
                     else 
                     {
                         Debug.LogWarning("KEY의 값이 비어 있습니다. 기본값(0)으로 저장합니다.");
                         currentIndex = 0; // 기본값 설정
-                        SaveSelectedImageIndex(currentIndex); // PlayFab에 저장
+                        //SaveSelectedImageIndex(currentIndex); // PlayFab에 저장
                     }
                 }
                 else
                 {
                     Debug.LogWarning("KEY가 존재하지 않습니다. 기본값(0)을 생성합니다.");
                     currentIndex = 0; // 기본값 설정
-                    SaveSelectedImageIndex(currentIndex); // PlayFab에 새로운 키 생성 및 값 저장
+                    //SaveSelectedImageIndex(currentIndex); // PlayFab에 새로운 키 생성 및 값 저장
                 }
 
-                UpdateCentralImage(); // 이미지 업데이트
+                UpdateCentralImage(); // 이미지 업데이트 및 인덱스 저장, 프로퍼티에 저장
             },
             error =>
             {
@@ -146,16 +153,19 @@ public class UserSetManager : MonoBehaviourPunCallbacks
             { PROFILE_IMAGE_INDEX_KEY, index.ToString() }
         }
         };
-
+        //playfab에 저장
         PlayFabClientAPI.UpdateUserData(request,
             result =>
             {
-                Debug.Log($"프로필 데이터 저장 성공: {index}");
+                Debug.Log($"프로필이미지 데이터 저장 성공: {index}");
             },
             error =>
             {
                 Debug.LogError($"유저 데이터 저장 실패: {error.GenerateErrorReport()}");
             });
+        //변경된 이미지 인덱스를 커스텀프로퍼티에 저장(덮어쓰기)
+        SaveCustomProperty("Imageindex", index.ToString()); 
+        Debug.Log($"선택된 Imageindex: {currentIndex}을 프로퍼티에 저장했습니다");
     }
 
 
@@ -185,15 +195,15 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         if (string.IsNullOrEmpty(displayName))
         {
             // displayName이 없을 경우 (첫 유저일 경우)
+            SaveDisplayName(); //닉네임을 저장(프로퍼티에도 저장)
             Debug.Log("첫 displayName이 설정되었습니다.");
-            SaveDisplayName(); //닉네임을 저장하고
             OnClickConnect(); //메인으로 서버접속을 요청한다
         }
         else //displayname이 이미 존재할 경우(재접속 유저일 경우)
         {
             // 전역 변수로 displayName에 저장
-            Debug.Log("새로운 displayName이 설정되었습니다.");
             SaveDisplayName(); //기존의 이름을 새 이름으로 덮어씌워 저장한다
+            Debug.Log("새로운 displayName이 설정되었습니다.");
             saveText.text = "저장되었습니다"; //저장 메시지 알림
         }
     }
@@ -205,7 +215,8 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         {
             DisplayName = displayName
         };
-
+        
+        //playfab에 저장
         PlayFabClientAPI.UpdateUserTitleDisplayName(request,
            result =>
            {
@@ -216,8 +227,22 @@ public class UserSetManager : MonoBehaviourPunCallbacks
            {
                Debug.LogError($"닉네임 저장 실패: {error.GenerateErrorReport()}");
            });
+        SaveCustomProperty("Displayname", displayName); //변경된 이름을 커스텀프로퍼티에 저장(or 덮어쓰기)
+        Debug.Log($"Displayname: {displayName}을 프로퍼티에 저장했습니다");
     }
 
+    // --------------커스텀프로퍼티에 이름, 인덱스 저장 -----------------
+    void SaveCustomProperty(string key, string value)
+    {
+        // 1. 해시테이블 생성
+        Hashtable customProperties = new Hashtable();
+
+        // 2. 키와 값을 추가
+        customProperties[key] = value;
+
+        // 3. 커스텀 프로퍼티를 설정 (플레이어의 커스텀 프로퍼티에 저장)
+        PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
+    }
 
 
     //이름 변경 버튼 클릭할 때 -> 이름 입력 인풋 활성화
@@ -296,6 +321,9 @@ public class UserSetManager : MonoBehaviourPunCallbacks
 
         //나의 이름을 포톤에 설정
         PhotonNetwork.NickName = inputText.text;
+
+        // 포톤 유저 ID 출력
+        //Debug.Log($"Photon UserId: {PhotonNetwork.AuthValues.UserId}");
 
         //로비진입
         PhotonNetwork.JoinLobby();
