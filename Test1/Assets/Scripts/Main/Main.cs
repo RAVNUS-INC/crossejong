@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using PlayFab;
 using PlayFab.ClientModels;
 using System;
+using Photon.Pun;
+using System.Reflection;
 
 // 메인에 존재하는 기능에 관한 스크립트
 public class Main : MonoBehaviour
@@ -44,11 +46,12 @@ public class Main : MonoBehaviour
         profileInputField.interactable = false; //프로필 이름 초기 비활성화
     }
 
-    
+
 
 
     // 프로필 이미지 인덱스 불러오기 함수
     // PlayFab에서 저장된 이미지 인덱스를 불러오는 함수
+    // -> 커스텀프로퍼티에 저장된 값을 불러오기
     private void LoadProfileImageIndex()
     {
         var request = new GetUserDataRequest();
@@ -71,18 +74,39 @@ public class Main : MonoBehaviour
         {
             Debug.LogError($"유저 데이터 불러오기 실패: {error.GenerateErrorReport()}");
         });
-    }
 
+        //// 커스텀 프로퍼티에서 해당 키의 값을 가져옵니다.
+        //if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("Imageindex"))
+        //{
+        //    int value = (int)PhotonNetwork.LocalPlayer.CustomProperties["Imageindex"];
+        //    centralImage.sprite = profileImages[value];
+        //}
+        //else
+        //{
+        //    Debug.Log("저장된 Imageindex가 없습니다.");
+        //}
+    }
     
 
     // 이름 불러오기
     // DisplayName 불러오기 함수
     public void GetUserDisplayName()
     {
+        //// 커스텀 프로퍼티에서 해당 키의 값을 가져옵니다.
+        //if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("Displayname"))
+        //{
+        //    string value = PhotonNetwork.LocalPlayer.CustomProperties["Displayname"].ToString();
+        //    displayNameText.text = value;
+        //}
+        //else
+        //{
+        //    Debug.Log("저장된 displayname이 없습니다.");
+        //}
+
         PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest(), OnGetAccountInfoSuccess, OnGetAccountInfoFailure);
     }
 
-    // 성공적으로 DisplayName을 가져온 경우
+    //성공적으로 DisplayName을 가져온 경우
     private void OnGetAccountInfoSuccess(GetAccountInfoResult result)
     {
         string displayName = result.AccountInfo.TitleInfo.DisplayName;

@@ -12,6 +12,7 @@ using Button = UnityEngine.UI.Button;
 using PlayFab.ClientModels;
 using PlayFab;
 using System.Reflection;
+using Photon.Pun.Demo.PunBasics;
 //using Unity.VisualScripting.Dependencies.Sqlite;
 
 
@@ -39,15 +40,16 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     public Button SaveBtn; //저장버튼
     public Text Savetext; //저장완료메시지
 
-    [SerializeField] private UserProfileLoad UserProfileLoad; // Inspector에서 드래그하여 연결
-
+    //[SerializeField] private UserProfileLoad UserProfileLoad; // Inspector에서 드래그하여 연결
+    public UserProfileLoad UserProfileLoad;
     void Awake()
     {
-
+        
     }
 
     private void Start()
     {
+        UserProfileLoad = GameObject.FindObjectOfType<UserProfileLoad>();  // 씬에 있는 PlayerManager를 찾기
         UpdateRoomInfo(); // 방 들어서자마자 방 정보 업데이트(awake에 있어야 하나? start에 있어야 하나?)
 
         //저장버튼 누르면 실행할 함수
@@ -75,8 +77,6 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             Savetext.text = "저장되었습니다.";
         });
 
-
-
         // 방장 여부에 따른 버튼 처리
         if (PhotonNetwork.IsMasterClient)
         {
@@ -86,6 +86,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         {
             RoomSetBtn.interactable = false;  // 방장이 아니면 버튼 비활성화
         }
+
 
     }
 
@@ -342,11 +343,6 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     }
 
 
-
-
-
-
-
     //현재인원과 최대인원 텍스트 정보 업데이트
     private void PlayersUpdate()
     {
@@ -359,7 +355,8 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     }
 
 
-    // 방장이 되지 않은 플레이어가 입장한 경우
+
+    // 내가 아닌 새로운 플레이어가 입장한 경우
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
         // 방장인지 아닌지 구분을 할 필요가 없다(인덱스0이 항상 방장 아니겟는가?)
@@ -370,14 +367,19 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         {
             RoomSetBtn.interactable = false;
             RoomSetPanel.SetActive(false);
-            UserProfileLoad.SendPlayerInfoToOthers();
         }
-        
+        UnityEngine.Debug.Log("내가 아닌 새로운 플레이어 입장");
+        UserProfileLoad.players.Clear();  // 기존 리스트의 모든 항목 제거
+        UserProfileLoad.SendPlayerInfoToOthers();
+        UserProfileLoad.UpdateMyInfo();
     }
 
     // 플레이어가 방을 나갔을 때 호출되는 콜백
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
+        base.OnPlayerLeftRoom(otherPlayer);  // 부모 클래스 메서드 호출(선택 사항)
+
+
         // 방장인지 아닌지 구분할 필요가 있다
 
         PlayersUpdate(); //현재 방 접속 인원 업데이트
@@ -388,7 +390,12 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             RoomSetBtn.interactable = true;
             RoomSetPanel.SetActive(false);
         }
+
+        UnityEngine.Debug.Log("다른 플레이어 방 나감");
+        UserProfileLoad.players.Clear();  // 기존 리스트의 모든 항목 제거
         UserProfileLoad.SendPlayerInfoToOthers();
+        UserProfileLoad.UpdateMyInfo();
+       
     }
 
 
@@ -399,6 +406,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.LeaveRoom();
         }
+        
     }
 
     // 방을 성공적으로 나갔을 때 호출되는 콜백
@@ -414,4 +422,6 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         Debug.LogError($"Disconnected from server: {cause}");
         // 필요한 경우 재접속 로직 추가
     }
+
+    
 }
