@@ -7,12 +7,19 @@ using System.Collections.Specialized;
 
 public class ChatManager : MonoBehaviour
 {
+    public UserProfileLoad UserProfileLoad;
+
     public GameObject YellowArea, WhiteArea, DateArea;
     public RectTransform ContentRect;
     public Scrollbar scrollBar;
     AreaScript LastArea;
 
-    public void Chat(bool isSend, string text, string user, Texture picture)
+    public void Start()
+    {
+        UserProfileLoad UserProfileLoad = GameObject.Find("UserProfileLoad").GetComponent<UserProfileLoad>();
+    }
+
+    public void Chat(bool isSend, string text, string user, int? imgindex)
     {
         if (text.Trim() == "") return;
 
@@ -45,7 +52,12 @@ public class ChatManager : MonoBehaviour
         //현재 것에 분까지 나오는 날짜와 유저이름을 대입
         DateTime t = DateTime.Now;
         Area.Time = t.ToString("yyyy-MM-dd-HH-mm");
-        Area.User = user;
+        Area.User = user; //이름 대입
+        if (imgindex != null)
+        {
+            Area.UserImage.sprite = UserProfileLoad.profileImages[imgindex.Value]; //이미지 교체
+        }
+        
 
         //현재 것은 항상 새로운 시간 대입
         int hour = t.Hour;
@@ -100,4 +112,6 @@ public class ChatManager : MonoBehaviour
     void Fit(RectTransform Rect) => LayoutRebuilder.ForceRebuildLayoutImmediate(Rect);
 
     void ScrollDelay() => scrollBar.value = 0;
+
+
 }

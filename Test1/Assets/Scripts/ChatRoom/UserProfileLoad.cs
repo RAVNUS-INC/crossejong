@@ -14,7 +14,7 @@ using System.Globalization;
 using System.Threading.Tasks;
 using static UserProfileLoad;
 
-// 현재 방/게임에 접속한 플레이어들의 프로필과 이름 표시하는 스크립트
+// 현재 방/게임에 접속한 플레이어들의 프로필과 이름 표시하는 스크립트(PlayerView)
 
 public class UserProfileLoad : MonoBehaviour, IOnEventCallback
 {
