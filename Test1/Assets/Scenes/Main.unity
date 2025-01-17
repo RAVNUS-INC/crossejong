@@ -2475,12 +2475,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayNameText: {fileID: 1661692659}
   profileInputField: {fileID: 644140251}
+  centralImage: {fileID: 1578942092}
   profileImages:
   - {fileID: 21300000, guid: 2febe3c46f2ec1e4e84107fb832a748e, type: 3}
   - {fileID: 21300000, guid: ed578dfef7418ff48aca7cba340ede9b, type: 3}
   - {fileID: 21300000, guid: f1dd6b8b6c5254c45b0f97346843c2c0, type: 3}
   profilePanel: {fileID: 2060435192}
-  centralImage: {fileID: 1578942092}
 --- !u!1 &619718626
 GameObject:
   m_ObjectHideFlags: 0
@@ -2832,7 +2832,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -5965,8 +5965,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -196.15, y: 599}
-  m_SizeDelta: {x: 323.85, y: 112.83}
+  m_AnchoredPosition: {x: 226.54, y: 647}
+  m_SizeDelta: {x: 296.93, y: 112.8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1331131039
 MonoBehaviour:
