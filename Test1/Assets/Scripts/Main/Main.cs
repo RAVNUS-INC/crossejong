@@ -1,15 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 using PlayFab;
 using PlayFab.ClientModels;
-using System;
 using Photon.Pun;
-using System.Reflection;
+using static UnityEngine.EventSystems.EventTrigger;
+using UnityEditor.PackageManager.Requests;
 
 // 메인에 존재하는 기능에 관한 스크립트
 public class Main : MonoBehaviour
 {
+    
     private InputField inputField; //프로필 패널 안의 이름입력필드
     private Text SaveText; //프로필 패널 안의 저장메시지
 
@@ -20,7 +20,16 @@ public class Main : MonoBehaviour
     public Sprite[] profileImages; // 3가지 기본 제공 이미지
     public GameObject profilePanel; // 프로필 수정 패널
 
+
+    // ---------------랭킹 오브젝트---------------
+    public GameObject[] ranklist; //활성화/비활성화를 위한 오브젝트
+    public Image[] userimage; //유저 이미지
+    public Text[] username; //유저 이름
+    public Text[] wordcount; //단어완성횟수
+
+
     private const string PROFILE_IMAGE_INDEX_KEY = "ProfileImageIndex";  // 저장 키
+    UserSetManager UserSetManager;
 
     private void Awake()
     {
@@ -30,7 +39,8 @@ public class Main : MonoBehaviour
         //유저 네임 불러와서 텍스트로 표시
         GetUserDisplayName();
 
-
+        RankActiveFalse(); //순위 오브젝트 모두 비활성화
+        GetLeaderBoard(); //순위 업데이트
     }
 
     void Start()
@@ -44,7 +54,10 @@ public class Main : MonoBehaviour
     
         profilePanel.SetActive(false);
         profileInputField.interactable = false; //프로필 이름 초기 비활성화
+
+        
     }
+
 
 
 
@@ -74,17 +87,6 @@ public class Main : MonoBehaviour
         {
             Debug.LogError($"유저 데이터 불러오기 실패: {error.GenerateErrorReport()}");
         });
-
-        //// 커스텀 프로퍼티에서 해당 키의 값을 가져옵니다.
-        //if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("Imageindex"))
-        //{
-        //    int value = (int)PhotonNetwork.LocalPlayer.CustomProperties["Imageindex"];
-        //    centralImage.sprite = profileImages[value];
-        //}
-        //else
-        //{
-        //    Debug.Log("저장된 Imageindex가 없습니다.");
-        //}
     }
     
 
@@ -92,17 +94,6 @@ public class Main : MonoBehaviour
     // DisplayName 불러오기 함수
     public void GetUserDisplayName()
     {
-        //// 커스텀 프로퍼티에서 해당 키의 값을 가져옵니다.
-        //if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("Displayname"))
-        //{
-        //    string value = PhotonNetwork.LocalPlayer.CustomProperties["Displayname"].ToString();
-        //    displayNameText.text = value;
-        //}
-        //else
-        //{
-        //    Debug.Log("저장된 displayname이 없습니다.");
-        //}
-
         PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest(), OnGetAccountInfoSuccess, OnGetAccountInfoFailure);
     }
 
@@ -141,6 +132,76 @@ public class Main : MonoBehaviour
         GetUserDisplayName();
         LoadProfileImageIndex();
 
+    }
+
+    private void RankActiveFalse()
+    {
+        //모든 순위오브젝트 비활성화 시키기
+        for (int i = 0; i < ranklist.Length; i++)
+        {
+            ranklist[i].SetActive(false);
+        }
+    }
+
+    //유저가 업데이트 버튼을 누르면
+    public void UpdateBtn()
+    {
+        //순위오브젝트 비활성화
+        RankActiveFalse();
+        //유저들 간의 순위를 재갱신
+        GetLeaderBoard();
+
+    }
+
+    // 리더보드 리스트에 들어갈 정보 불러오기
+    public void GetLeaderBoard()
+    {
+        // playfab에서 리더보드 정보 요청
+        var request = new GetLeaderboardRequest { StartPosition = 0, StatisticName = "WordCompletionCount", MaxResultsCount = 10, ProfileConstraints = new PlayerProfileViewConstraints() { ShowDisplayName = true } };
+        PlayFabClientAPI.GetLeaderboard(request, (result) =>
+        {
+            for (int i = 0; i < result.Leaderboard.Count; i++)
+            {
+                var curBoard = result.Leaderboard[i];
+                //유저 단어완성횟수 업데이트
+                wordcount[i].text = "총 " + curBoard.StatValue.ToString() + "회";
+                //유저 이름 업데이트
+                username[i].text = curBoard.DisplayName;
+                //유저 이미지 인덱스를 요청 및 업데이트
+                GetUserImageData(curBoard.PlayFabId, i);
+                //유저수, 순위에 따른 오브젝트 활성화
+                ranklist[i].SetActive(true);
+            }
+        },
+        (Error) => print("리더보드 불러오기 실패"));
+    }
+
+    // 특정 유저의 공개 데이터 요청 함수
+    private void GetUserImageData(string playFabId, int index)
+    {
+        var userDataRequest = new GetUserDataRequest
+        {
+            PlayFabId = playFabId // 데이터를 가져올 유저의 PlayFabId
+        };
+        PlayFabClientAPI.GetUserData(userDataRequest, result =>
+        {
+            // PROFILE_IMAGE_INDEX_KEY가 존재하는지 확인
+            if (result.Data.ContainsKey(PROFILE_IMAGE_INDEX_KEY))
+            {
+                // 저장된 인덱스 값 불러오기
+                int imgindex = int.Parse(result.Data[PROFILE_IMAGE_INDEX_KEY].Value);
+                // 인덱스 범위 체크 후 랭킹 유저 이미지 업데이트
+                userimage[index].sprite = profileImages[imgindex];
+            }
+            else
+            {
+                Debug.LogWarning("PROFILE_IMAGE_INDEX_KEY가 존재하지 않습니다. 기본 이미지로 설정합니다.");
+                userimage[index].sprite = profileImages[0];  // 기본 이미지로 설정
+            }
+        }, error =>
+        {
+            Debug.LogError($"유저 데이터 불러오기 실패: {error.GenerateErrorReport()}");
+        });
     }
 
 }

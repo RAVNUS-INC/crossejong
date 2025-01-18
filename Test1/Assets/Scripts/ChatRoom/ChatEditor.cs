@@ -123,16 +123,6 @@ public class ChatEditor : MonoBehaviour, IOnEventCallback
         }
     }
 
-
-
-
-
-
-
-
-
-
-
 }
 
 

@@ -51,8 +51,7 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         inputText.onValueChanged.AddListener(ValidateNickname);
 
         //확인 버튼 누르면 이름 저장
-        confirmButton.onClick.AddListener(OnClickSaveDisplayName);
-
+        confirmButton.onClick.AddListener(OnClickSaveDisplayName); //초기 이름 저장 (+ 단어완성횟수 버튼에 직접 연결)
     }
 
 
@@ -109,14 +108,12 @@ public class UserSetManager : MonoBehaviourPunCallbacks
                     {
                         Debug.LogWarning("KEY의 값이 비어 있습니다. 기본값(0)으로 저장합니다.");
                         currentIndex = 0; // 기본값 설정
-                        //SaveSelectedImageIndex(currentIndex); // PlayFab에 저장
                     }
                 }
                 else
                 {
                     Debug.LogWarning("KEY가 존재하지 않습니다. 기본값(0)을 생성합니다.");
                     currentIndex = 0; // 기본값 설정
-                    //SaveSelectedImageIndex(currentIndex); // PlayFab에 새로운 키 생성 및 값 저장
                 }
 
                 UpdateCentralImage(); // 이미지 업데이트 및 인덱스 저장, 프로퍼티에 저장
@@ -151,8 +148,10 @@ public class UserSetManager : MonoBehaviourPunCallbacks
             Data = new Dictionary<string, string>
         {
             { PROFILE_IMAGE_INDEX_KEY, index.ToString() }
-        }
+        },
+            Permission = UserDataPermission.Public // 데이터를 공개 상태로 저장
         };
+
         //playfab에 저장
         PlayFabClientAPI.UpdateUserData(request,
             result =>
