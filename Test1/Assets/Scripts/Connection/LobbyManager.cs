@@ -48,43 +48,14 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     // 방 목록을 가지고 있는 Dictionaly 변수
     Dictionary<string, RoomInfo> dicRoomInfo = new Dictionary<string, RoomInfo>();
 
-
+    
     //public static LobbyManager Instance { get; private set; } //씬 전환시에도 정보가 남아있게
 
 
     private void Awake() //필요
     {
-        //if (Instance == null)
-        //{
-        //    Instance = this;
-        //    DontDestroyOnLoad(gameObject); // 오브젝트를 씬 전환 시 제거하지 않음
-        //}
-        //else
-        //{
-        //    Destroy(gameObject); // 중복된 인스턴스 방지
-        //}
         ResetRoomSetPanel(); // 첫 메인 접속 시 최초 실행
-
     }
-
-
-    private void OnDestroy()
-    {
-
-        //// input_RoomName이 null이 아닐 경우에만 RemoveListener를 호출
-        //if (input_RoomName != null)
-        //{
-        //    input_RoomName.onValueChanged.RemoveListener(ValidateRoomName);
-        //}
-    }
-    
-
-
-    void Start() 
-    {
-        
-    }
-
 
     // 방 만들 때 선택 옵션 버튼과 방이름 규칙에 관한 초기화
     public void ResetRoomSetPanel()
