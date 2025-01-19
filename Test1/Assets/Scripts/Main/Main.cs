@@ -4,7 +4,10 @@ using PlayFab;
 using PlayFab.ClientModels;
 using Photon.Pun;
 using static UnityEngine.EventSystems.EventTrigger;
-using UnityEditor.PackageManager.Requests;
+
+//using UnityEditor.PackageManager;
+//using UnityEditor.PackageManager.Requests;
+
 using UnityEngine.SceneManagement;
 
 // 메인에 존재하는 기능에 관한 스크립트
@@ -156,15 +159,15 @@ public class Main : MonoBehaviour
     // 게임 종료 버튼을 누르면
     public void ExitGame()
     {
-        //Debug.Log("게임 종료"); // Unity 에디터에서 디버그 메시지 확인
-        //Application.Quit(); // 실제로 게임 종료
+        Debug.Log("게임 종료"); // Unity 에디터에서 디버그 메시지 확인
+        Application.Quit(); // 실제로 게임 종료
 
-            Debug.Log("게임 종료");
-    #if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false; // 에디터 종료
-    #else
-        Application.Quit(); // 빌드된 게임 종료
-    #endif
+        //Debug.Log("게임 종료");
+        //#if UNITY_EDITOR
+        //        UnityEditor.EditorApplication.isPlaying = false; // 에디터 종료
+        //#else
+        //    Application.Quit(); // 빌드된 게임 종료
+        //#endif
     }
 
     private void RankActiveFalse()
