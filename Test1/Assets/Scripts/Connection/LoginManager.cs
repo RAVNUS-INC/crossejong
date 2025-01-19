@@ -82,7 +82,6 @@ public class LoginManager : MonoBehaviour
     }
 
 
-
     // 비밀번호보기 토글의 초기화
     private void ResetPasswordToggle()
     {

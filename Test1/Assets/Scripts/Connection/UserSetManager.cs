@@ -22,7 +22,9 @@ public class UserSetManager : MonoBehaviourPunCallbacks
     [SerializeField] Button confirmButton; //제출(저장) 버튼
     [SerializeField] Text warningText; // 경고 메시지를 출력할 UI 텍스트
     [SerializeField] public Text saveText; // 저장완료 메시지를 출력할 UI 텍스트
-    
+
+    // -----displayname 조건-----
+    private const int MinLength = 3; // 최소 입력 길이(2글자 이상)
     private const int MaxLength = 8; // 최대 입력 길이(변동가능)
 
     public Image centralImage; // 중앙에 표시되는 프로필이미지
@@ -251,7 +253,7 @@ public class UserSetManager : MonoBehaviourPunCallbacks
     }
 
 
-    //이름 설정 규칙
+    //이름 설정 규칙(displayname)
     public void ValidateNickname(string input)
     {
         /// 한글(완성형/자음/모음)과 숫자만 허용하는 정규식
@@ -271,6 +273,12 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         {
             warningText.text = $"최대 {MaxLength}자까지만 입력 가능합니다.";
             confirmButton.interactable = false; 
+        }
+        // 최소 길이 충족 검사
+        else if (GetKoreanCharCount(inputname) < MinLength) // 한글 자음, 모음을 포함한 최대 길이 검사
+        {
+            warningText.text = $"최소 {MinLength}자 이상이어야 합니다."; //3자 이상이어야 함
+            confirmButton.interactable = false;
         }
         else if (inputname.Length == 0) // 빈 문자열 검사
         {
@@ -305,6 +313,11 @@ public class UserSetManager : MonoBehaviourPunCallbacks
             }
             // 한글 자음/모음인지 체크 (ㄱ-ㅎ, ㅏ-ㅣ 범위)
             else if ((c >= 'ㄱ' && c <= 'ㅎ') || (c >= 'ㅏ' && c <= 'ㅣ'))
+            {
+                count++;
+            }
+            // 숫자(0-9)인지 체크
+            else if (c >= '0' && c <= '9')
             {
                 count++;
             }
