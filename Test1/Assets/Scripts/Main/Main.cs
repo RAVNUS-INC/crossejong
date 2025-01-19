@@ -5,6 +5,7 @@ using PlayFab.ClientModels;
 using Photon.Pun;
 using static UnityEngine.EventSystems.EventTrigger;
 using UnityEditor.PackageManager.Requests;
+using UnityEngine.SceneManagement;
 
 // 메인에 존재하는 기능에 관한 스크립트
 public class Main : MonoBehaviour
@@ -134,6 +135,38 @@ public class Main : MonoBehaviour
 
     }
 
+
+    // 로그아웃 버튼을 누르면
+    public void LogoutBtn()
+    {
+        // PlayFab 인증 정보 초기화
+        PlayFabClientAPI.ForgetAllCredentials();
+
+        // 서버와의 연결도 끊기
+        if (PhotonNetwork.IsConnected)
+        {
+            PhotonNetwork.Disconnect(); // 현재 연결 끊기
+        }
+
+        // 로그인 화면으로 이동
+        SceneManager.LoadScene("Login");
+        Debug.Log("로그아웃되었습니다. 인증 정보가 초기화되었습니다.");
+    }
+
+    // 게임 종료 버튼을 누르면
+    public void ExitGame()
+    {
+        //Debug.Log("게임 종료"); // Unity 에디터에서 디버그 메시지 확인
+        //Application.Quit(); // 실제로 게임 종료
+
+            Debug.Log("게임 종료");
+    #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false; // 에디터 종료
+    #else
+        Application.Quit(); // 빌드된 게임 종료
+    #endif
+    }
+
     private void RankActiveFalse()
     {
         //모든 순위오브젝트 비활성화 시키기
@@ -157,7 +190,9 @@ public class Main : MonoBehaviour
     public void GetLeaderBoard()
     {
         // playfab에서 리더보드 정보 요청
-        var request = new GetLeaderboardRequest { StartPosition = 0, StatisticName = "WordCompletionCount", MaxResultsCount = 10, ProfileConstraints = new PlayerProfileViewConstraints() { ShowDisplayName = true } };
+        var request = new GetLeaderboardRequest 
+        { StartPosition = 0, StatisticName = "WordCompletionCount", MaxResultsCount = 10, 
+          ProfileConstraints = new PlayerProfileViewConstraints() { ShowDisplayName = true } };
         PlayFabClientAPI.GetLeaderboard(request, (result) =>
         {
             for (int i = 0; i < result.Leaderboard.Count; i++)

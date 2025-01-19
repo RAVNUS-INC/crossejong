@@ -83,7 +83,7 @@ public class PlayFabManager : MonoBehaviour
         // 알파벳으로만 이루어졌는지 확인 (3자리 이상)
         if ((Regex.IsMatch(inputID, @"[\u3131-\uD79D]"))) //한글을 포함하고 있으면
         {
-            IDErrorText.text = "비밀번호는 알파벳만 포함해야 합니다.";
+            IDErrorText.text = "ID는 알파벳만 포함해야 합니다.";
         }
         else if (inputID.Length < 3)
         {
@@ -92,7 +92,6 @@ public class PlayFabManager : MonoBehaviour
         else
         {
             IDErrorText.gameObject.SetActive(false);
-
         }
         // 입력란에 공백을 제거한 값 반영
         UseridInput.text = inputID;
@@ -195,7 +194,7 @@ public class PlayFabManager : MonoBehaviour
     // 단어완성횟수 변수 저장(초기값 0)
     public void SetStat()
     {
-        var request = new UpdatePlayerStatisticsRequest { Statistics = new List<StatisticUpdate> { new StatisticUpdate { StatisticName = "WordCompletionCount", Value = 24 } } };
+        var request = new UpdatePlayerStatisticsRequest { Statistics = new List<StatisticUpdate> { new StatisticUpdate { StatisticName = "WordCompletionCount", Value = 0 } } };
         PlayFabClientAPI.UpdatePlayerStatistics(request, (result) => print("단어완성횟수 초기화 및 저장 완료"), (error) => print("변수 저장 실패"));
     }
 
