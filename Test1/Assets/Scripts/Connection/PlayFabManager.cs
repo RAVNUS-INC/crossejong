@@ -192,6 +192,13 @@ public class PlayFabManager : MonoBehaviour
         PlayFabClientAPI.RegisterPlayFabUser(request, OnRegisterSuccess, OnRegisterFailure);
     }
 
+    // 단어완성횟수 변수 저장(초기값 0)
+    public void SetStat()
+    {
+        var request = new UpdatePlayerStatisticsRequest { Statistics = new List<StatisticUpdate> { new StatisticUpdate { StatisticName = "WordCompletionCount", Value = 24 } } };
+        PlayFabClientAPI.UpdatePlayerStatistics(request, (result) => print("단어완성횟수 초기화 및 저장 완료"), (error) => print("변수 저장 실패"));
+    }
+
     // 로그인 실패 시
     public void OnLoginFailure(PlayFabError error)
     {
@@ -249,12 +256,6 @@ public class PlayFabManager : MonoBehaviour
     {
         popupText.text = message;
     }
-
-    //public void OkBtn() //로그인 성공을 했고 메인으로 넘어가며 서버요청(닉네임 정보 받아오기)
-    //{
-    //    UserSetManager.OnClickConnect();
-    //}
-
 
 }
 

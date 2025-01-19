@@ -8,6 +8,11 @@ using ExitGames.Client.Photon;
 using System;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 using System.Collections.Generic;
+using Button = UnityEngine.UI.Button;
+using PlayFab.ClientModels;
+using PlayFab;
+using System.Reflection;
+using Photon.Pun.Demo.PunBasics;
 //using Unity.VisualScripting.Dependencies.Sqlite;
 
 
@@ -18,32 +23,33 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     private int selectedDifficultyIndex; // 난이도 선택 인덱스
     private int selectedTimeLimitIndex; // 제한시간 인덱스
 
+
     // UI 텍스트 연결
     public Text txtRoomName; // 방 이름
     public Text txtPlayerCount; // 현재인원/최대인원
-    //public Text txtDandT; // 난이도와 제한시간
+
     public Text txtDifficulty; // 난이도
     public Text txtTimelimit; // 제한시간
 
     public Button[] DifButton; // 난이도 버튼 배열
     public Button[] TimeButton; // 제한시간 버튼 배열
 
+    public Button RoomSetBtn; // 방장만 사용할 수 있는 방 속성 변경 버튼
+    public GameObject RoomSetPanel; //방장만 사용할 수 있는 방 속성 패널
 
     public Button SaveBtn; //저장버튼
     public Text Savetext; //저장완료메시지
 
-    //GameObject LobbyManager;
-    
-
+    //[SerializeField] private UserProfileLoad UserProfileLoad; // Inspector에서 드래그하여 연결
+    public UserProfileLoad UserProfileLoad;
     void Awake()
     {
-
         
-
     }
 
     private void Start()
     {
+        UserProfileLoad = GameObject.FindObjectOfType<UserProfileLoad>();  // 씬에 있는 PlayerManager를 찾기
         UpdateRoomInfo(); // 방 들어서자마자 방 정보 업데이트(awake에 있어야 하나? start에 있어야 하나?)
 
         //저장버튼 누르면 실행할 함수
@@ -70,37 +76,60 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             // UI 갱신 (저장 메시지 출력)
             Savetext.text = "저장되었습니다.";
         });
+
+        // 방장 여부에 따른 버튼 처리
+        if (PhotonNetwork.IsMasterClient)
+        {
+            RoomSetBtn.interactable = true;  // 방장이면 버튼 활성화
+        }
+        else
+        {
+            RoomSetBtn.interactable = false;  // 방장이 아니면 버튼 비활성화
+        }
+
+
     }
 
 
-    // 방 속성 변경 패널 열기 버튼을 눌렀을때 -> 버튼의 위치 현재 속성에 맞게 초기화
+    // 방장이 방 속성 변경 패널 열기 버튼을 눌렀을때 -> 버튼의 위치 현재 속성에 맞게 초기화
     public void RoomSetPanelOpenBtn()
     {
-        if (PhotonNetwork.InRoom)
+        if (PhotonNetwork.IsMasterClient)
         {
-            Room room = PhotonNetwork.CurrentRoom;
+            RoomSetPanel.SetActive(true);  // 방장이면 패널 열기
 
-            object ReDifficulty = room.CustomProperties["DifficultyIndex"]; //난이도 인덱스를 불러오기
-            object ReselectedTimeLimit = room.CustomProperties["TimeLimitIndex"]; //제한시간 인덱스를 불러오기
+            if (PhotonNetwork.InRoom)
+            {
+                Room room = PhotonNetwork.CurrentRoom;
 
-            // 변수명을 로비매니저 변수와 똑같게(함수 사용을 위해)
-            selectedDifficulty = (int)ReDifficulty; //int형변환
-            selectedTimeLimit = (int)ReselectedTimeLimit; //int형변환
+                object ReDifficulty = room.CustomProperties["DifficultyIndex"]; //난이도 인덱스를 불러오기
+                object ReselectedTimeLimit = room.CustomProperties["TimeLimitIndex"]; //제한시간 인덱스를 불러오기
 
-            // 처음 선택했던 버튼들(난이도, 제한시간)은 색상 다르게(바뀐 정보라면 바뀐 정보에만 노란색) 
-            SetDefaultSelection(DifButton, selectedDifficulty);
-            SetDefaultSelection(TimeButton, selectedTimeLimit);
+                // 변수명을 로비매니저 변수와 똑같게(함수 사용을 위해)
+                selectedDifficulty = (int)ReDifficulty; //int형변환
+                selectedTimeLimit = (int)ReselectedTimeLimit; //int형변환
+
+                // 처음 선택했던 버튼들(난이도, 제한시간)은 색상 다르게(바뀐 정보라면 바뀐 정보에만 노란색) 
+                SetDefaultSelection(DifButton, selectedDifficulty);
+                SetDefaultSelection(TimeButton, selectedTimeLimit);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("방장만 설정 패널을 열 수 있습니다.");
         }
     }
+
 
     // 플레이어가 방에 들어올때, 누군가 나갈때(실시간 인원수 업데이트)
     public void UpdateRoomInfo()
 
-    { 
+    {   
         if (PhotonNetwork.InRoom)
         {
             Room room = PhotonNetwork.CurrentRoom;
 
+            // -------------프로퍼티로부터 초기버튼 색상 표시-------------
             object ReDifficulty = room.CustomProperties["DifficultyIndex"];
             object ReselectedTimeLimit = room.CustomProperties["TimeLimitIndex"];
 
@@ -110,14 +139,16 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
 
             // 처음 선택했던 버튼들(난이도, 제한시간)은 색상 다르게(초기설정 1번만) 
             SetDefaultSelection(DifButton, selectedDifficulty);
-            SetDefaultSelection(TimeButton, selectedTimeLimit); 
+            SetDefaultSelection(TimeButton, selectedTimeLimit);
 
+
+            // -------------버튼 클릭 시 색상 변경(이거는 프로퍼티 영향X)-------------
             // 각 버튼 배열에 리스너 추가(클릭시 색상 변경) -> OK
             DifficultySet(DifButton);
             TimeLimitSet(TimeButton);
 
 
-            // OK (1/13)
+            // -------------프로퍼티로부터 접속한 방의 Text에 정보 표시/업데이트-------------
             // 방 이름
             txtRoomName.text = $"{room.Name}";
             
@@ -126,12 +157,12 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
 
             // 난이도(Custom Properties에서 가져오기)
             string difficulty = room.CustomProperties.ContainsKey("difficulty")
-                                ? room.CustomProperties["difficulty"].ToString()
-                                : "없음";
+                                ? room.CustomProperties["difficulty"].ToString(): "없음";
+
             // 제한 시간(Custom Properties에서 가져오기)
             string timeLimit = room.CustomProperties.ContainsKey("timeLimit")
-                                ? room.CustomProperties["timeLimit"].ToString()
-                                : "없음";
+                                ? room.CustomProperties["timeLimit"].ToString(): "없음";
+
             // 난이도, 제한시간 text 업데이트
             txtDifficulty.text = $"{difficulty}";
             txtTimelimit.text = $"{timeLimit}초";
@@ -142,6 +173,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         }
     }
 
+    // --------------------------- 방 속성 버튼 클릭 시 ------------------------
     public void DifficultySet(Button[] buttons)
     {
         // Difficulty 버튼에 리스너 추가
@@ -253,6 +285,8 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         }
     }
 
+
+    // --------------------------- 방 속성 업데이트 시 ------------------------
     public void UpdateRoomUI(string key, object value) // UI 업데이트 함수(난이도,시간)
     {
         if (key == "difficulty")
@@ -306,10 +340,11 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     {
         // 방 속성 서버에 업데이트
         SaveRoomProperties(key, value);
-        
     }
 
-    private void PlayersUpdate() //유저 수 업데이트
+
+    //현재인원과 최대인원 텍스트 정보 업데이트
+    private void PlayersUpdate()
     {
         if (PhotonNetwork.InRoom)
         {
@@ -319,27 +354,59 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         }
     }
 
-    // 플레이어가 방에 들어왔을 때 호출
+
+
+    // 내가 아닌 새로운 플레이어가 입장한 경우
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        PlayersUpdate(); //유저 수 업데이트
+        // 방장인지 아닌지 구분을 할 필요가 없다(인덱스0이 항상 방장 아니겟는가?)
+        PlayersUpdate(); //현재 방 접속 인원 업데이트
+
+        // 방장이 아닌 플레이어는 UI 패널 비활성화
+        if (!PhotonNetwork.IsMasterClient)
+        {
+            RoomSetBtn.interactable = false;
+            RoomSetPanel.SetActive(false);
+        }
+        UnityEngine.Debug.Log("내가 아닌 새로운 플레이어 입장");
+        UserProfileLoad.players.Clear();  // 기존 리스트의 모든 항목 제거
+        UserProfileLoad.SendPlayerInfoToOthers();
+        UserProfileLoad.UpdateMyInfo();
     }
 
-    // 플레이어가 방을 나갔을 때 호출
+    // 플레이어가 방을 나갔을 때 호출되는 콜백
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        PlayersUpdate(); //유저 수 업데이트
+        base.OnPlayerLeftRoom(otherPlayer);  // 부모 클래스 메서드 호출(선택 사항)
+
+
+        // 방장인지 아닌지 구분할 필요가 있다
+
+        PlayersUpdate(); //현재 방 접속 인원 업데이트
+
+        // 방장이 된 플레이어는 UI 패널 비활성화
+        if (PhotonNetwork.IsMasterClient)
+        {
+            RoomSetBtn.interactable = true;
+            RoomSetPanel.SetActive(false);
+        }
+
+        UnityEngine.Debug.Log("다른 플레이어 방 나감");
+        UserProfileLoad.players.Clear();  // 기존 리스트의 모든 항목 제거
+        UserProfileLoad.SendPlayerInfoToOthers();
+        UserProfileLoad.UpdateMyInfo();
+       
     }
 
 
     // 방을 나갈때
-    // LobbyManager스크립트의 모든 변수 값 초기화
     public void LeaveRoom()
     {
         if (PhotonNetwork.InRoom)
         {
             PhotonNetwork.LeaveRoom();
         }
+        
     }
 
     // 방을 성공적으로 나갔을 때 호출되는 콜백
@@ -347,10 +414,6 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     {
         // 로비 씬 이름으로 이동
         SceneManager.LoadScene("Main");
-
-        // LobbyManager 오브젝트를 찾고, 그 오브젝트에서 LobbyManager 스크립트를 가져오기
-        //LobbyManager lobbyManager = GameObject.Find("LobbyManager").GetComponent<LobbyManager>(); //씬이 전환되어도 객체정보는 유지
-        // 메인으로 다시 돌아가기에, 메인 접속 시 최초 실행하는 함수와 동일하게 수행
     }
 
     // 네트워크 에러가 발생하거나 방을 나가지 못했을 때
@@ -359,4 +422,6 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         Debug.LogError($"Disconnected from server: {cause}");
         // 필요한 경우 재접속 로직 추가
     }
+
+    
 }
