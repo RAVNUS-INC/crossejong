@@ -21,9 +21,4 @@ public class CardLists : MonoBehaviour
     public List<string> cardFrontSpecial = new List<string>
        {"ÄÃ·¯", "Èæ¹é"};
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 }

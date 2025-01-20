@@ -12,7 +12,6 @@ public class FieldCard : MonoBehaviour
 {
     public Transform fieldContainer; // FieldArea의 Contents
     public CardPool cardPool; // CardPool 참조
-    public CapableAreaPopup capableAreaPopup;
     public List<string> shownCardData; // 필드에 놓인 카드 데이터 리스트
     public List<GameObject> fieldDisplayedCards;
     public int row;
@@ -21,10 +20,6 @@ public class FieldCard : MonoBehaviour
     public int cardDataRowIndex;
     public int cardDataColIndex;
 
-    void Start()
-    {
-
-    }
 
     public void StartCardShown()
     {
@@ -33,27 +28,12 @@ public class FieldCard : MonoBehaviour
 
         RectTransform rectTransform = randomCards[0].GetComponent<RectTransform>();
         rectTransform.anchoredPosition = Vector2.zero;
+
         TextMeshProUGUI textComponent = randomCards[0].GetComponentInChildren<TextMeshProUGUI>();
         string currentText = textComponent.text;
         SaveCardData(currentText);
-        OnClickFieldCard();
-        
     }
 
-    public void OnClickFieldCard()
-    {
-        // 모든 카드에 대해 ChangeCardColor 연결
-        foreach (var card in fieldDisplayedCards)
-        {
-            Button cardButton = card.GetComponent<Button>();
-            if (cardButton != null)
-            {
-                cardButton.onClick.AddListener(() => capableAreaPopup.CapableAreaPopupf(cardButton));
-                cardButton.onClick.AddListener(() => capableAreaPopup.MoveCardsToCapableArea());
-                cardButton.onClick.AddListener(() => capableAreaPopup.MoveBlocksToCapableArea());
-            }
-        }
-    }
 
     public void InitializeSavedCardData(int rows, int columns)
     {
@@ -69,14 +49,6 @@ public class FieldCard : MonoBehaviour
             cardDataRowIndex = 1;
             cardDataColIndex = 1;
         }
-        else
-        {
-
-        }
     }
 
-    void Update()
-    {
-        
-    }
 }
