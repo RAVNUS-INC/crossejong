@@ -28,8 +28,8 @@ public class FieldCard : MonoBehaviour
 
         RectTransform rectTransform = randomCards[0].GetComponent<RectTransform>();
         rectTransform.anchoredPosition = Vector2.zero;
-        TextMeshProUGUI textComponent = randomCards[0].GetComponentInChildren<TextMeshProUGUI>();
 
+        TextMeshProUGUI textComponent = randomCards[0].GetComponentInChildren<TextMeshProUGUI>();
         string currentText = textComponent.text;
         SaveCardData(currentText);
     }

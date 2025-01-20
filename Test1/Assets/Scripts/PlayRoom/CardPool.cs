@@ -107,24 +107,40 @@ public class CardPool : MonoBehaviour
         rectTransform = GetComponent<RectTransform>();  // RectTransform 초기화
     }
 
-    public void FlipCard(Image cardFrontFeature, GameObject card)
+    public void FlipCard(GameObject card)
     {
-        Sprite savedCardFrontImage = cardFrontFeature.sprite;
+        Image cardFrontFeature = card.gameObject.GetComponent<Image>();
+        Sprite savedCardFrontImage = card.gameObject.GetComponent<Sprite>();
+        RectTransform cardRectTransform = card.GetComponent<RectTransform>();  // card의 RectTransform 가져오기
 
-        if (cardFrontFeature.sprite != cardBackImage) 
+        if (cardFrontFeature.sprite != cardBackImage)
         {
-            cardFrontFeature.sprite = cardBackImage;
-            // CardText라는 자식 오브젝트를 찾아서 비활성화
-            Transform cardTextTransform = card.transform.Find("CardText");
-            cardTextTransform.gameObject.SetActive(false);
+            // 카드가 이미 뒤집혔으면 앞면으로 돌아감
+            cardRectTransform.DORotate(new Vector3(0, 180, 0), 0.1f, RotateMode.LocalAxisAdd) // 180도 회전
+                .OnComplete(() =>
+                {
+                    cardFrontFeature.sprite = cardBackImage;
+                    // CardText라는 자식 오브젝트를 찾아서 비활성화
+                    Transform cardTextTransform = card.transform.Find("CardText");
+                    cardTextTransform.gameObject.SetActive(false);
+                });
         }
         else
         {
-            cardFrontFeature.sprite = savedCardFrontImage;
-            Transform cardTextTransform = card.transform.Find("CardText");
-            cardTextTransform.gameObject.SetActive(true);
+            // 카드가 앞면일 경우
+            cardRectTransform.DORotate(new Vector3(0, 180, 0), 0.1f, RotateMode.LocalAxisAdd) // 180도 회전
+                .OnComplete(() =>
+                {
+                    cardFrontFeature.sprite = savedCardFrontImage;
+                    Transform cardTextTransform = card.transform.Find("CardText");
+                    cardTextTransform.gameObject.SetActive(true);
+                });
         }
+
+        // 플립 상태를 반전시킴
+        isFlipped = !isFlipped;
     }
+
 
     private void CreateCard()
     {
