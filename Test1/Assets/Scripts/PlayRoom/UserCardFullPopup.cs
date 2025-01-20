@@ -13,10 +13,6 @@ public class UserCardFullPopup : MonoBehaviour
     public List<GameObject> rowDisplayedCards;
     public int fullPopupRow;
 
-    void Start()
-    {
-        // Optional: 초기화 작업
-    }
 
     public void MoveCardsToFullPopupArea()
     {

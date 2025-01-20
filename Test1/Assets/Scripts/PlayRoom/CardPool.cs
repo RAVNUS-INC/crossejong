@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using PlayFab.DataModels;
+using DG.Tweening;
 
 public class CardPool : MonoBehaviour
 {
@@ -16,6 +18,10 @@ public class CardPool : MonoBehaviour
     public TMP_FontAsset newFont; // 변경할 새로운 Font Asset
 
     public List<GameObject> cards = new List<GameObject>(); // 생성된 카드 목록
+
+    public bool isFlipped = false; // 카드가 뒤집혔는지 여부
+    public RectTransform rectTransform; // 카드의 RectTransform
+
 
     void Start()
     {
@@ -96,18 +102,27 @@ public class CardPool : MonoBehaviour
             }
         }
     }
-
-    public void FlipCard(Image CardFrontFeature)
+    void Awake()
     {
-        Sprite savedCardFrontImage = CardFrontFeature.sprite;
+        rectTransform = GetComponent<RectTransform>();  // RectTransform 초기화
+    }
 
-        if (CardFrontFeature.sprite != cardBackImage) 
-        { 
-            CardFrontFeature.sprite = cardBackImage;
+    public void FlipCard(Image cardFrontFeature, GameObject card)
+    {
+        Sprite savedCardFrontImage = cardFrontFeature.sprite;
+
+        if (cardFrontFeature.sprite != cardBackImage) 
+        {
+            cardFrontFeature.sprite = cardBackImage;
+            // CardText라는 자식 오브젝트를 찾아서 비활성화
+            Transform cardTextTransform = card.transform.Find("CardText");
+            cardTextTransform.gameObject.SetActive(false);
         }
         else
         {
-            CardFrontFeature.sprite = savedCardFrontImage;
+            cardFrontFeature.sprite = savedCardFrontImage;
+            Transform cardTextTransform = card.transform.Find("CardText");
+            cardTextTransform.gameObject.SetActive(true);
         }
     }
 

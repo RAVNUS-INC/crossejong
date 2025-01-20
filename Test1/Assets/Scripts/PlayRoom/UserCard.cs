@@ -10,12 +10,7 @@ public class UserCard : MonoBehaviour
     public FieldCard fieldCard;
     public Transform userCardContainer; // UserCardArea의 Contents
     public List<GameObject> displayedCards; // UserCardArea에서 보여지는 카드 리스트
-    public CapableAreaPopup capableAreaPopup;
 
-    void Start()
-    {
-
-    }
 
     // UserCardArea로 11개의 랜덤 카드 이동
     public void FirstUserCardArea()
@@ -34,8 +29,7 @@ public class UserCard : MonoBehaviour
             Button cardButton = card.GetComponent<Button>();
             if (cardButton != null)
             {
-                // 버튼 클릭 시 ChangeCardColor 함수 실행
-                cardButton.onClick.AddListener(() => capableAreaPopup.MoveCardsToCapableArea());
+
             }
         }
     }
