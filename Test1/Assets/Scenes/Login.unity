@@ -1158,19 +1158,7 @@ MonoBehaviour:
       m_Calls: []
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1771375483}
-        m_TargetAssemblyTypeName: PlayFabManager, Assembly-CSharp
-        m_MethodName: ValidateEmail
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
@@ -1769,7 +1757,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 920
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -2196,18 +2184,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 769672813}
-        m_TargetAssemblyTypeName: LoginManager, Assembly-CSharp
-        m_MethodName: BackBtn1
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
       - m_Target: {fileID: 1525279750}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
@@ -2224,6 +2200,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 769672813}
+        m_TargetAssemblyTypeName: LoginManager, Assembly-CSharp
+        m_MethodName: BackBtn1
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -2367,11 +2355,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6aaa1f1071a9f1a42902955f6435938e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  emailLoginPanel: {fileID: 1525279750}
+  playFabManager: {fileID: 1771375483}
+  emailPanel: {fileID: 1525279750}
   registerPanel: {fileID: 169660822}
   playersetPanel: {fileID: 1963969140}
   AlarmPanel: {fileID: 1394604886}
-  playFabManager: {fileID: 1771375483}
+  EmailInput: {fileID: 288974051}
+  PasswordInput: {fileID: 915820609}
+  UseridInput: {fileID: 605518842}
+  PasswordErrorText: {fileID: 1087717216}
+  EmailErrorText: {fileID: 264381614}
+  IDErrorText: {fileID: 1075462573}
+  PasswordToggle: {fileID: 74947506}
 --- !u!4 &769672814
 Transform:
   m_ObjectHideFlags: 0
@@ -2777,19 +2772,7 @@ MonoBehaviour:
       m_Calls: []
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1771375483}
-        m_TargetAssemblyTypeName: PlayFabManager, Assembly-CSharp
-        m_MethodName: ValidatePassword
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
@@ -5333,16 +5316,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LoginManager: {fileID: 769672813}
-  UserSetManager: {fileID: 1396937924}
-  EmailInput: {fileID: 288974051}
-  PasswordInput: {fileID: 915820609}
-  UseridInput: {fileID: 605518842}
   popupText: {fileID: 62692472}
-  PasswordErrorText: {fileID: 1087717216}
-  PasswordToggle: {fileID: 74947506}
-  EmailErrorText: {fileID: 264381614}
-  playerIDInputField: {fileID: 605518842}
-  IDErrorText: {fileID: 1075462573}
 --- !u!1 &1785941428
 GameObject:
   m_ObjectHideFlags: 0
@@ -6651,8 +6625,8 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1771375482}
-  - {fileID: 1396937925}
   - {fileID: 769672814}
+  - {fileID: 1396937925}
   - {fileID: 519420032}
   - {fileID: 1080737618}
   - {fileID: 739004370}

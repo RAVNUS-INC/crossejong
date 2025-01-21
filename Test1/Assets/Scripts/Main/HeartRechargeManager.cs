@@ -9,7 +9,7 @@ public class HeartRechargeManager : MonoBehaviour
     public int m_HeartAmount = 0; //보유 하트 개수
     private DateTime m_AppQuitTime = new DateTime(1970, 1, 1).ToLocalTime(); //앱이 종료된 시간을 저장
     private const int MAX_HEART = 5; //하트 최대값
-    public int HeartRechargeInterval = 10; //하트 충전 간격(단위:초)
+    public int HeartRechargeInterval = 0; //하트 충전 간격(단위:초)
     private Coroutine m_RechargeTimerCoroutine = null; //하트 충전 타이머를 위한 코루틴 변수
     private int m_RechargeRemainTime = 0; //다음 하트 충전까지 남은 시간을 저장
 
