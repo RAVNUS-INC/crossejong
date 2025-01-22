@@ -44,7 +44,6 @@ public class PlayFabManager : MonoBehaviour
         okBtn = AlarmPanel.transform.Find("OKbtn").GetComponent<Button>();
     }
 
-
     // 로그인 버튼 클릭 시
     public void LoginBtn()
     {
