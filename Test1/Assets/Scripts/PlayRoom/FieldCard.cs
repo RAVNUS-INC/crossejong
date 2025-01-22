@@ -14,7 +14,6 @@ public class FieldCard : MonoBehaviour
 {
     public Transform fieldContainer; // FieldArea의 Contents
     public CardPool cardPool; // CardPool 참조
-    public List<string> shownCardData; // 필드에 놓인 카드 데이터 리스트
     public List<GameObject> fieldDisplayedCards;
     public int i = 0;
     public int n = 3;
@@ -24,21 +23,12 @@ public class FieldCard : MonoBehaviour
     public Transform emptyArea;
 
 
-    public void StartCardShown()
-    {
-        List<GameObject> randomCards = cardPool.GetRandomCards(1); // 1개의 랜덤 카드 얻기
-        cardPool.MoveCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
-
-        RectTransform rectTransform = randomCards[0].GetComponent<RectTransform>();
-        rectTransform.anchoredPosition = Vector2.zero;
-    }
-
     public void CreateCapableArea()
     {
         for (int j = 0; j < (n + i) * (n + i); j++)
         {
             GameObject empty = new GameObject("");
-            fieldList.Add(empty );
+            fieldList.Add(empty);
             empty.transform.SetParent(fieldArea, false);
         }
     }

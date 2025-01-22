@@ -1495,6 +1495,7 @@ GameObject:
   - component: {fileID: 534768507}
   - component: {fileID: 534768506}
   - component: {fileID: 534768505}
+  - component: {fileID: 534768509}
   m_Layer: 5
   m_Name: Field
   m_TagString: Untagged
@@ -1597,6 +1598,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 534768503}
   m_CullTransparentMesh: 1
+--- !u!225 &534768509
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 534768503}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &536188792
 GameObject:
   m_ObjectHideFlags: 0
@@ -2295,7 +2308,6 @@ MonoBehaviour:
   emptyList: []
   fieldArea: {fileID: 534768504}
   emptyArea: {fileID: 523384446}
-  emptyObject: {fileID: 631174144}
 --- !u!1 &926444175
 GameObject:
   m_ObjectHideFlags: 0
@@ -4491,6 +4503,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1778291541}
+  - component: {fileID: 1778291542}
   m_Layer: 0
   m_Name: CardDrop
   m_TagString: Untagged
@@ -4513,6 +4526,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 738986996}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1778291542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778291540}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f90526970c7b80746a48e0eb075565b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardDrag: {fileID: 1831656661}
 --- !u!1 &1831656659
 GameObject:
   m_ObjectHideFlags: 0
@@ -4522,6 +4548,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1831656660}
+  - component: {fileID: 1831656661}
   m_Layer: 0
   m_Name: CardDrag
   m_TagString: Untagged
@@ -4544,6 +4571,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 738986996}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1831656661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1831656659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb3f1bef3d5312242b1c11b5f7cf43fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  userCard: {fileID: 11155626}
+  beingDraggedCard: {fileID: 0}
+  onDragParent: {fileID: 534768504}
+  startParent: {fileID: 0}
 --- !u!1 &1848812340
 GameObject:
   m_ObjectHideFlags: 0
