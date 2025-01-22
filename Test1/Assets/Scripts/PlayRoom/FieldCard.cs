@@ -16,7 +16,6 @@ public class FieldCard : MonoBehaviour
     public CardPool cardPool; // CardPool 참조
     public List<string> shownCardData; // 필드에 놓인 카드 데이터 리스트
     public List<GameObject> fieldDisplayedCards;
-    public int Count = 0;
     public int i;
     public int n = 3;
     public List<GameObject> fieldList;
@@ -34,27 +33,13 @@ public class FieldCard : MonoBehaviour
         rectTransform.anchoredPosition = Vector2.zero;
     }
 
-    public void SetCapableArea()
-    {
-        if (Count == 0)
-        {
-            i = 0;
-            CreateCapableArea();
-        }
-        else
-        {
-            i = 1;
-            CreateCapableArea();
-        }
-    }
-
     public void CreateCapableArea()
     {
         for (int j = 0; j < (n + i) * (n + i); j++)
         {
-            GameObject emptyObject = new GameObject("");
-            emptyList.Add(emptyObject);
-            emptyObject.SetActive(false);
+            GameObject empty = new GameObject("");
+            fieldList.Add(empty );
+            empty.transform.SetParent(fieldArea, false);
         }
     }
 
@@ -62,17 +47,16 @@ public class FieldCard : MonoBehaviour
     {
         List<GameObject> randomCards = cardPool.GetRandomCards(1); // 1개의 랜덤 카드 얻기
         int middleIndex = fieldList.Count / 2;
-        MoveEmptyToFieldArea();
-        fieldList[middleIndex] = randomCards[0];
+
+        GameObject middleObject = fieldList[middleIndex];
+        GameObject firstCard = randomCards[0];
+
+        firstCard.transform.SetParent(middleObject.transform, false);
+        fieldList[middleIndex] = firstCard;
     }
 
     private void Start()
     {
-        SetCapableArea();
-    }
-
-    public void MoveEmptyToFieldArea()
-    {
-        cardPool.MoveCardsToTarGetArea(emptyList, fieldArea, fieldList);
+        CreateCapableArea();
     }
 }
