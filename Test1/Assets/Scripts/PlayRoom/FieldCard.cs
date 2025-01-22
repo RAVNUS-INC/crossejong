@@ -16,7 +16,7 @@ public class FieldCard : MonoBehaviour
     public CardPool cardPool; // CardPool 참조
     public List<string> shownCardData; // 필드에 놓인 카드 데이터 리스트
     public List<GameObject> fieldDisplayedCards;
-    public int i;
+    public int i = 0;
     public int n = 3;
     public List<GameObject> fieldList;
     public List<GameObject> emptyList;
