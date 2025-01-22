@@ -5,59 +5,52 @@ using DG.Tweening;
 // CardDrag 클래스는 Unity에서 드래그 가능한 카드를 구현하는 스크립트
 public class CardDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
-    private Vector2 initialPosition; // 카드의 초기 위치를 저장
-    private Transform originalParent; // 카드의 원래 부모 Transform을 저장
-    private Canvas canvas; // 카드를 드래그하기 위해 참조할 Canvas
-    private RectTransform rectTransform; // 카드의 RectTransform 참조
-    private CardDrop cardDrop; // DropSlot을 관리하는 CardDrop 스크립트 참조
-
-    void Awake()
-    {
-        rectTransform = GetComponent<RectTransform>(); // 카드의 RectTransform 컴포넌트를 가져옴
-        canvas = GetComponentInParent<Canvas>(); // 부모 오브젝트 중 Canvas를 가져옴
-        cardDrop = FindObjectOfType<CardDrop>(); // CardDrop 스크립트를 가진 오브젝트를 찾아 참조
-    }
+    public UserCard userCard; // UserCard 참조
+    public GameObject beingDraggedCard; // 드래그 중인 카드
+    private Vector3 startPosition; // 카드 시작 위치
+    [SerializeField] private Transform onDragParent; // 드래그 중 카드가 위치할 부모
+    [HideInInspector] public Transform startParent; // 원래 부모
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        initialPosition = rectTransform.anchoredPosition; // 드래그 시작 시 카드의 초기 위치를 저장
-        originalParent = transform.parent; // 드래그 시작 시 카드의 원래 부모 Transform을 저장
-        rectTransform.DOScale(1.1f, 0.2f); // 드래그 시작 시 카드 크기를 1.1배로 확대 (애니메이션 0.2초)
-        transform.SetParent(canvas.transform); // 카드의 부모를 Canvas로 설정 (최상위 레이어로 이동)
-        cardDrop.ShowDropSlots(); // 드롭 가능한 슬롯을 화면에 표시
+        // 드래그 시작 시에 displayedCards에서 카드를 찾아 선택
+        foreach (var card in userCard.displayedCards)
+        {
+            if (card.GetComponent<Collider2D>().OverlapPoint(eventData.position)) // 드래그 시작 위치에 있는 카드를 찾기
+            {
+                beingDraggedCard = card; // 드래그할 카드 할당
+                break; // 찾은 카드로 드래그 시작
+            }
+        }
+
+        // 카드의 원래 위치와 부모를 저장
+        startPosition = transform.position;
+        startParent = transform.parent;
+
+        // 카드가 UI 요소일 경우 Raycast 차단을 해제
+        GetComponent<CanvasGroup>().blocksRaycasts = false;
+
+        // 드래그할 카드의 부모를 onDragParent로 변경
+        transform.SetParent(onDragParent);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        // 드래그 중 마우스의 화면 좌표를 Canvas의 로컬 좌표로 변환
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                canvas.transform as RectTransform, // 변환 기준이 될 RectTransform
-                eventData.position, // 마우스의 화면 좌표
-                eventData.pressEventCamera, // 마우스를 클릭한 카메라
-                out Vector2 localPoint)) // 변환된 로컬 좌표를 저장할 변수
-        {
-            rectTransform.anchoredPosition = localPoint; // 카드의 위치를 마우스 위치에 따라 업데이트
-        }
+        // 드래그 중에는 카드가 마우스 위치를 따르도록 설정
+        transform.position = Input.mousePosition;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        rectTransform.DOScale(1f, 0.2f); // 드래그 종료 시 카드 크기를 원래 크기(1)로 복원 (애니메이션 0.2초)
-        cardDrop.HideDropSlots(); // 드래그 종료 시 드롭 가능한 슬롯을 화면에서 숨김
+        // 드래그 종료
+        beingDraggedCard = null; // 드래그 중인 카드가 없도록 설정
+        GetComponent<CanvasGroup>().blocksRaycasts = true; // Raycast를 다시 활성화
 
-        // 드래그가 종료된 시점에 마우스가 어떤 DropSlot 위에 있는지 확인
-        GameObject hoveredSlot = cardDrop.GetHoveredDropSlot(eventData.position);
-
-        if (hoveredSlot != null) // 마우스가 드롭 가능한 슬롯 위에 있는 경우
+        // 드래그가 끝난 후, 카드가 원래 위치로 돌아오도록 처리
+        if (transform.parent == onDragParent)
         {
-            transform.SetParent(hoveredSlot.transform); // 카드의 부모를 해당 슬롯으로 변경
-            rectTransform.anchoredPosition = Vector2.zero; // 슬롯의 중심에 카드 위치 고정
-        }
-        else // 드롭 가능한 슬롯 위에 있지 않은 경우
-        {
-            rectTransform.DOAnchorPos(initialPosition, 0.3f).SetEase(Ease.OutBack);
-            // 원래 위치로 부드럽게 복귀 (애니메이션 0.3초, Ease.OutBack 효과 사용)
-            transform.SetParent(originalParent); // 카드의 부모를 원래 부모로 복원
+            transform.position = startPosition;
+            transform.SetParent(startParent);
         }
     }
 }

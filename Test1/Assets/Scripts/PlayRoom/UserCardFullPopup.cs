@@ -10,13 +10,10 @@ public class UserCardFullPopup : MonoBehaviour
     public UserCard userCard; // UserCard 참조
     public Transform fullCardContainer; // FullPopupArea의 Content
     public List<GameObject> fullDisplayedCards; // FullPopup에서 보여지는 카드 리스트
-    public List<GameObject> rowDisplayedCards;
-    public int fullPopupRow;
 
 
     public void MoveCardsToFullPopupArea()
     {
-        fullPopupRow = fullDisplayedCards.Count / 5 + 1;
         cardPool.MoveCardsToTarGetArea(userCard.displayedCards, fullCardContainer, fullDisplayedCards);
     }
     

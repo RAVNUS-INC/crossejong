@@ -8,6 +8,7 @@ public class UserCard : MonoBehaviour
 {
     public CardPool cardPool; // CardPool 참조 
     public FieldCard fieldCard;
+    public CardDrag cardDrag;
     public Transform userCardContainer; // UserCardArea의 Contents
     public List<GameObject> displayedCards; // UserCardArea에서 보여지는 카드 리스트
 
@@ -27,10 +28,20 @@ public class UserCard : MonoBehaviour
         foreach (var card in displayedCards)
         {
             Button cardButton = card.GetComponent<Button>();
-            if (cardButton != null)
+            
+            cardDrag = card.GetComponent<CardDrag>();
+            if (cardDrag == null)
             {
-
+                cardDrag = card.AddComponent<CardDrag>(); // CardDrag 컴포넌트 추가
             }
+
+            // 카드가 드래그 가능한 상태로 설정 (필요한 초기화나 설정을 추가할 수 있음)
+            cardButton.onClick.AddListener(() =>
+            {
+                // 카드가 클릭되었을 때 (원하는 동작을 추가할 수 있음)
+                // 예: 카드 색상 변경, 드래그 시작 처리 등
+                cardDrag.OnBeginDrag(null);  // 예시로 OnBeginDrag 호출 (이 부분은 실제로는 PointerEventData가 필요하므로 적절히 수정)
+            });
         }
     }
 }
