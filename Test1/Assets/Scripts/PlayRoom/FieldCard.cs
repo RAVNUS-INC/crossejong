@@ -7,6 +7,8 @@ using PlayFab.DataModels;
 using JetBrains.Annotations;
 using System;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.VisualScripting.Antlr3.Runtime.Collections;
+using Unity.VisualScripting;
 
 public class FieldCard : MonoBehaviour
 {
@@ -14,11 +16,13 @@ public class FieldCard : MonoBehaviour
     public CardPool cardPool; // CardPool 참조
     public List<string> shownCardData; // 필드에 놓인 카드 데이터 리스트
     public List<GameObject> fieldDisplayedCards;
-    public int row;
-    public int col;
-    public string[,] savedCardData;
-    public int cardDataRowIndex;
-    public int cardDataColIndex;
+    public int Count = 0;
+    public int i;
+    public int n = 3;
+    public List<GameObject> fieldList;
+    public List<GameObject> emptyList;
+    public Transform fieldArea;
+    public Transform emptyArea;
 
 
     public void StartCardShown()
@@ -28,27 +32,47 @@ public class FieldCard : MonoBehaviour
 
         RectTransform rectTransform = randomCards[0].GetComponent<RectTransform>();
         rectTransform.anchoredPosition = Vector2.zero;
-
-        TextMeshProUGUI textComponent = randomCards[0].GetComponentInChildren<TextMeshProUGUI>();
-        string currentText = textComponent.text;
-        SaveCardData(currentText);
     }
 
-
-    public void InitializeSavedCardData(int rows, int columns)
+    public void SetCapableArea()
     {
-        savedCardData = new string[rows, columns]; // 동적으로 배열 크기 설정
-    }
-
-    public void SaveCardData(string CardText)
-    {
-        if (savedCardData == null)
+        if (Count == 0)
         {
-            InitializeSavedCardData(3, 3);
-            savedCardData[1, 1] = CardText;
-            cardDataRowIndex = 1;
-            cardDataColIndex = 1;
+            i = 0;
+            CreateCapableArea();
+        }
+        else
+        {
+            i = 1;
+            CreateCapableArea();
         }
     }
 
+    public void CreateCapableArea()
+    {
+        for (int j = 0; j < (n + i) * (n + i); j++)
+        {
+            GameObject emptyObject = new GameObject("");
+            emptyList.Add(emptyObject);
+            emptyObject.SetActive(false);
+        }
+    }
+
+    public void FirstFieldCard()
+    {
+        List<GameObject> randomCards = cardPool.GetRandomCards(1); // 1개의 랜덤 카드 얻기
+        int middleIndex = fieldList.Count / 2;
+        MoveEmptyToFieldArea();
+        fieldList[middleIndex] = randomCards[0];
+    }
+
+    private void Start()
+    {
+        SetCapableArea();
+    }
+
+    public void MoveEmptyToFieldArea()
+    {
+        cardPool.MoveCardsToTarGetArea(emptyList, fieldArea, fieldList);
+    }
 }

@@ -16,7 +16,6 @@ public class UserCardFullPopup : MonoBehaviour
 
     public void MoveCardsToFullPopupArea()
     {
-        fullPopupRow = fullDisplayedCards.Count / 5 + 1;
         cardPool.MoveCardsToTarGetArea(userCard.displayedCards, fullCardContainer, fullDisplayedCards);
     }
     
