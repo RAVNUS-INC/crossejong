@@ -168,6 +168,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardPool: {fileID: 1342198615}
   fieldCard: {fileID: 910563715}
+  cardDrag: {fileID: 0}
   userCardContainer: {fileID: 1145204212}
   displayedCards: []
 --- !u!1 &16479856
@@ -1527,7 +1528,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 536188795}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1926508068}
+        m_TargetAssemblyTypeName: GetCard, Assembly-CSharp
+        m_MethodName: GetCardToUserCard
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &536188795
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1814,6 +1827,7 @@ Transform:
   - {fileID: 11155625}
   - {fileID: 910563714}
   - {fileID: 1768101436}
+  - {fileID: 1926508069}
   m_Father: {fileID: 1590252816}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &746054139
@@ -4354,6 +4368,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1848812340}
   m_CullTransparentMesh: 1
+--- !u!1 &1926508067
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1926508069}
+  - component: {fileID: 1926508068}
+  m_Layer: 0
+  m_Name: GetCard
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1926508068
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1926508067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c62e363606dd3394393c28f3a4676880, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardPool: {fileID: 1342198615}
+  userCard: {fileID: 11155626}
+--- !u!4 &1926508069
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1926508067}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 738986996}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1937347927
 GameObject:
   m_ObjectHideFlags: 0
