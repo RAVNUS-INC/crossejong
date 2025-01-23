@@ -66,10 +66,6 @@ public class UserProfileLoad : MonoBehaviour, IOnEventCallback
         LoadCustomProperty("Imageindex"); //커스텀프로퍼티에서 유저 이미지인덱스 불러와 변수에 저장
         IsMaster(); //방장인지 아닌지에 대한 0/1 값
 
-        //Debug.Log($"내 이름:  {mydisplayname}");
-        //Debug.Log($"내 인덱스:  {myimgindex}");
-        //Debug.Log($"방장인가? :  {mymaster}");
-
         // 전송할 데이터를 Hashtable로 준비
         Hashtable playerInfo = new Hashtable();
         playerInfo["Displayname"] = mydisplayname;
@@ -231,61 +227,5 @@ public class UserProfileLoad : MonoBehaviour, IOnEventCallback
             this.isMaster = isMaster;
         }
     }
-
-    // ---------------------Displayname 불러오기 함수---------------------
-    // DisplayName 불러오기 함수
-    //public void GetUserDisplayName()
-    //{
-    //    PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest(), OnGetAccountInfoSuccess, OnGetAccountInfoFailure);
-    //}
-
-    //// 성공적으로 DisplayName을 가져온 경우 -> displayname변수에 저장
-    //private void OnGetAccountInfoSuccess(GetAccountInfoResult result)
-    //{
-    //    string displayName = result.AccountInfo.TitleInfo.DisplayName;
-    //    mydisplayname = displayName; //변수에 저장
-
-    //    if (!string.IsNullOrEmpty(displayName))
-    //    {
-    //        Debug.Log($"유저의 DisplayName: {displayName}");
-    //    }
-    //    else
-    //    {
-    //        Debug.Log("DisplayName이 설정되지 않았습니다.");
-    //    }
-    //}
-
-    //// DisplayName 가져오기에 실패한 경우
-    //private void OnGetAccountInfoFailure(PlayFabError error)
-    //{
-    //    Debug.LogError($"DisplayName 가져오기 실패: {error.GenerateErrorReport()}");
-    //}
-
-
-
-    // ---------------------프로필 이미지 인덱스 불러오기 함수---------------------
-    //private void LoadProfileImageIndex()
-    //{
-    //    var request = new GetUserDataRequest();
-    //    PlayFabClientAPI.GetUserData(request, result =>
-    //    {
-    //        // PROFILE_IMAGE_INDEX_KEY가 존재하는지 확인
-    //        if (result.Data.ContainsKey(PROFILE_IMAGE_INDEX_KEY))
-    //        {
-    //            // 저장된 인덱스 값 불러오기
-    //            int index = int.Parse(result.Data[PROFILE_IMAGE_INDEX_KEY].Value);
-    //            // 인덱스 범위 체크 후 이미지 업데이트
-    //            myimgindex = index; // -> imgindex 변수에 인덱스값 저장
-    //        }
-    //        else
-    //        {
-    //            Debug.LogWarning("PROFILE_IMAGE_INDEX_KEY가 존재하지 않습니다. 기본 이미지로 설정합니다.");
-    //        }
-    //    }, error =>
-    //    {
-    //        Debug.LogError($"유저 데이터 불러오기 실패: {error.GenerateErrorReport()}");
-    //    });
-    //}
-
 
 }

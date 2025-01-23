@@ -9,44 +9,6 @@ using UnityEngine.UI;
 using static System.Net.Mime.MediaTypeNames;
 using static UnityEngine.GraphicsBuffer;
 
-//[CustomEditor(typeof(ChatManager))]
-//public class ChatEditor : Editor
-//{
-//    ChatManager chatManager;
-//    string text;
-
-
-//    void OnEnable()
-//    {
-//        chatManager = target as ChatManager;
-//    }
-
-
-//    public override void OnInspectorGUI()
-//    {
-//        base.OnInspectorGUI();
-
-//        EditorGUILayout.BeginHorizontal();
-//        text = EditorGUILayout.TextArea(text);
-
-//        if (GUILayout.Button("보내기", GUILayout.Width(60)) && text.Trim() != "")
-//        {
-//            chatManager.Chat(true, text, "나", null);
-//            text = "";
-//            GUI.FocusControl(null);
-//        }
-
-//        if (GUILayout.Button("받기", GUILayout.Width(60)) && text.Trim() != "")
-//        {
-//            chatManager.Chat(false, text, "타인", null);
-//            text = "";
-//            GUI.FocusControl(null);
-//        }
-
-//        EditorGUILayout.EndHorizontal();
-//    }
-
-//}
 
 public class ChatEditor : MonoBehaviour, IOnEventCallback
 {
@@ -55,9 +17,15 @@ public class ChatEditor : MonoBehaviour, IOnEventCallback
     private const byte SendChatEventCode = 1; // 이벤트 코드 정의
     public InputField ChatField; //채팅입력창
 
+
     void Awake()
     {
         ChatField.text = ""; //채팅입력창은 항상 비워놓기
+
+        var customProperties = PhotonNetwork.LocalPlayer.CustomProperties;
+        string displayname = customProperties.ContainsKey("Displayname") ? (string)customProperties["Displayname"] : "Unknown";
+        // 유저가 입장했음을 알리는 메시지 띄우기
+        chatManager.DisplayUserMessage(displayname, true);
     }
 
     private void OnEnable()

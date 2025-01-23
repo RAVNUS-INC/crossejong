@@ -13,12 +13,24 @@ public class RoomListItem : MonoBehaviour
     //클릭되었을때 호출되는 함수
     public Action<string> onDelegate;
 
+
+    private void Awake()
+    {
+        // 프리팹 내 텍스트(자식요소) 연결
+        roomInfo = GetComponentInChildren<Text>();
+    }
     public void SetInfo(string roomName, int currPlayer, int maxPlayer, string difficulty, int timeLimit)
     {
-        name = roomName;
+        if (roomInfo == null)
+        {
+            Debug.LogError("roomInfo is not assigned!");
+            return;
+        }
 
+        name = roomName;
         // 텍스트 업데이트: 첫 줄에 방 이름과 인원, 두 번째 줄에 난이도와 제한 시간
         roomInfo.text = $"{roomName} ({currPlayer}/{maxPlayer})\n" + $"{maxPlayer}명 / {difficulty} / {timeLimit}초";
+        Debug.Log("Updated roomInfo.text: " + roomInfo.text);
     }
 
     public void OnClick()
@@ -27,6 +39,7 @@ public class RoomListItem : MonoBehaviour
         if (onDelegate != null)
         {
             onDelegate(name);
+            Debug.Log("onDelegate executed for room: " + name);
         }
     }
 }

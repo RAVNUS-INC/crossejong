@@ -55,7 +55,7 @@ public class HeartRechargeManager : MonoBehaviour
         m_HeartAmount = 0;
         m_RechargeRemainTime = 0;
         m_AppQuitTime = new DateTime(1970, 1, 1).ToLocalTime();
-        Debug.Log("heartRechargeTimer : " + m_RechargeRemainTime + "s");
+        //Debug.Log("heartRechargeTimer : " + m_RechargeRemainTime + "s");
     }//하트 개수, 충전까지 남은 시간, 앱 종료 시간을 초기화, 디버그 출력
 
     //저장된 하트 정보를 로드하는 함수
@@ -214,11 +214,11 @@ public class HeartRechargeManager : MonoBehaviour
         {
             m_RechargeRemainTime = reaminTime;
         } //남은 시간을 설정
-        Debug.Log("heartRechargeTimer : " + m_RechargeRemainTime + "s");
+        //Debug.Log("heartRechargeTimer : " + m_RechargeRemainTime + "s");
 
         while (m_RechargeRemainTime > 0)
         {
-            Debug.Log("heartRechargeTimer : " + m_RechargeRemainTime + "s");
+            //Debug.Log("heartRechargeTimer : " + m_RechargeRemainTime + "s");
             yield return new WaitForSeconds(1f);
             m_RechargeRemainTime -= 1;
         } //1초마다 남은 시간을 감소시키며 로그 출력

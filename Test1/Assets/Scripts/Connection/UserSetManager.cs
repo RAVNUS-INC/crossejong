@@ -37,6 +37,7 @@ public class UserSetManager : MonoBehaviourPunCallbacks
     public GameObject profilePanel; //프로필 설정 패널(메인패널에서 미리 준비해야 작동)
     public GameObject usersetPanel; //유저 초기 설정 패널
 
+
     void Start()
     {
         if ((usersetPanel.activeSelf || profilePanel.activeSelf))
