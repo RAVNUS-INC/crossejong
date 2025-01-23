@@ -79,25 +79,25 @@ public class ChatManager : MonoBehaviour
         }
 
         //이전 것과 날짜가 다르면 날짜 영역 보이기
-        if (LastArea != null && LastArea.Time.Substring(0, 10) != Area.Time.Substring(0, 10))
-        {
-            Transform CurDateArea = Instantiate(DateArea).transform;
-            CurDateArea.SetParent(ContentRect.transform, false);
-            CurDateArea.SetSiblingIndex(CurDateArea.GetSiblingIndex() - 1);
+        //if (LastArea != null && LastArea.Time.Substring(0, 10) != Area.Time.Substring(0, 10))
+        //{
+        //    Transform CurDateArea = Instantiate(DateArea).transform;
+        //    CurDateArea.SetParent(ContentRect.transform, false);
+        //    CurDateArea.SetSiblingIndex(CurDateArea.GetSiblingIndex() - 1);
 
-            string week = "";
-            switch (t.DayOfWeek)
-            {
-                case DayOfWeek.Sunday: week = "일"; break;
-                case DayOfWeek.Monday: week = "월"; break;
-                case DayOfWeek.Tuesday: week = "화"; break;
-                case DayOfWeek.Wednesday: week = "수"; break;
-                case DayOfWeek.Thursday: week = "목"; break;
-                case DayOfWeek.Friday: week = "금"; break;
-                case DayOfWeek.Saturday: week = "토"; break;
-            }
-            CurDateArea.GetComponent<AreaScript>().DateText.text = t.Year + "년" + t.Month + "월" + t.Day + "일" + week + "요일";
-        }
+        //    string week = "";
+        //    switch (t.DayOfWeek)
+        //    {
+        //        case DayOfWeek.Sunday: week = "일"; break;
+        //        case DayOfWeek.Monday: week = "월"; break;
+        //        case DayOfWeek.Tuesday: week = "화"; break;
+        //        case DayOfWeek.Wednesday: week = "수"; break;
+        //        case DayOfWeek.Thursday: week = "목"; break;
+        //        case DayOfWeek.Friday: week = "금"; break;
+        //        case DayOfWeek.Saturday: week = "토"; break;
+        //    }
+        //    CurDateArea.GetComponent<AreaScript>().DateText.text = t.Year + "년" + t.Month + "월" + t.Day + "일" + week + "요일";
+        //}
 
         Fit(Area.BoxRect);
         Fit(Area.AreaRect);
@@ -107,6 +107,22 @@ public class ChatManager : MonoBehaviour
         //스크롤바가 위로 올라간 상태에서 메시지를 받으면 맨 아래로 내리지 않음
         if (isSend && !isBottom) return;
         Invoke("ScrollDelay", 0.03f);
+    }
+
+    // 플레이어가 입장/퇴장했을 때 알림 띄우기
+    public void DisplayUserMessage(string userName, bool isEntering)
+    {
+        // 새로운 메시지 영역을 생성
+        Transform userMessageArea = Instantiate(DateArea).transform;
+
+        // 부모 객체(ContentRect)의 자식으로 설정
+        userMessageArea.SetParent(ContentRect.transform, false);
+
+        // 메시지 설정: 입장/퇴장 여부에 따라 다르게 표시
+        string message = isEntering ? $"{userName}님이 입장하셨습니다." : $"{userName}님이 퇴장하셨습니다.";
+
+        // 메시지 텍스트를 설정
+        userMessageArea.GetComponent<AreaScript>().DateText.text = message;
     }
 
     void Fit(RectTransform Rect) => LayoutRebuilder.ForceRebuildLayoutImmediate(Rect);

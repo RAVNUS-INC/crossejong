@@ -13,19 +13,19 @@ using UnityEngine.SceneManagement;
 // 메인에 존재하는 기능에 관한 스크립트
 public class Main : MonoBehaviour
 {
-    
+
+    //usersestmanager에서 가져온 변수들    
     private InputField inputField; //프로필 패널 안의 이름입력필드
     private Text SaveText; //프로필 패널 안의 저장메시지
+    private Sprite[] ProfileImg; //프로필 이미지 배열
 
+    // --------------메인에 보여질 오브젝트------------------
     public Text displayNameText; // DisplayName을 표시할 UI 텍스트
     public InputField profileInputField; //메인의 프로필 이름 입력란
     public Image centralImage;  // 메인 프로필 이미지
-
-    public Sprite[] profileImages; // 3가지 기본 제공 이미지
     public GameObject profilePanel; // 프로필 수정 패널
 
-
-    // ---------------랭킹 오브젝트---------------
+    // ---------------대시보드에 보여질 랭킹 오브젝트---------------
     public GameObject[] ranklist; //활성화/비활성화를 위한 오브젝트
     public Image[] userimage; //유저 이미지
     public Text[] username; //유저 이름
@@ -33,7 +33,6 @@ public class Main : MonoBehaviour
 
 
     private const string PROFILE_IMAGE_INDEX_KEY = "ProfileImageIndex";  // 저장 키
-    UserSetManager UserSetManager;
 
     private void Awake()
     {
@@ -55,15 +54,13 @@ public class Main : MonoBehaviour
         // UserSetManager에서 InputField를 가져옴
         inputField = userSetManager.inputText;
         SaveText = userSetManager.saveText;
-    
+        ProfileImg = userSetManager.profileImages; //프로필 이미지 배열을 가져옴
+
+
         profilePanel.SetActive(false);
         profileInputField.interactable = false; //프로필 이름 초기 비활성화
-
-        
+  
     }
-
-
-
 
 
     // 프로필 이미지 인덱스 불러오기 함수
@@ -80,12 +77,12 @@ public class Main : MonoBehaviour
                 // 저장된 인덱스 값 불러오기
                 int index = int.Parse(result.Data[PROFILE_IMAGE_INDEX_KEY].Value);
                 // 인덱스 범위 체크 후 이미지 업데이트
-                centralImage.sprite = profileImages[index];
+                centralImage.sprite = ProfileImg[index];
             }
             else
             {
                 Debug.LogWarning("PROFILE_IMAGE_INDEX_KEY가 존재하지 않습니다. 기본 이미지로 설정합니다.");
-                centralImage.sprite = profileImages[0]; ;  // 기본 이미지로 설정
+                centralImage.sprite = ProfileImg[0]; ;  // 기본 이미지로 설정
             }
         }, error =>
         {
@@ -229,12 +226,12 @@ public class Main : MonoBehaviour
                 // 저장된 인덱스 값 불러오기
                 int imgindex = int.Parse(result.Data[PROFILE_IMAGE_INDEX_KEY].Value);
                 // 인덱스 범위 체크 후 랭킹 유저 이미지 업데이트
-                userimage[index].sprite = profileImages[imgindex];
+                userimage[index].sprite = ProfileImg[imgindex];
             }
             else
             {
                 Debug.LogWarning("PROFILE_IMAGE_INDEX_KEY가 존재하지 않습니다. 기본 이미지로 설정합니다.");
-                userimage[index].sprite = profileImages[0];  // 기본 이미지로 설정
+                userimage[index].sprite = ProfileImg[0];  // 기본 이미지로 설정
             }
         }, error =>
         {
