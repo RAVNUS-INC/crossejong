@@ -3,17 +3,17 @@ using UnityEditor;
 
 public class TestMultiplay
 {
-    [MenuItem("Test/Test Multiplay Android")]
+    [MenuItem("Test/Test Multiplay")]
     private static void TestMultiplayWin64()
     {
-        EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android, BuildTarget.Android);
+        EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64);
 
         for (int n = 0; n < 1; n++)
         {
             BuildPlayerOptions options = new BuildPlayerOptions();
             options.scenes = GetScenesPath();
-            options.locationPathName = string.Format("Build/Android/{0}/Test.apk", n);
-            options.target = BuildTarget.Android;
+            options.locationPathName = string.Format("Build/Win64/{0}/Test.exe", n);
+            options.target = BuildTarget.StandaloneWindows64;
             options.options = BuildOptions.AutoRunPlayer;
             BuildPipeline.BuildPlayer(options);
 

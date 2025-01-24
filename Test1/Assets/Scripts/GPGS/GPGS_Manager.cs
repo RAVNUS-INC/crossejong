@@ -1,3 +1,4 @@
+#if UNITY_ANDROID
 using Photon.Pun;
 using PlayFab;
 using PlayFab.ClientModels;
@@ -84,3 +85,4 @@ public class GPGS_Manager : MonoBehaviour
         PhotonNetwork.ConnectUsingSettings();
     }
 }
+#endif

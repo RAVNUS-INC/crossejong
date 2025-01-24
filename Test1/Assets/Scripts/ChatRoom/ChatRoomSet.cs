@@ -18,8 +18,8 @@ using Photon.Pun.Demo.PunBasics;
 
 public class ChatRoomSet : MonoBehaviourPunCallbacks
 {
-    //[SerializeField] private UserProfileLoad UserProfileLoad; // Inspector에서 드래그하여 연결
     public UserProfileLoad UserProfileLoad;
+    public ChatEditor ChatEditor;
     
     private string selectedDifficulty; // 갱신된 난이도(초급, 중급, 고급)(변경 전)
     private int selectedTimeLimit; //  갱신된 제한시간(15초, 30초, 45초)(변경 전)
@@ -224,21 +224,6 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         UnityEngine.Debug.Log("Selected Difficulty: " + selectedDifficulty); //메시지 출력
     }
 
-    // selectedDifficulty의 값이 2, 3, 4일 때 각각 "초급", "중급", "고급"이라는 문자열을 출력
-    //public string GetDifficultyText(int difficulty)
-    //{
-    //    switch (difficulty)
-    //    {
-    //        case 2:
-    //            return "초급";
-    //        case 3:
-    //            return "중급";
-    //        case 4:
-    //            return "고급";
-    //        default:
-    //            return "알 수 없음"; // 다른 값일 경우 기본 값 반환
-    //    }
-    //}
 
     public void OnTimeLimitButtonClicked(int index, Button[] TimBtn)
     {
@@ -412,8 +397,11 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     // 방을 나갈때
     public void LeaveRoom()
     {
+
         if (PhotonNetwork.InRoom)
         {
+            ChatEditor.UserEnterState(false); //나의 퇴장을 유저들에게 알리기
+
             PhotonNetwork.LeaveRoom();
         }
         
@@ -422,6 +410,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     // 방을 성공적으로 나갔을 때 호출되는 콜백
     public override void OnLeftRoom()
     {
+
         // 로비 씬 이름으로 이동
         SceneManager.LoadScene("Main");
     }
