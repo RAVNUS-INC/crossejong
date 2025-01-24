@@ -7513,6 +7513,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UserProfileLoad: {fileID: 1800025131}
+  ChatEditor: {fileID: 1701042638}
   txtRoomName: {fileID: 952932562}
   txtPlayerCount: {fileID: 130383250}
   txtDifficulty: {fileID: 1655885900}

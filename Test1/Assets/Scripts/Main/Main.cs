@@ -198,14 +198,14 @@ public class Main : MonoBehaviour
             for (int i = 0; i < result.Leaderboard.Count; i++)
             {
                 var curBoard = result.Leaderboard[i];
+                //유저수, 순위에 따른 오브젝트 활성화
+                ranklist[i].SetActive(true);
                 //유저 단어완성횟수 업데이트
                 wordcount[i].text = "총 " + curBoard.StatValue.ToString() + "회";
                 //유저 이름 업데이트
                 username[i].text = curBoard.DisplayName;
                 //유저 이미지 인덱스를 요청 및 업데이트
                 GetUserImageData(curBoard.PlayFabId, i);
-                //유저수, 순위에 따른 오브젝트 활성화
-                ranklist[i].SetActive(true);
             }
         },
         (Error) => print("리더보드 불러오기 실패"));
