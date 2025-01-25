@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using DG.Tweening;
 using System.Collections.Generic;
 using Unity.Collections.LowLevel.Unsafe;
+using TMPro;
 
 public class UserCard : MonoBehaviour
 {
@@ -19,7 +20,6 @@ public class UserCard : MonoBehaviour
         List<GameObject> randomCards = cardPool.GetRandomCards(11); // 11개의 랜덤 카드 얻기
         cardPool.MoveCardsToTarGetArea(randomCards, userCardContainer, displayedCards);
     }
-
 
 
     //public void SelectedUserCard()
