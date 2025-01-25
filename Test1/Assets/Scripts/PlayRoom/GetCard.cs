@@ -7,8 +7,8 @@ public class GetCard : MonoBehaviour
     public UserCard userCard;
     public void GetCardToUserCard()
     {
-        List<GameObject> randomCards = cardPool.GetRandomCards(1); // 11개의 랜덤 카드 얻기
-        cardPool.MoveCardsToTarGetArea(randomCards, userCard.userCardContainer, userCard.displayedCards);
+        List<GameObject> randomCards = cardPool.GetRandomCards(1); // 1개의 랜덤 카드 얻기
+        cardPool.GetCardsToTarGetArea(randomCards, userCard.userCardContainer, userCard.displayedCards);
     }
 
 }
