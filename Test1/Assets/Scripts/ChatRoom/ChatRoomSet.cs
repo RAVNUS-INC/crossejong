@@ -18,8 +18,12 @@ using Photon.Pun.Demo.PunBasics;
 
 public class ChatRoomSet : MonoBehaviourPunCallbacks
 {
-    private int selectedDifficulty; // 갱신된 난이도(초급, 중급, 고급)(변경 전)
+    public UserProfileLoad UserProfileLoad;
+    public ChatEditor ChatEditor;
+    
+    private string selectedDifficulty; // 갱신된 난이도(초급, 중급, 고급)(변경 전)
     private int selectedTimeLimit; //  갱신된 제한시간(15초, 30초, 45초)(변경 전)
+
     private int selectedDifficultyIndex; // 난이도 선택 인덱스
     private int selectedTimeLimitIndex; // 제한시간 인덱스
 
@@ -40,8 +44,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     public Button SaveBtn; //저장버튼
     public Text Savetext; //저장완료메시지
 
-    //[SerializeField] private UserProfileLoad UserProfileLoad; // Inspector에서 드래그하여 연결
-    public UserProfileLoad UserProfileLoad;
+    
     void Awake()
     {
         
@@ -50,7 +53,8 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     private void Start()
     {
         UserProfileLoad = GameObject.FindObjectOfType<UserProfileLoad>();  // 씬에 있는 PlayerManager를 찾기
-        UpdateRoomInfo(); // 방 들어서자마자 방 정보 업데이트(awake에 있어야 하나? start에 있어야 하나?)
+
+        UpdateRoomInfo(); // 방 들어서자마자 방 정보 업데이트
 
         //저장버튼 누르면 실행할 함수
         SaveBtn.onClick.AddListener(() =>
@@ -60,15 +64,17 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
                 Room room = PhotonNetwork.CurrentRoom;
                 if (room.CustomProperties.ContainsKey("difficulty"))
                 {
-                    string difficultyText = GetDifficultyText(selectedDifficulty);
+                    //string difficultyText = GetDifficultyText(selectedDifficulty); //난이도 문자열 변환
                     UpdateRoomUIBtn("DifficultyIndex", selectedDifficultyIndex); //인덱스도 저장
-                    UpdateRoomUIBtn("difficulty", difficultyText);
-                    UnityEngine.Debug.Log("difficulty: " + difficultyText);
+                    UpdateRoomUIBtn("difficulty", selectedDifficulty); //난이도 저장(실제 반영될 텍스트)
+
+                    UnityEngine.Debug.Log("difficulty: " + selectedDifficulty);
                 }
                 if (room.CustomProperties.ContainsKey("timeLimit"))
                 {
                     UpdateRoomUIBtn("TimeLimitIndex", selectedTimeLimitIndex); //인덱스도 저장
-                    UpdateRoomUIBtn("timeLimit", selectedTimeLimit);
+                    UpdateRoomUIBtn("timeLimit", selectedTimeLimit); //시간 저장(실제 반영될 값)
+
                     UnityEngine.Debug.Log("timeLimit: " + selectedTimeLimit);
                 }
 
@@ -104,14 +110,18 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
 
                 object ReDifficulty = room.CustomProperties["DifficultyIndex"]; //난이도 인덱스를 불러오기
                 object ReselectedTimeLimit = room.CustomProperties["TimeLimitIndex"]; //제한시간 인덱스를 불러오기
+                object Difficulty = room.CustomProperties["difficulty"]; //난이도를 불러오기
+                object TimeLimit = room.CustomProperties["timeLimit"]; //제한시간을 불러오기
 
                 // 변수명을 로비매니저 변수와 똑같게(함수 사용을 위해)
-                selectedDifficulty = (int)ReDifficulty; //int형변환
-                selectedTimeLimit = (int)ReselectedTimeLimit; //int형변환
+                selectedDifficultyIndex = (int)ReDifficulty; //int형변환
+                selectedTimeLimitIndex = (int)ReselectedTimeLimit; //int형변환
+                selectedDifficulty = (string)Difficulty; //문자열 변환
+                selectedTimeLimit= (int)TimeLimit; //int형변환
 
                 // 처음 선택했던 버튼들(난이도, 제한시간)은 색상 다르게(바뀐 정보라면 바뀐 정보에만 노란색) 
-                SetDefaultSelection(DifButton, selectedDifficulty);
-                SetDefaultSelection(TimeButton, selectedTimeLimit);
+                SetDefaultSelection(DifButton, selectedDifficultyIndex);
+                SetDefaultSelection(TimeButton, selectedTimeLimitIndex);
             }
         }
         else
@@ -134,15 +144,15 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             object ReselectedTimeLimit = room.CustomProperties["TimeLimitIndex"];
 
             // 변수명을 로비매니저 변수와 똑같게(함수 사용을 위해)
-            selectedDifficulty = (int)ReDifficulty; //int형변환
-            selectedTimeLimit = (int)ReselectedTimeLimit; //int형변환
+            selectedDifficultyIndex = (int)ReDifficulty; //int형변환
+            selectedTimeLimitIndex = (int)ReselectedTimeLimit; //int형변환
 
             // 처음 선택했던 버튼들(난이도, 제한시간)은 색상 다르게(초기설정 1번만) 
-            SetDefaultSelection(DifButton, selectedDifficulty);
-            SetDefaultSelection(TimeButton, selectedTimeLimit);
+            SetDefaultSelection(DifButton, selectedDifficultyIndex);
+            SetDefaultSelection(TimeButton, selectedTimeLimitIndex);
 
 
-            // -------------버튼 클릭 시 색상 변경(이거는 프로퍼티 영향X)-------------
+            // -------------버튼 클릭 시 색상 변경(이거는 프로퍼티 영향X, 값이 실제로 저장되지는 않는다)-------------
             // 각 버튼 배열에 리스너 추가(클릭시 색상 변경) -> OK
             DifficultySet(DifButton);
             TimeLimitSet(TimeButton);
@@ -199,36 +209,21 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         switch (index) // 0: 초급, 1: 중급, 2: 고급
         {
             case 0:
-                selectedDifficulty = 2;
+                selectedDifficulty = "초급";
                 break;
             case 1:
-                selectedDifficulty = 3;
+                selectedDifficulty = "중급";
                 break;
             case 2:
-                selectedDifficulty = 4;
+                selectedDifficulty = "고급";
                 break;
         }
         selectedDifficultyIndex = index;
-        string difficultyText = GetDifficultyText(selectedDifficulty); // selectedDifficulty 값을 기반으로 실제 문자열로 반환
+        //string difficultyText = GetDifficultyText(selectedDifficulty); // selectedDifficulty 값을 기반으로 실제 문자열로 반환
         UpdateButtonColors(difBtn, index); //색상 업데이트
-        UnityEngine.Debug.Log("Selected Difficulty: " + difficultyText); //메시지 출력
+        UnityEngine.Debug.Log("Selected Difficulty: " + selectedDifficulty); //메시지 출력
     }
 
-    // selectedDifficulty의 값이 2, 3, 4일 때 각각 "초급", "중급", "고급"이라는 문자열을 출력
-    public string GetDifficultyText(int difficulty)
-    {
-        switch (difficulty)
-        {
-            case 2:
-                return "초급";
-            case 3:
-                return "중급";
-            case 4:
-                return "고급";
-            default:
-                return "알 수 없음"; // 다른 값일 경우 기본 값 반환
-        }
-    }
 
     public void OnTimeLimitButtonClicked(int index, Button[] TimBtn)
     {
@@ -402,8 +397,11 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     // 방을 나갈때
     public void LeaveRoom()
     {
+
         if (PhotonNetwork.InRoom)
         {
+            ChatEditor.UserEnterState(false); //나의 퇴장을 유저들에게 알리기
+
             PhotonNetwork.LeaveRoom();
         }
         
@@ -412,6 +410,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     // 방을 성공적으로 나갔을 때 호출되는 콜백
     public override void OnLeftRoom()
     {
+
         // 로비 씬 이름으로 이동
         SceneManager.LoadScene("Main");
     }
