@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 5373074371033966230}
   - component: {fileID: 81563127244270843}
   - component: {fileID: 2811049416354316396}
-  - component: {fileID: 8892737232038295160}
   - component: {fileID: -5547961652875677482}
   m_Layer: 5
   m_Name: CardPrefab
@@ -145,20 +144,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &8892737232038295160
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6484471033068988317}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: efd161d4e7d5a7e4fbe7ff260ca0287b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  frontImage: {fileID: 5373074371033966230}
-  backImage: {fileID: 5373074371033966230}
 --- !u!61 &-5547961652875677482
 BoxCollider2D:
   m_ObjectHideFlags: 0
