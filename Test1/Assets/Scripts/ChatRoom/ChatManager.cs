@@ -53,6 +53,7 @@ public class ChatManager : MonoBehaviour
         DateTime t = DateTime.Now;
         Area.Time = t.ToString("yyyy-MM-dd-HH-mm");
         Area.User = user; //이름 대입
+
         if (imgindex != null)
         {
             Area.UserImage.sprite = UserProfileLoad.profileImages[imgindex.Value]; //이미지 교체
