@@ -6,6 +6,20 @@ using Unity.Collections.LowLevel.Unsafe;
 
 public class UserCardFullPopup : MonoBehaviour
 {
+    public static UserCardFullPopup instance = null;
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
+
     public CardPool cardPool; // CardPool 참조 
     public UserCard userCard; // UserCard 참조
     public Transform fullCardContainer; // FullPopupArea의 Content

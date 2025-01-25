@@ -7,6 +7,22 @@ using DG.Tweening;
 
 public class CardPool : MonoBehaviour
 {
+    public static CardPool instance = null;
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+        }
+
+        rectTransform = GetComponent<RectTransform>();  // RectTransform 초기화
+    }
+
     public Transform cardContainer; // 카드 부모 오브젝트
     public Sprite cardFrontImage; // 카드 앞면 이미지
     public Sprite cardBackImage; // 카드 뒷면 이미지
@@ -66,6 +82,7 @@ public class CardPool : MonoBehaviour
                 tmpText.fontSize = 120;
                 tmpText.alignment = TextAlignmentOptions.Center;
                 tmpText.color = color;
+                tmpText.raycastTarget = false; // 텍스트 레이캐스트 제거
             }
             else
             {
@@ -101,10 +118,6 @@ public class CardPool : MonoBehaviour
                 cardButton.colors = colorBlock;
             }
         }
-    }
-    void Awake()
-    {
-        rectTransform = GetComponent<RectTransform>();  // RectTransform 초기화
     }
 
     public void FlipCard(GameObject card)
@@ -200,6 +213,8 @@ public class CardPool : MonoBehaviour
             card.SetActive(true); // 카드가 보이도록 활성화
             targetList.Add(card); // 보여지는 리스트에 추가
         }
+
+        SortCardIndex(targetList);
     }
     public void GetCardsToTarGetArea(List<GameObject> startList, Transform targetArea, List<GameObject> targetList)
     {
@@ -208,6 +223,23 @@ public class CardPool : MonoBehaviour
             MoveCardToParent(card, targetArea); // 각 카드를 TargetArea로 이동
             card.SetActive(true); // 카드가 보이도록 활성화
             targetList.Add(card); // 보여지는 리스트에 추가
+        }
+
+        SortCardIndex(targetList);
+    }
+
+    public void SortCardIndex(List<GameObject> cardList)
+    {
+        if (cardList.Count != 0)
+        {
+            for (int i = 0; i < cardList.Count; i++)
+            {
+                CardDrag CD = cardList[i].GetComponent<CardDrag>();
+                if (CD != null)
+                {
+                    CD.cardIndex = i;
+                }
+            }
         }
     }
 }

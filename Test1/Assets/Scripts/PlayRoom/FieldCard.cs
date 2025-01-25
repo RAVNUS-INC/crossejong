@@ -22,7 +22,6 @@ public class FieldCard : MonoBehaviour
     public Transform fieldArea;
     public Transform emptyArea;
 
-
     public void CreateCapableArea()
     {
         for (int j = 0; j < (n + i) * (n + i); j++)
@@ -30,12 +29,18 @@ public class FieldCard : MonoBehaviour
             GameObject empty = new GameObject("");
             fieldList.Add(empty);
             empty.transform.SetParent(fieldArea, false);
+            RectTransform RT = empty.AddComponent<RectTransform>();
+            RT.sizeDelta = new Vector2(200, 200);
+            Image img = empty.AddComponent<Image>();
+            img.color = Color.clear;
+            empty.AddComponent<CardDrop>();
         }
     }
 
     public void FirstFieldCard()
     {
         List<GameObject> randomCards = cardPool.GetRandomCards(1); // 1개의 랜덤 카드 얻기
+        fieldDisplayedCards.Add(randomCards[0]);
         int middleIndex = fieldList.Count / 2;
 
         GameObject middleObject = fieldList[middleIndex];
