@@ -5874,7 +5874,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1726527752
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5887,10 +5887,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f10e20d08176faa409df5b5b2ba22274, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LoginManager: {fileID: 769672813}
-  UserID: {fileID: 382826499}
-  Username: {fileID: 635957071}
-  Messages: {fileID: 1054705960}
 --- !u!4 &1726527753
 Transform:
   m_ObjectHideFlags: 0

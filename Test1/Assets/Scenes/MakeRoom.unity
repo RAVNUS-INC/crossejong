@@ -1486,6 +1486,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 722018857}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
       - m_Target: {fileID: 2046631741}
         m_TargetAssemblyTypeName: ChatRoomSet, Assembly-CSharp
         m_MethodName: RoomSetPanelOpenBtn
@@ -6997,7 +7009,7 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 4
     m_MaxSize: 45
-    m_Alignment: 0
+    m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 0
     m_HorizontalOverflow: 1
@@ -7518,6 +7530,7 @@ MonoBehaviour:
   txtPlayerCount: {fileID: 130383250}
   txtDifficulty: {fileID: 1655885900}
   txtTimelimit: {fileID: 1592181505}
+  Savetext: {fileID: 1483309611}
   DifButton:
   - {fileID: 1534322858}
   - {fileID: 1260422830}
@@ -7527,9 +7540,8 @@ MonoBehaviour:
   - {fileID: 1615638586}
   - {fileID: 881168555}
   RoomSetBtn: {fileID: 445915892}
-  RoomSetPanel: {fileID: 722018857}
   SaveBtn: {fileID: 145841136}
-  Savetext: {fileID: 1483309611}
+  RoomSetPanel: {fileID: 722018857}
 --- !u!4 &2046631742
 Transform:
   m_ObjectHideFlags: 0

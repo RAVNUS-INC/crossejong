@@ -74,33 +74,37 @@ public class ChatEditor : MonoBehaviour, IOnEventCallback
 
     public void OnEvent(EventData photonEvent)
     {
+
         object[] data = (object[])photonEvent.CustomData; //데이터파싱
         //공통
-        int actornumber = (int)data[0];
-        string senderName = (string)data[1];
-
-        switch (photonEvent.Code)
+        if (data != null)
         {
-            case SendChatEventCode:
-                int Index = (int)data[2]; //보낸 유저의 인덱스 받기
-                string message = (string)data[3]; //보낸 유저의 메시지 내용 받기
-                Debug.Log($"상대방의 정보를 받았습니다");
+            int actornumber = (int)data[0];
+            string senderName = (string)data[1];
 
-                if (actornumber != PhotonNetwork.LocalPlayer.ActorNumber) // 자신의 ActorNumber와 다르다면(다른 유저가 보낸 이벤트라면)
-                {
-                    //화면에 보낸사람 말풍선 띄우기
-                    chatManager.Chat(false, message, senderName, Index);
-                }
-                break;
+            switch (photonEvent.Code)
+            {
+                case SendChatEventCode:
+                    int Index = (int)data[2]; //보낸 유저의 인덱스 받기
+                    string message = (string)data[3]; //보낸 유저의 메시지 내용 받기
+                    Debug.Log($"상대방의 정보를 받았습니다");
 
-            case SendUserEventCode:
-                bool isEnter = (bool)data[2]; //보낸 유저가 입장인지 퇴장인지 구분
+                    if (actornumber != PhotonNetwork.LocalPlayer.ActorNumber) // 자신의 ActorNumber와 다르다면(다른 유저가 보낸 이벤트라면)
+                    {
+                        //화면에 보낸사람 말풍선 띄우기
+                        chatManager.Chat(false, message, senderName, Index);
+                    }
+                    break;
 
-                if (actornumber != PhotonNetwork.LocalPlayer.ActorNumber) // 자신의 ActorNumber와 다르다면(다른 유저가 보낸 이벤트라면)
-                {
-                    chatManager.DisplayUserMessage(senderName, isEnter);
-                }
-                break;
+                case SendUserEventCode:
+                    bool isEnter = (bool)data[2]; //보낸 유저가 입장인지 퇴장인지 구분
+
+                    if (actornumber != PhotonNetwork.LocalPlayer.ActorNumber) // 자신의 ActorNumber와 다르다면(다른 유저가 보낸 이벤트라면)
+                    {
+                        chatManager.DisplayUserMessage(senderName, isEnter);
+                    }
+                    break;
+            }
         }
 
     }

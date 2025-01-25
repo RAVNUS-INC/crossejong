@@ -4,10 +4,6 @@ using PlayFab;
 using PlayFab.ClientModels;
 using Photon.Pun;
 using static UnityEngine.EventSystems.EventTrigger;
-
-//using UnityEditor.PackageManager;
-//using UnityEditor.PackageManager.Requests;
-
 using UnityEngine.SceneManagement;
 
 // 메인에 존재하는 기능에 관한 스크립트

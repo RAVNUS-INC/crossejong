@@ -8,7 +8,7 @@ public class TestMultiplay
     {
         EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64);
 
-        for (int n = 0; n < 1; n++)
+        for (int n = 0; n < 2; n++)
         {
             BuildPlayerOptions options = new BuildPlayerOptions();
             options.scenes = GetScenesPath();

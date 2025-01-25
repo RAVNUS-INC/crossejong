@@ -131,9 +131,9 @@ public class LoginManager : MonoBehaviour
         }
 
         // 알파벳으로만 이루어졌는지 확인 (3자리 이상)
-        if ((Regex.IsMatch(inputID, @"[\u3131-\uD79D]"))) //한글을 포함하고 있으면
+        if ((!Regex.IsMatch(inputID, @"^[a-zA-Z0-9]+$"))) //한글을 포함하고 있으면
         {
-            IDErrorText.text = "ID는 알파벳만 포함해야 합니다.";
+            IDErrorText.text = "알파벳과 숫자만 입력 가능합니다.";
         }
         else if (inputID.Length < 3)
         {
@@ -184,10 +184,9 @@ public class LoginManager : MonoBehaviour
             PasswordErrorText.text = "비밀번호를 입력해주세요";
             return;
         }
-
-        if ((Regex.IsMatch(inputPW, @"[\u3131-\uD79D]")))
+        if ((!Regex.IsMatch(inputPW, @"^[a-zA-Z0-9]+$")))
         {
-            PasswordErrorText.text = "비밀번호는 알파벳만 포함해야 합니다.";
+            PasswordErrorText.text = "알파벳과 숫자만 입력이 가능합니다.";
         }
         else if (inputPW.Length < 6) // 6자리 미만이면
         {
