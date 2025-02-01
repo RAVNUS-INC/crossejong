@@ -33,18 +33,17 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     // 난이도, 제한시간 선택 인덱스, 갱신된 제한시간(15초, 30초, 45초)(변경 전)
     private int selectedDifficultyIndex, selectedTimeLimitIndex, selectedTimeLimit;
 
-    private int myActorNum, myImgIndex; //내 actornumber, 내 사진 인덱스
+    private int myActorNum, myImgIndex, myMaster; //내 actornumber, 내 사진 인덱스, 방장인지 아닌지
     private string myDisplayName, myMesseages; //내 이름, 내가 보낸 메시지
     private Dictionary<int, bool> playerReadyStates = new Dictionary<int, bool>(); // 플레이어 준비 상태 저장
 
     public InputField ChatField; //채팅입력창
     public Button ReadyBtn; //준비버튼
 
+
+
     void Awake()
     {
-        // 씬에 있는 PlayerManager를 찾기
-        UserProfileLoad = GameObject.FindObjectOfType<UserProfileLoad>();
-
         // property에 있는 방 정보 불러와 변수에 저장(방이름도 저장)
         LoadRoomInfo();
 
@@ -272,36 +271,26 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         }
     }
 
-    //다른 플레이어들의 입장 및 퇴장 시 공통적으로 사용되는 함수
-    public void UserEnterorOut()
-    {
-        // 방장이 아닌 플레이어는 버튼 비활성화
-        RoomSetBtn.interactable = PhotonNetwork.IsMasterClient;
-
-        //현재 방 접속 인원 업데이트
-        PlayersUpdate();
-
-        // 기존 리스트의 모든 항목 제거
-        UserProfileLoad.players.Clear();
-
-        // 내 정보 다른 유저들에게 전송
-        UserProfileLoad.SendPlayerInfoToOthers();
-
-        // 내 정보 업데이트
-        UserProfileLoad.UpdateMyInfo();
-    }
 
     // 내가 아닌 새로운 플레이어가 입장한 경우
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
-        UserEnterorOut();
-        UnityEngine.Debug.Log("내가 아닌 새로운 플레이어 입장");
+        // 방장이 아닌 플레이어는 버튼 비활성화
+        RoomSetBtn.interactable = PhotonNetwork.IsMasterClient;
+
+        //현재 접속 인원 업데이트
+        PlayersUpdate();
+        UnityEngine.Debug.Log("새로운 플레이어 입장");
     }
 
     // 플레이어가 방을 나갔을 때 호출되는 콜백
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        UserEnterorOut();
+        // 방장이 아닌 플레이어는 버튼 비활성화
+        RoomSetBtn.interactable = PhotonNetwork.IsMasterClient;
+
+        //현재 접속 인원 업데이트
+        PlayersUpdate();
         UnityEngine.Debug.Log("다른 플레이어 방 나감");
     }
 
@@ -313,6 +302,9 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         {
             //나의 퇴장을 모두에게 알리기
             photonView.RPC("EnterState", RpcTarget.All, myDisplayName, false);
+
+            //나 자신을 players리스트에서 제거(후 접속자에게도 정보 전달)
+            UserProfileLoad.photonView.RPC("RemoveUserInfo", RpcTarget.AllBuffered, myActorNum);
 
             //나가기
             PhotonNetwork.LeaveRoom();
@@ -369,6 +361,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         // 플레이룸 씬으로 이동(현재 방에서 준비버튼을 누른 모든 플레이어에 한하여)
         photonView.RPC("ChangeScene", RpcTarget.All, "PlayRoom");
     }
+
 
     [PunRPC]
     //채팅을 모두에게 보내고 ui업데이트까지 한번에 동기화

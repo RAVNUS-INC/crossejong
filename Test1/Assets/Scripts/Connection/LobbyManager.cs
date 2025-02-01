@@ -333,7 +333,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             };
             count++;
         }
-        UnityEngine.Debug.Log($"[DEBUG] 积己等 规 UI 俺荐: {count}");
+        UnityEngine.Debug.Log($"积己等 规 UI 俺荐: {count}");
     }
 
 

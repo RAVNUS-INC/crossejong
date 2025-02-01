@@ -6792,6 +6792,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1800025130}
+  - component: {fileID: 1800025132}
   - component: {fileID: 1800025131}
   m_Layer: 0
   m_Name: UserProfileLoad
@@ -6849,6 +6850,29 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 2febe3c46f2ec1e4e84107fb832a748e, type: 3}
   - {fileID: 21300000, guid: ed578dfef7418ff48aca7cba340ede9b, type: 3}
   - {fileID: 21300000, guid: f1dd6b8b6c5254c45b0f97346843c2c0, type: 3}
+--- !u!114 &1800025132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1800025129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 0
+  ObservedComponents:
+  - {fileID: 0}
+  sceneViewId: 3
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &1816781334
 GameObject:
   m_ObjectHideFlags: 0
@@ -7842,10 +7866,10 @@ CanvasRenderer:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 2046631742}
   - {fileID: 1457311510}
-  - {fileID: 1701042637}
+  - {fileID: 2046631742}
   - {fileID: 1800025130}
+  - {fileID: 1701042637}
   - {fileID: 295395251}
   - {fileID: 272463197}
   - {fileID: 1187475337}
