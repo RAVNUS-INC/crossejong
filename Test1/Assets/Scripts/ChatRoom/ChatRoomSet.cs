@@ -18,6 +18,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
 {
     public UserProfileLoad UserProfileLoad;
     public ChatEditor ChatEditor;
+    public ChatManager chatManager; 
 
     // 방 이름, 현재인원/최대인원, 난이도, 제한시간, 저장완료메시지
     public Text txtRoomName, txtPlayerCount, txtDifficulty, txtTimelimit, Savetext; 
@@ -30,7 +31,14 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     // 갱신된 난이도(초급, 중급, 고급)(변경 전)
     private string selectedDifficulty; 
     // 난이도, 제한시간 선택 인덱스, 갱신된 제한시간(15초, 30초, 45초)(변경 전)
-    private int selectedDifficultyIndex, selectedTimeLimitIndex, selectedTimeLimit; 
+    private int selectedDifficultyIndex, selectedTimeLimitIndex, selectedTimeLimit;
+
+    private int myActorNum, myImgIndex; //내 actornumber, 내 사진 인덱스
+    private string myDisplayName, myMesseages; //내 이름, 내가 보낸 메시지
+    private Dictionary<int, bool> playerReadyStates = new Dictionary<int, bool>(); // 플레이어 준비 상태 저장
+
+    public InputField ChatField; //채팅입력창
+    public Button ReadyBtn; //준비버튼
 
     void Awake()
     {
@@ -46,6 +54,20 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         // 난이도, 제한시간 text 업데이트
         txtDifficulty.text = selectedDifficulty; //ex. 초급
         txtTimelimit.text = selectedTimeLimit + "초"; //ex. 15초
+
+        ChatField.text = ""; //채팅입력창은 항상 비워놓기
+
+        ReadyBtn.interactable = true; // 처음에는 준비버튼 활성화
+
+        //내 정보 불러오기(내 이름, 내 고유번호, 프로필 인덱스)
+        var customProperties = PhotonNetwork.LocalPlayer.CustomProperties;
+        myDisplayName = customProperties.ContainsKey("Displayname") ? (string)customProperties["Displayname"] : "Unknown";
+        myActorNum = PhotonNetwork.LocalPlayer.ActorNumber;
+        myImgIndex = int.Parse(customProperties.ContainsKey("Imageindex") ? (string)customProperties["Imageindex"] : "Unknown");
+
+        //나의 입장 알리기("~님이 입장하였습니다.")
+        photonView.RPC("EnterState", RpcTarget.All, myDisplayName, true);
+        Debug.Log("나의 입장을 알렸습니다");
     }
 
     private void Start()
@@ -289,8 +311,8 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.InRoom)
         {
-            //나의 퇴장을 유저들에게 알리기
-            ChatEditor.UserEnterState(false);
+            //나의 퇴장을 모두에게 알리기
+            photonView.RPC("EnterState", RpcTarget.All, myDisplayName, false);
 
             //나가기
             PhotonNetwork.LeaveRoom();
@@ -304,4 +326,79 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         SceneManager.LoadScene("Main");
     }
 
+    // 채팅 전송버튼에 직접 연결해 사용(메시지 전송 역할)
+    public void SendMyMessage()
+    {
+        if (ChatField.text.Trim() != "")
+        {
+            //채팅창에 입력한 내용을 메시지 변수에 저장
+            myMesseages = ChatField.text;
+
+            //나를 제외한 다른 유저들에게 내 채팅 전달
+            photonView.RPC("SendChat", RpcTarget.Others, false, myMesseages, myDisplayName, myImgIndex);
+            Debug.Log($"내 채팅과 정보를 다른 유저에게 전달했습니다");
+
+            //내 채팅에 내 메시지 업데이트
+            chatManager.Chat(true, myMesseages, "나", null);
+
+            //내용을 전달한 뒤, 채팅 인풋필드 비우기
+            ChatField.text = "";
+        }
+    }
+
+    //준비 버튼에 직접 연결(준비 상태 알리는 역할, 방장은 이동까지 수행)
+    public void UserReadyState()
+    {
+        ReadyBtn.interactable = false; // 버튼 한번 눌렀으면 다음부턴 비활성화(준비 취소 불가능)
+
+        //방장에게만 나의 준비 상태 전달
+        photonView.RPC("IsReady", RpcTarget.MasterClient, myDisplayName, myActorNum);
+        Debug.Log("방장에게 준비 완료 상태를 알렸습니다.");
+
+        //방장인 경우에만 아래의 코드를 수행
+        if (!PhotonNetwork.IsMasterClient) return;
+
+        // 플레이어들 중 한 명이라도 준비하지 않았다면 종료
+        foreach (Player player in PhotonNetwork.PlayerList)
+        {
+            if (!playerReadyStates.ContainsKey(player.ActorNumber) || !playerReadyStates[player.ActorNumber])
+                return; 
+        }
+        //모두 준비 했을 경우
+        Debug.Log("모든 플레이어 준비. 플레이방으로 이동합니다.");
+        // 플레이룸 씬으로 이동(현재 방에서 준비버튼을 누른 모든 플레이어에 한하여)
+        photonView.RPC("ChangeScene", RpcTarget.All, "PlayRoom");
+    }
+
+    [PunRPC]
+    //채팅을 모두에게 보내고 ui업데이트까지 한번에 동기화
+    void SendChat(bool who, string chat, string senderName, int index)
+    {
+        //화면에 말풍선 띄우기(나: true, 상대방: false), index는 프로필이미지
+        chatManager.Chat(who, chat, senderName, index);
+        Debug.Log("누군가의 채팅이 도착했습니다");
+    }
+
+    [PunRPC]
+    //유저의 입장 퇴장 메시지 알리미
+    void EnterState(string enteruserName, bool isbool)
+    {
+        // 내가 입장/퇴장했음을 알리는 메시지 띄우기
+        chatManager.DisplayUserMessage(enteruserName, isbool);
+        Debug.Log(isbool ? $"{enteruserName}이 입장했습니다" : $"{enteruserName}이 퇴장했습니다");
+    }
+
+    [PunRPC]
+    //모든 유저들의 준비 유무 알리미
+    void IsReady(string userName, int userNum)
+    {
+        playerReadyStates[userNum] = true; // 유저의 준비 상태 저장
+    }
+
+    [PunRPC]
+    //모든 유저가 준비하면 플레이룸으로 이동
+    void ChangeScene(string sceneName)
+    {
+        PhotonNetwork.LoadLevel(sceneName);
+    }
 }

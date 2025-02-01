@@ -132,7 +132,7 @@ public class Main : MonoBehaviour
     }
 
 
-    // 로그아웃 버튼을 누르면
+    // 로그아웃 버튼을 누르면->playfab 인증을 로그아웃
     public void LogoutBtn()
     {
         // PlayFab 인증 정보 초기화

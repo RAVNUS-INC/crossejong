@@ -14,11 +14,6 @@ public class ChatManager : MonoBehaviour
     public Scrollbar scrollBar;
     AreaScript LastArea;
 
-    public void Start()
-    {
-        UserProfileLoad UserProfileLoad = GameObject.Find("UserProfileLoad").GetComponent<UserProfileLoad>();
-    }
-
     public void Chat(bool isSend, string text, string user, int? imgindex)
     {
         if (text.Trim() == "") return;

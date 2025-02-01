@@ -152,7 +152,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     // 방 목록을 선택했을 때
     void SelectRoomItem(string roomName, GameObject button)
     {
-        input_RoomName.text = roomName;
         // 이전에 선택된 버튼의 색상을 초기화
         if (roomListItem != null)
         {
@@ -171,14 +170,9 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             currentImage.color = Color.yellow; // 노란색으로 설정
         }
 
-        // 방 이름을 입력 필드에 설정
-        //input_RoomName.text = roomName;
+        // 선택한 방 이름을 전달
+        input_RoomName.text = roomName;
     }
-
-
-
-    
-
 
 
     // 방 옵션 선택 시 이뤄지는 ui와 index 업데이트에 관한 코드
