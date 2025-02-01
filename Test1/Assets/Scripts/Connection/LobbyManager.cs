@@ -172,7 +172,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         }
 
         // 방 이름을 입력 필드에 설정
-        input_RoomName.text = roomName;
+        //input_RoomName.text = roomName;
     }
 
 
@@ -300,12 +300,17 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                 dicRoomInfo[info.Name] = info; // 방 정보 추가 또는 업데이트
             }
         }
+        UnityEngine.Debug.Log($"[DEBUG] 현재 방 개수: {dicRoomInfo.Count}");
+        
     }
 
 
     // 생성된 방 목록을 스크롤 뷰에 보여줄 때
     void CreateRoomListItem()
     {
+ 
+        int count = 0;
+
         foreach (RoomInfo info in dicRoomInfo.Values)
         {
             //방 정보 생성과 동시에 ScrollView-> Content의 자식으로 하자
@@ -332,7 +337,9 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                 // SelectRoomItem을 바로 호출
                 SelectRoomItem(roomName, go); // roomName과 현재 버튼(GameObject)을 전달 -> 선택된 방목록의 색상이 변경되도록
             };
+            count++;
         }
+        UnityEngine.Debug.Log($"[DEBUG] 생성된 방 UI 개수: {count}");
     }
 
 
