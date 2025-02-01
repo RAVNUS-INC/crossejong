@@ -152,7 +152,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     // 방 목록을 선택했을 때
     void SelectRoomItem(string roomName, GameObject button)
     {
-        input_RoomName.text = roomName;
         // 이전에 선택된 버튼의 색상을 초기화
         if (roomListItem != null)
         {
@@ -171,14 +170,9 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             currentImage.color = Color.yellow; // 노란색으로 설정
         }
 
-        // 방 이름을 입력 필드에 설정
+        // 선택한 방 이름을 전달
         input_RoomName.text = roomName;
     }
-
-
-
-    
-
 
 
     // 방 옵션 선택 시 이뤄지는 ui와 index 업데이트에 관한 코드
@@ -300,12 +294,17 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                 dicRoomInfo[info.Name] = info; // 방 정보 추가 또는 업데이트
             }
         }
+        UnityEngine.Debug.Log($"[DEBUG] 현재 방 개수: {dicRoomInfo.Count}");
+        
     }
 
 
     // 생성된 방 목록을 스크롤 뷰에 보여줄 때
     void CreateRoomListItem()
     {
+ 
+        int count = 0;
+
         foreach (RoomInfo info in dicRoomInfo.Values)
         {
             //방 정보 생성과 동시에 ScrollView-> Content의 자식으로 하자
@@ -332,7 +331,9 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                 // SelectRoomItem을 바로 호출
                 SelectRoomItem(roomName, go); // roomName과 현재 버튼(GameObject)을 전달 -> 선택된 방목록의 색상이 변경되도록
             };
+            count++;
         }
+        UnityEngine.Debug.Log($"생성된 방 UI 개수: {count}");
     }
 
 
