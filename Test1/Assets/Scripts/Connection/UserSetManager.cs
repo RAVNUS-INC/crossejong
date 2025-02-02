@@ -6,7 +6,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -16,14 +15,12 @@ using UnityEngine.UI;
 // À¯Àú ÇÁ·ÎÇÊ ¼³Á¤ È­¸é¿¡¼­ ÀÛµ¿ÇÏ´Â ÄÚµå(´Ğ³×ÀÓ, À¯ÀúÇÁ·ÎÇÊ»çÁø º¯°æ ÀúÀå)
 public class UserSetManager : MonoBehaviourPunCallbacks
 {
-    public static UserSetManager Instance { get; private set; }
-
     [SerializeField] public InputField inputText; //´Ğ³×ÀÓ ÀÔ·Â(³ªÁß¿¡ ¹Ù²Ü ¼ö ÀÖ´Â Displayname)
     [SerializeField] Button confirmButton; //Á¦Ãâ(ÀúÀå) ¹öÆ°
     [SerializeField] Text warningText; // °æ°í ¸Ş½ÃÁö¸¦ Ãâ·ÂÇÒ UI ÅØ½ºÆ®
-    [SerializeField] public Text saveText; // ÀúÀå¿Ï·á ¸Ş½ÃÁö¸¦ Ãâ·ÂÇÒ UI ÅØ½ºÆ®
+    [SerializeField] public Text saveText; // ÀúÀå¿Ï·á ¸Ş½ÃÁö¸¦ Ãâ·ÂÇÒ UI ÅØ½ºÆ®(profile panel¿¡¸¸ Á¸Àç)
 
-    // -----displayname Á¶°Ç-----
+    // displayname Á¶°Ç
     private const int MinLength = 3; // ÃÖ¼Ò ÀÔ·Â ±æÀÌ(2±ÛÀÚ ÀÌ»ó)
     private const int MaxLength = 8; // ÃÖ´ë ÀÔ·Â ±æÀÌ(º¯µ¿°¡´É)
 
@@ -37,15 +34,19 @@ public class UserSetManager : MonoBehaviourPunCallbacks
     public GameObject profilePanel; //ÇÁ·ÎÇÊ ¼³Á¤ ÆĞ³Î(¸ŞÀÎÆĞ³Î¿¡¼­ ¹Ì¸® ÁØºñÇØ¾ß ÀÛµ¿)
     public GameObject usersetPanel; //À¯Àú ÃÊ±â ¼³Á¤ ÆĞ³Î
 
+    //playerprefs¿¡ ÀúÀåÇÒ ³»¿ëµé(Key)
+    private const string DISPLAYNAME_KEY = "DisplayName"; // À¯ÀúÀÇ DisplayName
+    private const string IMAGEINDEX_KEY = "ImageIndex"; // À¯ÀúÀÇ ÀÌ¹ÌÁö ÀÎµ¦½º
 
     void Start()
     {
-        if ((usersetPanel.activeSelf || profilePanel.activeSelf))
+        // ÃÊ±â À¯Àú ¼¼ÆÃ ÆĞ³Î OR ±âÁ¸ À¯Àú ÇÁ·ÎÇÊ ÆĞ³ÎÀÌ È°¼ºÈ­µÇ¾îÀÖ´Ù¸é
+        if ((usersetPanel.activeSelf || profilePanel.activeSelf)) 
         {
-            DisplayName(); // ±âÁ¸ ÀÌ¸§ Á¤º¸ ºÒ·¯¿Í º¯¼ö¿¡ ÀúÀå
-            CheckAndSaveDefaultImageIndex(); // °ÔÀÓ ½ÃÀÛ ½Ã ÀúÀåµÈ ÀÌ¹ÌÁö ÀÎµ¦½º¸¦ ºÒ·¯¿Í º¯¼ö¿¡ ÀúÀå ¹× ÀÌ¹ÌÁö ¾÷µ¥ÀÌÆ®
+            LoadDefaultDisplayName(); // ±âÁ¸ ÀÌ¸§ Á¤º¸ ºÒ·¯¿Í º¯¼ö¿¡ ÀúÀå
+            LoadDefaultImageIndex(); // ±âÁ¸ ÀÌ¹ÌÁö ÀÎµ¦½º¸¦ ºÒ·¯¿Í º¯¼ö¿¡ ÀúÀå, ¾÷µ¥ÀÌÆ®
         }
-
+        
         confirmButton.interactable = false; // ±âº»ÀûÀ¸·Î ¹öÆ° ºñÈ°¼ºÈ­
         warningText.text = ""; // ÃÊ±â °æ°í ¸Ş½ÃÁö ºñ¿ì±â
         saveText.text = ""; // ÃÊ±â ÀúÀå ¸Ş½ÃÁö ºñ¿ì±â
@@ -53,104 +54,101 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         //³»¿ëÀÌ º¯°æµÇ¾úÀ»¶§ ±ÔÄ¢ °Ë»ç
         inputText.onValueChanged.AddListener(ValidateNickname);
 
-        //È®ÀÎ ¹öÆ° ´©¸£¸é ÀÌ¸§ ÀúÀå
-        confirmButton.onClick.AddListener(OnClickSaveDisplayName); //ÃÊ±â ÀÌ¸§ ÀúÀå (+ ´Ü¾î¿Ï¼ºÈ½¼ö ¹öÆ°¿¡ Á÷Á¢ ¿¬°á)
+        //È®ÀÎ ¹öÆ° ´©¸£¸é ÀÌ¸§ ¹× ÀÌ¹ÌÁö ÀúÀå(playfab ¹× playerprefs¿¡ ¾÷µ¥ÀÌÆ®)(+ ´Ü¾î¿Ï¼ºÈ½¼ö ¹öÆ°¿¡ Á÷Á¢ ¿¬°á)
+        confirmButton.onClick.AddListener(SaveDisplayName); //ÀÌ¸§ ÀúÀå 
+        confirmButton.onClick.AddListener(SaveSelectedImageIndex); // ÀÌ¹ÌÁö ÀúÀå
     }
 
-
-    // ÀÌ¸§ ´Ğ³×ÀÓ °ü·Ã ÇÔ¼öµé
-    // ¼³Á¤ÇÑ ÀÌ¸§ ÀúÀå ÇÔ¼ö
-    public void DisplayName() //DisplayName: °íÀ¯ÇÏÁö ¾ÊÀ½
+    
+    private void LoadDefaultDisplayName() // ÀúÀåµÈ DisplayName ·Îµå ¹× ÀúÀå ÇÔ¼ö(Á¸ÀçÇÏ¸é ÇØ´ç °ªÀ», Á¸ÀçÇÏÁö ¾ÊÀ¸¸é Guest)
     {
-        var request = new GetAccountInfoRequest(); //ÀÌ¸§ Á¤º¸ ºÒ·¯¿À±â
-        PlayFabClientAPI.GetAccountInfo(request,
-             result =>
-             {
-                 // ±âÁ¸ displayNameÀÌ ¾ø´Â °æ¿ì nullÀ» ¹İÈ¯
-                 if (string.IsNullOrEmpty(result.AccountInfo.TitleInfo.DisplayName))
-                 {
-                     displayName = null; // displayNameÀÌ ¾øÀ¸¸é null ÇÒ´ç
-                     Debug.Log("displayNameÀÌ ¾ø½À´Ï´Ù.");
-                 }
-                 else // ±âÁ¸ °ªÀÌ Á¸ÀçÇÏ´Â °æ¿ì
-                 {
-                     // displayName °ªÀ» Àü¿ª º¯¼ö¿¡ ÀúÀå
-                     displayName = result.AccountInfo.TitleInfo.DisplayName;
-
-                     SaveCustomProperty("Displayname", displayName); //ÇÁ·ÎÇÊÆĞ³Î¿¡ ¾÷µ¥ÀÌÆ®-ÇØ´ç ÀÌ¸§À» Ä¿½ºÅÒÇÁ·ÎÆÛÆ¼¿¡ ÀúÀå
-                     Debug.Log($"displayName: {displayName}À» ÇÁ·ÎÆÛÆ¼¿¡ ÀúÀåÇß½À´Ï´Ù");
-                 }
-             },
-            error =>
-            {
-                Debug.LogError($"À¯Àú Á¤º¸ ºÒ·¯¿À±â ½ÇÆĞ: {error.GenerateErrorReport()}");
-            });
-    }
-
-
-    // À¯Àú ÇÁ·ÎÇÊ ÀÌ¹ÌÁö °ü·Ã ÇÔ¼öµé
-    // ÀúÀåµÈ ÀÌ¹ÌÁö ÀÎµ¦½º¸¦ ºÒ·¯¿À±â
-    private void CheckAndSaveDefaultImageIndex()
-    {
-        var request = new GetUserDataRequest();
-        PlayFabClientAPI.GetUserData(request,
-            result =>
-            {
-                // PROFILE_IMAGE_INDEX_KEY°¡ Á¸ÀçÇÏ´ÂÁö È®ÀÎ
-                if (result.Data.ContainsKey(PROFILE_IMAGE_INDEX_KEY))
-                {
-                    Debug.Log("ÇÁ·ÎÇÊÀÌ¹ÌÁö KEY°¡ Á¸ÀçÇÕ´Ï´Ù. °ªÀ» ºÒ·¯¿É´Ï´Ù.");
-                    string value = result.Data[PROFILE_IMAGE_INDEX_KEY].Value;
-
-                    if (!string.IsNullOrEmpty(value))  //°ªÀÌ Á¸ÀçÇÑ´Ù¸é
-                    {
-                        currentIndex = int.Parse(value);
-                        
-                    }
-                    else 
-                    {
-                        Debug.LogWarning("KEYÀÇ °ªÀÌ ºñ¾î ÀÖ½À´Ï´Ù. ±âº»°ª(0)À¸·Î ÀúÀåÇÕ´Ï´Ù.");
-                        currentIndex = 0; // ±âº»°ª ¼³Á¤
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning("KEY°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù. ±âº»°ª(0)À» »ı¼ºÇÕ´Ï´Ù.");
-                    currentIndex = 0; // ±âº»°ª ¼³Á¤
-                }
-
-                UpdateCentralImage(); // ÀÌ¹ÌÁö ¾÷µ¥ÀÌÆ® ¹× ÀÎµ¦½º ÀúÀå, ÇÁ·ÎÆÛÆ¼¿¡ ÀúÀå
-            },
-            error =>
-            {
-                Debug.LogError($"À¯Àú µ¥ÀÌÅÍ ºÒ·¯¿À±â ½ÇÆĞ: {error.GenerateErrorReport()}");
-            });
-    }
-
-
-    // ÀÌ¹ÌÁö ¾÷µ¥ÀÌÆ® ÇÔ¼ö
-    private void UpdateCentralImage()
-    {
-        if (profileImages.Length > 0 && currentIndex >= 0 && currentIndex < profileImages.Length)
+        if (PlayerPrefs.HasKey(DISPLAYNAME_KEY))
         {
-            centralImage.sprite = profileImages[currentIndex];  // ÀÎµ¦½º¿¡ ÇØ´çÇÏ´Â ÀÌ¹ÌÁö·Î ¾÷µ¥ÀÌÆ®
-            SaveSelectedImageIndex(currentIndex);                // ¼±ÅÃµÈ ÀÌ¹ÌÁö ÀÎµ¦½º ÀúÀå
+            // Å°°¡ Á¸ÀçÇÏ¸é ÀúÀåµÈ °ªÀ» °¡Á®¿Â´Ù
+            string displayName = PlayerPrefs.GetString(DISPLAYNAME_KEY, "Guest");
+
+            // ºÒ·¯¿Â ÀÌ¸§À» ÀÎÇ²¶õ¿¡ º¸¿©ÁÖ±â
+            inputText.text = displayName;
+
+            //ÇÁ·ÎÇÊ ÀÌ¸§ ÃÊ±â ºñÈ°¼ºÈ­
+            inputText.interactable = false;
         }
         else
         {
-            Debug.LogWarning("Invalid profile image index.");
+            // Å°°¡ Á¸ÀçÇÏÁö ¾ÊÀ¸¸é ±âº»°ªÀ» ¼³Á¤ÇÑ´Ù
+            inputText.text = "";
+
+            // ±âº»°ªÀ» playerprefs¿¡µµ ¹Ù·Î ÀúÀå
+            PlayerPrefs.SetString(DISPLAYNAME_KEY, "Guest"); PlayerPrefs.Save();
         }
     }
 
-    // ¼±ÅÃµÈ ÀÌ¹ÌÁö ÀÎµ¦½º¸¦ ÀúÀå
-    private void SaveSelectedImageIndex(int index)
+    private void LoadDefaultImageIndex() // ÀúÀåµÈ ÀÌ¹ÌÁö ÀÎµ¦½º¸¦ ºÒ·¯¿À±â(Á¸ÀçÇÏ¸é ÇØ´ç °ªÀ», Á¸ÀçÇÏÁö ¾ÊÀ¸¸é ±âº»°ª 0)
     {
-        // ¼±ÅÃµÈ ÀÌ¹ÌÁö ÀÎµ¦½º¸¦ PlayFab Å¸ÀÌÆ² µ¥ÀÌÅÍ¿¡ ÀúÀå
+        if (PlayerPrefs.HasKey(IMAGEINDEX_KEY))
+        {
+            // Å°°¡ Á¸ÀçÇÏ¸é ÀúÀåµÈ °ªÀ» °¡Á®¿Â´Ù
+            int Index = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0);
+
+            //currentIndex ÀÎµ¦½º º¯¼ö¿¡ °ª ÀúÀå
+            currentIndex = Index;
+        }
+        else
+        {
+            // Å°°¡ Á¸ÀçÇÏÁö ¾ÊÀ¸¸é ±âº»°ªÀ» ¼³Á¤ÇÑ´Ù
+            currentIndex = 0;
+
+            // ±âº»°ªÀ» playerprefs¿¡µµ ¹Ù·Î ÀúÀå
+            PlayerPrefs.SetInt(IMAGEINDEX_KEY, currentIndex); PlayerPrefs.Save();
+        }
+        centralImage.sprite = profileImages[currentIndex];  // ÀÌ¹ÌÁö ¾÷µ¥ÀÌÆ®
+    }
+
+    public void SaveDisplayName() //DisplayNameÀ» playfab°ú playerprefs¿¡ ÀúÀå
+    { 
+        string displayName = inputText.text.Trim();
+
+        var request = new UpdateUserTitleDisplayNameRequest
+        {
+            DisplayName = displayName
+        };
+
+        //playfab¿¡ ÀúÀå
+        PlayFabClientAPI.UpdateUserTitleDisplayName(request,
+            result =>
+            {
+                Debug.Log($"[Playfab] ´Ğ³×ÀÓ ÀúÀå ¼º°ø: {result.DisplayName}");
+            },
+            error =>
+            {
+                Debug.LogError($"[Playfab] ´Ğ³×ÀÓ ÀúÀå ½ÇÆĞ: {error.GenerateErrorReport()}");
+            });
+
+        //º¯°æµÈ ÀÌ¹ÌÁö ÀÎµ¦½º¸¦ playerprefs¿¡ ÀúÀå(±âÁ¸ À¯ÀúÀÇ °æ¿ì µ¤¾î¾²±â, ½Å±Ô À¯Àú´Â »õ·Î Ãß°¡ÇÏ´Â »óÈ²)
+        UpdateDisplayName(displayName);
+        Debug.Log($"[playerprefs] Displayname: {displayName}À» ÀúÀåÇß½À´Ï´Ù");
+
+        if (usersetPanel.activeSelf)
+        {
+            // ¸ŞÀÎÀ¸·Î ¼­¹öÁ¢¼ÓÀ» ¿äÃ»
+            OnClickConnect();
+        }
+        if (profilePanel.activeSelf)
+        {
+            // ÀúÀå ¸Ş½ÃÁö ¾Ë¸²
+            saveText.text = "ÀúÀåµÇ¾ú½À´Ï´Ù";
+        }
+    }
+
+    private void SaveSelectedImageIndex() // ¼±ÅÃµÈ ÀÌ¹ÌÁö ÀÎµ¦½º¸¦ ÀúÀåÇØ playfab¿¡ Àü¼Û, playerprefs ¾÷µ«
+    {
+        string ImageIndex = currentIndex.ToString(); //intÇü -> ¹®ÀÚ¿­·Î º¯È¯
+
         var request = new UpdateUserDataRequest
         {
             Data = new Dictionary<string, string>
         {
-            { PROFILE_IMAGE_INDEX_KEY, index.ToString() }
+            { PROFILE_IMAGE_INDEX_KEY, ImageIndex}
         },
             Permission = UserDataPermission.Public // µ¥ÀÌÅÍ¸¦ °ø°³ »óÅÂ·Î ÀúÀå
         };
@@ -159,103 +157,52 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         PlayFabClientAPI.UpdateUserData(request,
             result =>
             {
-                Debug.Log($"ÇÁ·ÎÇÊÀÌ¹ÌÁö µ¥ÀÌÅÍ ÀúÀå ¼º°ø: {index}");
+                Debug.Log($"[Playfab] ÇÁ·ÎÇÊÀÌ¹ÌÁö µ¥ÀÌÅÍ ÀúÀå ¼º°ø: {ImageIndex}");
             },
             error =>
             {
-                Debug.LogError($"À¯Àú µ¥ÀÌÅÍ ÀúÀå ½ÇÆĞ: {error.GenerateErrorReport()}");
+                Debug.LogError($"[Playfab] À¯Àú µ¥ÀÌÅÍ ÀúÀå ½ÇÆĞ: {error.GenerateErrorReport()}");
             });
-        //º¯°æµÈ ÀÌ¹ÌÁö ÀÎµ¦½º¸¦ Ä¿½ºÅÒÇÁ·ÎÆÛÆ¼¿¡ ÀúÀå(µ¤¾î¾²±â)
-        SaveCustomProperty("Imageindex", index.ToString()); 
-        Debug.Log($"¼±ÅÃµÈ Imageindex: {currentIndex}À» ÇÁ·ÎÆÛÆ¼¿¡ ÀúÀåÇß½À´Ï´Ù");
+
+        //¹®ÀÚ¿­ -> intÇüÀ¸·Î º¯È¯
+        int RImageIndex = int.Parse(ImageIndex); 
+
+        //º¯°æµÈ ÀÌ¹ÌÁö ÀÎµ¦½º¸¦ playerprefs¿¡ ÀúÀå(±âÁ¸ À¯ÀúÀÇ °æ¿ì µ¤¾î¾²±â, ½Å±Ô À¯Àú´Â »õ·Î Ãß°¡ÇÏ´Â »óÈ²)
+        UpdateImageIndex(RImageIndex); 
+        Debug.Log($"[playerprefs] Imageindex: {currentIndex}À» ÀúÀåÇß½À´Ï´Ù");
     }
 
+    void UpdateDisplayName(string name) //»õ·Î¿î ÀÌ¸§ ÀúÀå
+    {
+        PlayerPrefs.SetString(DISPLAYNAME_KEY, name); // »õ·Î¿î °ª ÀúÀå
+        PlayerPrefs.Save(); // ÀúÀå À¯Áö
+    }
 
-
-
-    // ¿ŞÂÊ ¹öÆ° Å¬¸¯ ½Ã È£Ãâ
-    public void OnLeftButtonClicked()
+    void UpdateImageIndex(int newIndex) //»õ·Î¿î ÀÎµ¦½º ÀúÀå
+    {
+        PlayerPrefs.SetInt(IMAGEINDEX_KEY, newIndex); // »õ·Î¿î °ª ÀúÀå
+        PlayerPrefs.Save(); // ÀúÀå À¯Áö
+    }
+    
+    public void OnLeftButtonClicked() // ¿ŞÂÊ ¹öÆ° Å¬¸¯ ½Ã È£Ãâ
     {
         currentIndex--;
         if (currentIndex < 0) currentIndex = profileImages.Length - 1;  // ¼øÈ¯ (¸Ç Ã³À½À¸·Î µ¹¾Æ°¨)
-        UpdateCentralImage();  // ÀÌ¹ÌÁö ¾÷µ¥ÀÌÆ®
+        centralImage.sprite = profileImages[currentIndex];  // ÀÎµ¦½º¿¡ ÇØ´çÇÏ´Â ÀÌ¹ÌÁö·Î ¾÷µ¥ÀÌÆ®
     }
 
-    // ¿À¸¥ÂÊ ¹öÆ° Å¬¸¯ ½Ã È£Ãâ
-    public void OnRightButtonClicked()
+    public void OnRightButtonClicked() // ¿À¸¥ÂÊ ¹öÆ° Å¬¸¯ ½Ã È£Ãâ
     {
-        currentIndex++;
-        if (currentIndex >= profileImages.Length) currentIndex = 0;  // ¼øÈ¯ (¸Ç ¸¶Áö¸·¿¡¼­ Ã³À½À¸·Î µ¹¾Æ°¨)
-        UpdateCentralImage();  // ÀÌ¹ÌÁö ¾÷µ¥ÀÌÆ®
+        currentIndex = (currentIndex + 1) % profileImages.Length;
+        centralImage.sprite = profileImages[currentIndex];  // ÀÎµ¦½º¿¡ ÇØ´çÇÏ´Â ÀÌ¹ÌÁö·Î ¾÷µ¥ÀÌÆ®
     }
 
-
-
-    public void OnClickSaveDisplayName()
-    {
-        // displayNameÀÌ Á¸ÀçÇÏ´ÂÁö È®ÀÎ(Ã¹ À¯ÀúÀÎÁö ¾Æ´ÑÁö¸¦ È®ÀÎ)
-        if (string.IsNullOrEmpty(displayName))
-        {
-            // displayNameÀÌ ¾øÀ» °æ¿ì (Ã¹ À¯ÀúÀÏ °æ¿ì)
-            SaveDisplayName(); //´Ğ³×ÀÓÀ» ÀúÀå(ÇÁ·ÎÆÛÆ¼¿¡µµ ÀúÀå)
-            Debug.Log("Ã¹ displayNameÀÌ ¼³Á¤µÇ¾ú½À´Ï´Ù.");
-            OnClickConnect(); //¸ŞÀÎÀ¸·Î ¼­¹öÁ¢¼ÓÀ» ¿äÃ»ÇÑ´Ù
-        }
-        else //displaynameÀÌ ÀÌ¹Ì Á¸ÀçÇÒ °æ¿ì(ÀçÁ¢¼Ó À¯ÀúÀÏ °æ¿ì)
-        {
-            // Àü¿ª º¯¼ö·Î displayName¿¡ ÀúÀå
-            SaveDisplayName(); //±âÁ¸ÀÇ ÀÌ¸§À» »õ ÀÌ¸§À¸·Î µ¤¾î¾º¿ö ÀúÀåÇÑ´Ù
-            Debug.Log("»õ·Î¿î displayNameÀÌ ¼³Á¤µÇ¾ú½À´Ï´Ù.");
-            saveText.text = "ÀúÀåµÇ¾ú½À´Ï´Ù"; //ÀúÀå ¸Ş½ÃÁö ¾Ë¸²
-        }
-    }
-    public void SaveDisplayName() //´Ü¼øÈ÷ ÀÌ¸§ ÀúÀåÇÏ±â
-    {
-        string displayName = inputText.text.Trim();
-
-        var request = new UpdateUserTitleDisplayNameRequest
-        {
-            DisplayName = displayName
-        };
-        
-        //playfab¿¡ ÀúÀå
-        PlayFabClientAPI.UpdateUserTitleDisplayName(request,
-           result =>
-           {
-               Debug.Log($"´Ğ³×ÀÓ ÀúÀå ¼º°ø: {result.DisplayName}");
-           },
-
-           error =>
-           {
-               Debug.LogError($"´Ğ³×ÀÓ ÀúÀå ½ÇÆĞ: {error.GenerateErrorReport()}");
-           });
-        SaveCustomProperty("Displayname", displayName); //º¯°æµÈ ÀÌ¸§À» Ä¿½ºÅÒÇÁ·ÎÆÛÆ¼¿¡ ÀúÀå(or µ¤¾î¾²±â)
-        Debug.Log($"Displayname: {displayName}À» ÇÁ·ÎÆÛÆ¼¿¡ ÀúÀåÇß½À´Ï´Ù");
-    }
-
-    // --------------Ä¿½ºÅÒÇÁ·ÎÆÛÆ¼¿¡ ÀÌ¸§, ÀÎµ¦½º ÀúÀå -----------------
-    void SaveCustomProperty(string key, string value)
-    {
-        // 1. ÇØ½ÃÅ×ÀÌºí »ı¼º
-        Hashtable customProperties = new Hashtable();
-
-        // 2. Å°¿Í °ªÀ» Ãß°¡
-        customProperties[key] = value;
-
-        // 3. Ä¿½ºÅÒ ÇÁ·ÎÆÛÆ¼¸¦ ¼³Á¤ (ÇÃ·¹ÀÌ¾îÀÇ Ä¿½ºÅÒ ÇÁ·ÎÆÛÆ¼¿¡ ÀúÀå)
-        PhotonNetwork.LocalPlayer.SetCustomProperties(customProperties);
-    }
-
-
-    //ÀÌ¸§ º¯°æ ¹öÆ° Å¬¸¯ÇÒ ¶§ -> ÀÌ¸§ ÀÔ·Â ÀÎÇ² È°¼ºÈ­
-    public void ChangeNameBtn() 
+    public void ChangeNameBtn() //ÀÌ¸§ º¯°æ ¹öÆ° Å¬¸¯ÇÒ ¶§ -> ÀÌ¸§ ÀÔ·Â ÀÎÇ² È°¼ºÈ­
     {
         inputText.interactable = true; //ÀÌ¸§ º¯°æ È°¼ºÈ­
     }
 
-
-    //ÀÌ¸§ ¼³Á¤ ±ÔÄ¢(displayname)
-    public void ValidateNickname(string input)
+    public void ValidateNickname(string input) //ÀÌ¸§ ¼³Á¤ ±ÔÄ¢(displayname)
     {
         /// ÇÑ±Û(¿Ï¼ºÇü/ÀÚÀ½/¸ğÀ½)°ú ¼ıÀÚ¸¸ Çã¿ëÇÏ´Â Á¤±Ô½Ä
         string validPattern = @"^[°¡-ÆR¤¡-¤¾¤¿-¤Ó0-9]*$";
@@ -300,9 +247,7 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         inputText.text = inputname;
     }
 
-
-    // ÇÑ±Û À½Àı ÀÚÀ½, ¸ğÀ½À» Æ÷ÇÔÇÏ¿© ±ÛÀÚ ¼ö¸¦ °è»êÇÏ´Â ÇÔ¼ö
-    private int GetKoreanCharCount(string input)
+    private int GetKoreanCharCount(string input) // ÇÑ±Û À½Àı ÀÚÀ½, ¸ğÀ½À» Æ÷ÇÔÇÏ¿© ±ÛÀÚ ¼ö¸¦ °è»êÇÏ´Â ÇÔ¼ö
     {
         int count = 0;
         foreach (char c in input)
@@ -327,7 +272,7 @@ public class UserSetManager : MonoBehaviourPunCallbacks
     }
 
 
-    public override void OnConnectedToMaster()
+    public override void OnConnectedToMaster() //¸¶½ºÅÍ ¼­¹ö Á¢¼Ó µÇ¸é
     {
         base.OnConnectedToMaster();
         Debug.Log("¸¶½ºÅÍ ¼­¹ö Á¢¼Ó ¼º°ø");
@@ -335,15 +280,10 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         //³ªÀÇ ÀÌ¸§À» Æ÷Åæ¿¡ ¼³Á¤
         PhotonNetwork.NickName = inputText.text;
 
-        // Æ÷Åæ À¯Àú ID Ãâ·Â
-        //Debug.Log($"Photon UserId: {PhotonNetwork.AuthValues.UserId}");
-
         //·ÎºñÁøÀÔ
         PhotonNetwork.JoinLobby();
     }
-
-    //Lobby ÁøÀÔ¿¡ ¼º°øÇßÀ¸¸é È£ÃâµÇ´Â ÇÔ¼ö
-    public override void OnJoinedLobby()
+    public override void OnJoinedLobby() //Lobby ÁøÀÔ¿¡ ¼º°øÇßÀ¸¸é È£ÃâµÇ´Â ÇÔ¼ö
     {
         base.OnJoinedLobby();
 
@@ -353,15 +293,16 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         print("·Îºñ ÁøÀÔ ¼º°ø");
 
     }
-    public void OnClickConnect()
+    public void OnClickConnect() // ¸¶½ºÅÍ ¼­¹ö Á¢¼Ó ¿äÃ»(OkBtn¿¡ ¿¬°á)
     {
         // ¸¶½ºÅÍ ¼­¹ö Á¢¼Ó ¿äÃ»
         PhotonNetwork.ConnectUsingSettings();
-    }
 
-    private void OnDestroy()
+        //·Îµù¹Ù ui ¾Ö´Ï¸ŞÀÌ¼Ç º¸¿©ÁÖ±â
+        LoadingSceneController.Instance.LoadScene("Main");
+    }
+    private void OnDestroy() // ÀÌº¥Æ® ÇØÁ¦
     {
-        // ÀÌº¥Æ® ÇØÁ¦
         inputText.onValueChanged.RemoveListener(ValidateNickname);
     }
 
