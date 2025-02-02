@@ -28,13 +28,22 @@ public class CardDrop : MonoBehaviour, IDropHandler
             card.GetComponent<Image>().raycastTarget = true;
             card.transform.position = this.transform.position;
             card.transform.SetParent(transform);
+
+            // RectTransform 설정
+            RectTransform rect = card.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.5f, 0.5f);  // 중앙 정렬 (anchorMin)
+            rect.anchorMax = new Vector2(0.5f, 0.5f);  // 중앙 정렬 (anchorMax)
+            rect.pivot = new Vector2(0.5f, 0.5f);      // 중앙 정렬 (pivot)
+            rect.anchoredPosition = Vector2.zero;      // 부모의 중심에 위치
+
             ObjectManager.instance.moveCardObejct = null;
             ObjectManager.instance.SortAfterMove();
             CardDrag CD = card.GetComponent<CardDrag>();
             if (CD != null) Destroy(card.GetComponent<CardDrag>());
 
-            ObjectManager.instance.movedCardPosition = card.transform.parent.position;
+            ObjectManager.instance.movedCardPosition = card.transform.position;
             ObjectManager.instance.isDragged = true;
+            Debug.Log(ObjectManager.instance.movedCardPosition);
         }
     }
 }
