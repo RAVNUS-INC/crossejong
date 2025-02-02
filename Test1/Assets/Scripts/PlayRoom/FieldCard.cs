@@ -9,6 +9,7 @@ using System;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.VisualScripting.Antlr3.Runtime.Collections;
 using Unity.VisualScripting;
+using System.Xml.Linq;
 
 public class FieldCard : MonoBehaviour
 {
@@ -62,13 +63,21 @@ public class FieldCard : MonoBehaviour
                 new Vector2(200, 0)
             };
 
+        if (ObjectManager.instance.isDragged) 
+        {
+            for (int i = 0; i < emptyPosition.Length; i++) 
+            {
+                emptyPosition[i] += ObjectManager.instance.movedCardPosition;
+            }
+        }
+
         for (int i = 0; i < 4; i++)
         {
             GameObject empty = new GameObject("");
             empty.transform.SetParent(fieldArea, false);
             RectTransform rect = empty.AddComponent<RectTransform>();
             rect.sizeDelta = new Vector2(200, 200);
-            rect.position = emptyPosition[i];
+            rect.anchoredPosition = emptyPosition[i];
             Image img = empty.AddComponent<Image>();
             img.color = Color.white;
             empty.AddComponent<CardDrop>();
@@ -78,10 +87,10 @@ public class FieldCard : MonoBehaviour
     public void FirstFieldCard()
     {
         List<GameObject> randomCards = cardPool.GetRandomCards(1); // 1개의 랜덤 카드 얻기
+        cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
 
         RectTransform rect = randomCards[0].GetComponent<RectTransform>();
-        rect.position = new Vector2(0, 0);
-
+        rect.anchoredPosition = Vector2.zero; // 부모의 기준점에서 (0,0)으로 설정
         fieldDisplayedCards.Add(randomCards[0]);
 
 

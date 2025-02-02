@@ -25,6 +25,8 @@ public class ObjectManager : MonoBehaviour
     public bool isFullPopup;
     public int score;
     public int time;
+    public Vector2 movedCardPosition;
+    public bool isDragged = false;
 
     public void SortAfterMove() {
         if (isFullPopup)

@@ -32,6 +32,9 @@ public class CardDrop : MonoBehaviour, IDropHandler
             ObjectManager.instance.SortAfterMove();
             CardDrag CD = card.GetComponent<CardDrag>();
             if (CD != null) Destroy(card.GetComponent<CardDrag>());
+
+            ObjectManager.instance.movedCardPosition = card.transform.parent.position;
+            ObjectManager.instance.isDragged = true;
         }
     }
 }

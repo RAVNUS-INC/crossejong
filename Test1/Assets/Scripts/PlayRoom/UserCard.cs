@@ -42,7 +42,7 @@ public class UserCard : MonoBehaviour
         for (int i = 0; i < displayedCards.Count; i++) { 
             GameObject card = displayedCards[i];
 
-            Button cardButton = card.GetComponent<Button>();
+            Button cardButton = card.AddComponent<Button>();
 
             cardDrag = card.GetComponent<CardDrag>();
             if (cardDrag == null)

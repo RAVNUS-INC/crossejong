@@ -1227,6 +1227,8 @@ MonoBehaviour:
   isFullPopup: 0
   score: 0
   time: 0
+  movedCardPosition: {x: 0, y: 0}
+  isDragged: 0
 --- !u!1 &453961798
 GameObject:
   m_ObjectHideFlags: 0
@@ -1261,7 +1263,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -1.4500122}
+  m_AnchoredPosition: {x: 0, y: -1.4499512}
   m_SizeDelta: {x: 1000, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &453961800
@@ -1563,10 +1565,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1050932899}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 123.55005}
-  m_SizeDelta: {x: 40, y: -71.93799}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 1040, y: 1596}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &534768507
 MonoBehaviour:
@@ -2105,7 +2107,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -4.999939}
+  m_AnchoredPosition: {x: 0, y: -5}
   m_SizeDelta: {x: 760, y: 880}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &749620249
@@ -2337,7 +2339,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b787b08f0357b14986921de852f6921, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fieldContainer: {fileID: 1050932899}
+  fieldContainer: {fileID: 534768504}
   cardPool: {fileID: 1342198615}
   fieldDisplayedCards: []
   fieldList: []
@@ -2785,7 +2787,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1036394993}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 910563715}
+        m_TargetAssemblyTypeName: FieldCard, Assembly-CSharp
+        m_MethodName: CreateDropArea
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1036394993
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2857,10 +2871,10 @@ RectTransform:
   - {fileID: 749620248}
   m_Father: {fileID: 1310410830}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 1600}
+  m_SizeDelta: {x: 0, y: 215}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1113932982
 GameObject:
@@ -3170,7 +3184,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 110}
-  m_SizeDelta: {x: 1080, y: 1422.9}
+  m_SizeDelta: {x: 1080, y: 1420}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1268501757
 MonoBehaviour:
