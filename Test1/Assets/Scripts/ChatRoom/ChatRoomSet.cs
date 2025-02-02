@@ -308,14 +308,19 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
 
             //나가기
             PhotonNetwork.LeaveRoom();
+
+            //로딩바 ui 애니메이션 보여주기
+            LoadingSceneController.Instance.LoadScene("Main");
         }
     }
 
     // 방을 성공적으로 나갔을 때 호출되는 콜백
     public override void OnLeftRoom()
     {
+        Debug.Log("방을 성공적으로 퇴장했습니다.");
+
         // 로비 씬 이름으로 이동
-        SceneManager.LoadScene("Main");
+        //SceneManager.LoadScene("Main");
     }
 
     // 채팅 전송버튼에 직접 연결해 사용(메시지 전송 역할)

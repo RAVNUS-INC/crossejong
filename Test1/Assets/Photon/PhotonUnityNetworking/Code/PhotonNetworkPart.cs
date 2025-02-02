@@ -2571,5 +2571,10 @@ namespace Photon.Pun
                 }
             }
         }
+
+        public static AsyncOperation LoadLevelAsync(string loadSceneName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

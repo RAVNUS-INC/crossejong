@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 public class Main : MonoBehaviour
 {
 
-    //usersestmanager에서 가져온 변수들    
+    //usersetmanager에서 가져온 변수들    
     private InputField inputField; //프로필 패널 안의 이름입력필드
     private Text SaveText; //프로필 패널 안의 저장메시지
     private Sprite[] ProfileImg; //프로필 이미지 배열
@@ -52,9 +52,8 @@ public class Main : MonoBehaviour
         SaveText = userSetManager.saveText;
         ProfileImg = userSetManager.profileImages; //프로필 이미지 배열을 가져옴
 
-
-        profilePanel.SetActive(false);
-        profileInputField.interactable = false; //프로필 이름 초기 비활성화
+        profileInputField.interactable = false; //메인의 프로필 인풋란은 항상 비활
+        profilePanel.SetActive(false); //프로필 패널 비활성화
   
     }
 
@@ -64,8 +63,7 @@ public class Main : MonoBehaviour
     // -> 커스텀프로퍼티에 저장된 값을 불러오기
     private void LoadProfileImageIndex()
     {
-        var request = new GetUserDataRequest();
-        PlayFabClientAPI.GetUserData(request, result =>
+        PlayFabClientAPI.GetUserData(new GetUserDataRequest(), result =>
         {
             // PROFILE_IMAGE_INDEX_KEY가 존재하는지 확인
             if (result.Data.ContainsKey(PROFILE_IMAGE_INDEX_KEY))
@@ -119,7 +117,8 @@ public class Main : MonoBehaviour
     }
 
 
-    public void ExitBtn() //프로필 패널의 닫기 버튼을 누르면
+    //프로필 패널의 닫기 버튼을 누르면(닫기 버튼에 연결해둠)
+    public void ExitBtn() 
     {
         profilePanel.SetActive(false); //패널 비활성화
         inputField.interactable = false; //이름입력란 비활성화
@@ -163,9 +162,9 @@ public class Main : MonoBehaviour
         //#endif
     }
 
+    //모든 순위오브젝트 비활성화 시키기
     private void RankActiveFalse()
     {
-        //모든 순위오브젝트 비활성화 시키기
         for (int i = 0; i < ranklist.Length; i++)
         {
             ranklist[i].SetActive(false);
@@ -207,7 +206,7 @@ public class Main : MonoBehaviour
         (Error) => print("리더보드 불러오기 실패"));
     }
 
-    // 특정 유저의 공개 데이터 요청 함수
+    // 특정 유저의 공개 데이터 요청 함수(playfab으로부터)
     private void GetUserImageData(string playFabId, int index)
     {
         var userDataRequest = new GetUserDataRequest

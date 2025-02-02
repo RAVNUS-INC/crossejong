@@ -33,7 +33,7 @@ public class UserProfileLoad : MonoBehaviourPunCallbacks
 
     public List<Player> players = new List<Player>(); // 플레이어 리스트 (방장과 일반 플레이어 구분 및 순서)
 
-    void Awake() // 초기화
+    void Start() 
     { 
    
         //현재 유저 정보를 불러와서 해쉬테이블로 생성(변수에 저장)

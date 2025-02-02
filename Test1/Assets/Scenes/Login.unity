@@ -370,7 +370,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 62.50001, y: -64.2}
+  m_AnchoredPosition: {x: 62.5, y: -64.2}
   m_SizeDelta: {x: 123.6, y: 128.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &39004837
@@ -827,8 +827,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.0024414062}
-  m_SizeDelta: {x: 0, y: 0.0048828}
+  m_AnchoredPosition: {x: 0, y: -866.2158}
+  m_SizeDelta: {x: 0, y: -1732.4518}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &169660824
 MonoBehaviour:
@@ -951,8 +951,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1771375483}
-        m_TargetAssemblyTypeName: PlayFabManager, Assembly-CSharp
+      - m_Target: {fileID: 769672813}
+        m_TargetAssemblyTypeName: LoginManager, Assembly-CSharp
         m_MethodName: SetStat
         m_Mode: 1
         m_Arguments:
@@ -2329,7 +2329,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 210, y: -1130}
+  m_AnchoredPosition: {x: 210, y: 603}
   m_SizeDelta: {x: 660, y: 120}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &605518842
@@ -2392,7 +2392,7 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1771375483}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: PlayFabManager, Assembly-CSharp
         m_MethodName: ValidateUserID
         m_Mode: 0
@@ -2783,7 +2783,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6aaa1f1071a9f1a42902955f6435938e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playFabManager: {fileID: 1771375483}
   emailPanel: {fileID: 1525279750}
   registerPanel: {fileID: 169660822}
   playersetPanel: {fileID: 1963969140}
@@ -2794,7 +2793,11 @@ MonoBehaviour:
   PasswordErrorText: {fileID: 1087717216}
   EmailErrorText: {fileID: 264381614}
   IDErrorText: {fileID: 1075462573}
+  NextBtn: {fileID: 1899599296}
+  OkBtn: {fileID: 1536490752}
+  ReBtn: {fileID: 1256136450}
   PasswordToggle: {fileID: 74947506}
+  popupText: {fileID: 62692472}
 --- !u!4 &769672814
 Transform:
   m_ObjectHideFlags: 0
@@ -3454,7 +3457,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 210, y: -1350}
+  m_AnchoredPosition: {x: 210, y: 383}
   m_SizeDelta: {x: 660, y: 170}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &978655771
@@ -3501,8 +3504,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1771375483}
-        m_TargetAssemblyTypeName: PlayFabManager, Assembly-CSharp
+      - m_Target: {fileID: 769672813}
+        m_TargetAssemblyTypeName: LoginManager, Assembly-CSharp
         m_MethodName: RegisterBtn
         m_Mode: 1
         m_Arguments:
@@ -3660,7 +3663,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -6.500004}
+  m_AnchoredPosition: {x: 0, y: -6.5}
   m_SizeDelta: {x: -20, y: -24.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1039295813
@@ -5175,8 +5178,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1771375483}
-        m_TargetAssemblyTypeName: PlayFabManager, Assembly-CSharp
+      - m_Target: {fileID: 769672813}
+        m_TargetAssemblyTypeName: LoginManager, Assembly-CSharp
         m_MethodName: LoginBtn
         m_Mode: 1
         m_Arguments:
@@ -5684,7 +5687,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1726527753}
-  - component: {fileID: 1726527752}
   m_Layer: 0
   m_Name: GPGS Manager
   m_TagString: Untagged
@@ -5692,18 +5694,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!114 &1726527752
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1726527751}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f10e20d08176faa409df5b5b2ba22274, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1726527753
 Transform:
   m_ObjectHideFlags: 0
@@ -5877,52 +5867,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1769800165}
   m_CullTransparentMesh: 1
---- !u!1 &1771375480
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1771375482}
-  - component: {fileID: 1771375483}
-  m_Layer: 0
-  m_Name: PlayFabManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1771375482
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1771375480}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1771375483
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1771375480}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee84ed1b3f80ebc4095eda30c5e920ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  LoginManager: {fileID: 769672813}
-  popupText: {fileID: 62692472}
 --- !u!1 &1785941428
 GameObject:
   m_ObjectHideFlags: 0
@@ -6655,7 +6599,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 210, y: -250}
+  m_AnchoredPosition: {x: 210, y: 1481}
   m_SizeDelta: {x: 190, y: 100}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2011456581
@@ -7187,7 +7131,6 @@ CanvasRenderer:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1771375482}
   - {fileID: 1726527753}
   - {fileID: 769672814}
   - {fileID: 1396937925}
