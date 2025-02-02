@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -6,6 +7,9 @@ using UnityEngine.UI;
 public class CardDrop : MonoBehaviour, IDropHandler
 {
     public CardDrag cardDrag;
+    public UserCard userCard;
+    public FieldCard fieldCard;
+    public CardPool cardPool;
 
     private bool HasCard()
     {

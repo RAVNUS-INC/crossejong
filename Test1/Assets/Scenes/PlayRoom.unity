@@ -1542,8 +1542,6 @@ GameObject:
   - component: {fileID: 534768504}
   - component: {fileID: 534768508}
   - component: {fileID: 534768507}
-  - component: {fileID: 534768506}
-  - component: {fileID: 534768505}
   m_Layer: 5
   m_Name: Field
   m_TagString: Untagged
@@ -1570,44 +1568,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 123.55005}
   m_SizeDelta: {x: 40, y: -71.93799}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &534768505
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 534768503}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_HorizontalFit: 0
-  m_VerticalFit: 0
---- !u!114 &534768506
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 534768503}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 4
-  m_StartCorner: 0
-  m_StartAxis: 0
-  m_CellSize: {x: 200, y: 200}
-  m_Spacing: {x: 10, y: 10}
-  m_Constraint: 1
-  m_ConstraintCount: 3
 --- !u!114 &534768507
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2380,8 +2340,6 @@ MonoBehaviour:
   fieldContainer: {fileID: 1050932899}
   cardPool: {fileID: 1342198615}
   fieldDisplayedCards: []
-  i: 0
-  n: 3
   fieldList: []
   emptyList: []
   fieldArea: {fileID: 534768504}

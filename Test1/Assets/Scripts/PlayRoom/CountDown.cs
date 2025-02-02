@@ -45,5 +45,6 @@ public class Countdown : MonoBehaviour
         userCard.FirstUserCardArea();
         fieldCard.FirstFieldCard();
         userCard.SelectedUserCard();
+        fieldCard.CreateDropArea();
     }
 }
