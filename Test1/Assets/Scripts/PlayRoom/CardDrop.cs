@@ -1,3 +1,4 @@
+using ExitGames.Client.Photon.StructWrapping;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,6 +27,7 @@ public class CardDrop : MonoBehaviour, IDropHandler
         else
             return false;
     }
+
 
     public void OnDrop(PointerEventData eventData)
     {
