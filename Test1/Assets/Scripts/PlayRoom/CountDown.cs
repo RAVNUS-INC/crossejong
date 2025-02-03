@@ -43,8 +43,8 @@ public class Countdown : MonoBehaviour
     private void StartGame()
     {
         userCard.FirstUserCardArea();
+        fieldCard.CreateDropArea();
         fieldCard.FirstFieldCard();
         userCard.SelectedUserCard();
-        fieldCard.CreateDropArea();
     }
 }

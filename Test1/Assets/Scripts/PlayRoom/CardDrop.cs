@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -10,6 +11,13 @@ public class CardDrop : MonoBehaviour, IDropHandler
     public UserCard userCard;
     public FieldCard fieldCard;
     public CardPool cardPool;
+
+    void Awake()
+    {
+        fieldCard = FindObjectOfType<FieldCard>();
+        userCard = FindObjectOfType<UserCard>();
+    }
+
 
     private bool HasCard()
     {
@@ -28,6 +36,11 @@ public class CardDrop : MonoBehaviour, IDropHandler
             card.GetComponent<Image>().raycastTarget = true;
             card.transform.position = this.transform.position;
             card.transform.SetParent(transform);
+
+
+            fieldCard.fieldDisplayedCards.Add(card);
+            userCard.displayedCards.Remove(card);
+
 
             // RectTransform ¼³Á¤
             RectTransform rect = card.GetComponent<RectTransform>();
