@@ -6366,53 +6366,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1667768950}
   m_CullTransparentMesh: 1
---- !u!1 &1701042636
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1701042637}
-  - component: {fileID: 1701042638}
-  m_Layer: 0
-  m_Name: ChatEditor
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &1701042637
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1701042636}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.024027523, y: -0.10304168, z: 1378.3936}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1701042638
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1701042636}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 48d541cde2430c9489226f5edd088199, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  chatManager: {fileID: 1457311509}
-  ChatField: {fileID: 1770512131}
-  ReadyBtn: {fileID: 1443976291}
 --- !u!1 &1714952850
 GameObject:
   m_ObjectHideFlags: 0
@@ -6792,7 +6745,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1800025130}
-  - component: {fileID: 1800025132}
+  - component: {fileID: 1800025133}
   - component: {fileID: 1800025131}
   m_Layer: 0
   m_Name: UserProfileLoad
@@ -6850,7 +6803,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 2febe3c46f2ec1e4e84107fb832a748e, type: 3}
   - {fileID: 21300000, guid: ed578dfef7418ff48aca7cba340ede9b, type: 3}
   - {fileID: 21300000, guid: f1dd6b8b6c5254c45b0f97346843c2c0, type: 3}
---- !u!114 &1800025132
+--- !u!114 &1800025133
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -6870,7 +6823,7 @@ MonoBehaviour:
   observableSearch: 0
   ObservedComponents:
   - {fileID: 0}
-  sceneViewId: 3
+  sceneViewId: 2
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1 &1816781334
@@ -7703,7 +7656,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2046631742}
-  - component: {fileID: 2046631743}
+  - component: {fileID: 2046631744}
   - component: {fileID: 2046631741}
   m_Layer: 0
   m_Name: ChatRoomSet
@@ -7725,7 +7678,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UserProfileLoad: {fileID: 1800025131}
-  ChatEditor: {fileID: 1701042638}
   chatManager: {fileID: 1457311509}
   txtRoomName: {fileID: 952932562}
   txtPlayerCount: {fileID: 130383250}
@@ -7760,7 +7712,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2046631743
+--- !u!114 &2046631744
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -7780,7 +7732,7 @@ MonoBehaviour:
   observableSearch: 0
   ObservedComponents:
   - {fileID: 0}
-  sceneViewId: 2
+  sceneViewId: 3
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1 &2062066567
@@ -7869,7 +7821,6 @@ SceneRoots:
   - {fileID: 1457311510}
   - {fileID: 2046631742}
   - {fileID: 1800025130}
-  - {fileID: 1701042637}
   - {fileID: 295395251}
   - {fileID: 272463197}
   - {fileID: 1187475337}

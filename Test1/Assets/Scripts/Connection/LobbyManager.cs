@@ -132,7 +132,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         }
     }
 
-
     //방 목록의 변화가 있을 때 호출되는 함수(포톤 기본 제공)
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
@@ -173,7 +172,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         // 선택한 방 이름을 전달
         input_RoomName.text = roomName;
     }
-
 
     // 방 옵션 선택 시 이뤄지는 ui와 index 업데이트에 관한 코드
     void OnMaxPlayersButtonClicked(int index, Button[] PlayBtn)
@@ -268,8 +266,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         }
     }
 
-
-
     void DeleteRoomListItem() // 기존 방 정보 삭제할 때
     {
 
@@ -278,7 +274,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             Destroy(tr.gameObject);
         }
     }
-
 
     // 스크롤 뷰에 보여지는 방 목록을 갱신 할 때
     void UpdateRoomListItem(List<RoomInfo> roomList)
@@ -297,7 +292,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         UnityEngine.Debug.Log($"[DEBUG] 현재 방 개수: {dicRoomInfo.Count}");
         
     }
-
 
     // 생성된 방 목록을 스크롤 뷰에 보여줄 때
     void CreateRoomListItem()
@@ -336,7 +330,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         UnityEngine.Debug.Log($"생성된 방 UI 개수: {count}");
     }
 
-
     // 방 생성 할 때(변수고정불변)
     public void OnClickCreateRoom()
     {
@@ -369,7 +362,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         LoadingSceneController.Instance.LoadScene("MakeRoom");
     }
 
-
     public override void OnCreatedRoom() // 방 생성에 성공했을 때
     {
         base.OnCreatedRoom();
@@ -392,14 +384,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         LoadingSceneController.Instance.LoadScene("MakeRoom");
     }
 
-    public override void OnJoinedRoom() // 방 입장에 성공했을 때
-    {
-        base.OnJoinedRoom();
-
-        UnityEngine.Debug.Log("방 입장 성공");
-
-        PhotonNetwork.LoadLevel("MakeRoom");
-    }
 
     public override void OnJoinRoomFailed(short returnCode, string message) // 방 입장에 실패했을 때
     {
