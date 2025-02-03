@@ -1,19 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Windows;
 using PlayFab;
 using PlayFab.ClientModels;
-using UnityEngine.SceneManagement;
+
 
 // 로그인 화면 전체를 구성하는 코드
-// 일반 이메일 로그인 방법일 경우에만 뒤로 돌아갈 수 있도록 하는 코드
 // 나머지 로그인 방법의 경우, 버튼 클릭 시 바로 로그인 시도
 public class LoginManager : MonoBehaviour
 {
+    public UserSetManager  UserSetManager;
+
     //패널 관련 선언
     public GameObject emailPanel, registerPanel, playersetPanel, AlarmPanel; //이메일, 회원가입, 유저초기세팅, 알람 패널 4종류
 
@@ -33,19 +32,26 @@ public class LoginManager : MonoBehaviour
     private string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"; // 이메일 형식 확인을 위한 정규식
 
     // 로그인 시 팝업창에 표시할 알림 내용
-    public Text popupText; 
+    public Text popupText;
 
     //playerprefs에 저장할 내용들
-    private const string FIRST_LOGIN_KEY = "IsFirstLogin"; // 첫 로그인 여부
     private const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
     private const string IMAGEINDEX_KEY = "ImageIndex"; // 유저의 이미지 인덱스
     private const string PROFILE_IMAGE_INDEX_KEY = "ProfileImageIndex";  // 저장 키
 
+    public Text TestText, InitialTestText; //알림창 테스트 메시지, 처음 접속 테스트 메시지 배치
+
+    void Awake()
+    {
+       //PlayerPrefs.DeleteAll();
+       //Debug.Log("PlayerPrefs 모두 삭제함");
+    }
 
     void Start() // 초기 상태 설정
     {
         // 로그인 상태 확인 및 첫 로그인 체크
         CheckLoginStatus();
+
 
         ResetPasswordToggle(); //토글 비활성화
         ResetWarningTexts(); //경고메시지 비활성화
@@ -61,42 +67,25 @@ public class LoginManager : MonoBehaviour
 
     private void CheckLoginStatus() //로그인 상태에 따라 다른 씬으로 이동
     {
-        // PlayerPrefs에서 첫 로그인 상태 체크(기본값 1)
-        bool isFirstLogin = !PlayerPrefs.HasKey(FIRST_LOGIN_KEY) || PlayerPrefs.GetInt(FIRST_LOGIN_KEY) == 1;
+        // 기기 ID로 자동 로그인
+        AutoLoginWithDeviceID();
 
-        if (isFirstLogin)
-        {
-            // 첫 로그인인 경우(1), 로그인으로 이동
-            //SceneManager.LoadScene("Login");
-            Debug.Log("첫 로그인 감지 -> 로그인 화면으로 이동");
-        }
-        else
-        {
-            // 이미 로그인된 유저라면(0) PlayFab 세션 확인
-            if (PlayFabClientAPI.IsClientLoggedIn())
-            {
-                // 세션이 유효하면 로컬에서 저장된 정보 불러오기
-                LoadUserInfoFromPrefs();
+        // playerprefs에서 정보 불러오기(디버그를 위한)
+        //LoadUserInfoFromPrefs();
 
-                // Main 씬으로 이동
-                SceneManager.LoadScene("Main");
-            }
-            else
-            {
-                // 로그인 세션이 만료된 경우 (비활성화된 상태)
-                // 로그인 화면으로 이동
-                //SceneManager.LoadScene("Login");
-            }
-        }
+        // 첫 로그인인 경우, 로그인으로 이동
+        //SceneManager.LoadScene("Login");
+        
+
     }
     private void LoadUserInfoFromPrefs() // 플레이어 정보 로컬에 저장된 값 불러오기
-    {   
+    {
         // GetString의 두번째 값은 기본값을 나타냄
         string displayName = PlayerPrefs.GetString(DISPLAYNAME_KEY, "Guest");
         int imageIndex = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0);
 
         // 필요한 곳에 정보를 설정하거나 UI에 반영
-        Debug.Log($"로컬 - DisplayName: {displayName}, ImageIndex: {imageIndex}");
+       Debug.Log($"로컬 - DisplayName: {displayName}, ImageIndex: {imageIndex}");
     }
 
     // 로그인 버튼 클릭 시
@@ -109,7 +98,7 @@ public class LoginManager : MonoBehaviour
     // 회원가입 버튼 클릭 시
     public void RegisterBtn() //회원가입 버튼에 연결
     {
-        var request = new RegisterPlayFabUserRequest { Email = EmailInput.text, Password = PasswordInput.text, Username = UseridInput.text };
+        var request = new RegisterPlayFabUserRequest { Email = EmailInput.text, Password = PasswordInput.text, Username = UseridInput.text};
         PlayFabClientAPI.RegisterPlayFabUser(request, OnRegisterSuccess, OnRegisterFailure);
     }
 
@@ -128,7 +117,7 @@ public class LoginManager : MonoBehaviour
         SetUIState(true, false, false, true, false, false); // 로그인 실패 시 UI 상태 설정
     }
 
-    // 로그인 성공 시->세팅 넘기고 로비로 넘어가야지
+    // (다른 기기에서 이메일로)로그인 성공 시
     public void OnLoginSuccess(LoginResult result)
     {
         print("로그인 성공");
@@ -144,6 +133,7 @@ public class LoginManager : MonoBehaviour
             PlayerPrefs.SetString(DISPLAYNAME_KEY, displayName);
             PlayerPrefs.Save();
             Debug.Log($"[playerprefs] DisplayName 저장 완료: {displayName}");
+            TestText.text = "DisplayName 저장";
         }, error =>
         {
             Debug.LogError("DisplayName 불러오기 실패: " + error.GenerateErrorReport());
@@ -159,6 +149,7 @@ public class LoginManager : MonoBehaviour
                 PlayerPrefs.SetInt(IMAGEINDEX_KEY, imageIndex);
                 PlayerPrefs.Save();
                 Debug.Log($"[playerprefs] ImageIndex 저장 완료: {imageIndex}");
+                TestText.text = "ImageIndex 저장";
             }
             else
             {
@@ -168,12 +159,52 @@ public class LoginManager : MonoBehaviour
         {
             Debug.LogError("ImageIndex 불러오기 실패: " + error.GenerateErrorReport());
         });
-
-        // 3. 로그인 상태를 false로 설정
-        PlayerPrefs.SetInt(FIRST_LOGIN_KEY, 0);
-        PlayerPrefs.Save();
-        Debug.Log($"[playerprefs] 로그인 상태 저장 완료: {FIRST_LOGIN_KEY}");
+        // 3. 로그인 성공 후, 기기 ID와 연동 실행
+        LinkDeviceID();
     }
+
+    void LinkDeviceID() // 계정 로그인한 기기를 playfab과 직접 연동
+    {
+        var request = new LinkAndroidDeviceIDRequest
+        {
+            AndroidDeviceId = SystemInfo.deviceUniqueIdentifier
+        };
+
+        PlayFabClientAPI.LinkAndroidDeviceID(request, result =>
+        {
+            Debug.Log("기기 ID와 PlayFab 계정 연동 완료");
+            TestText.text = "기기 ID 연동 완료";
+        },
+        error =>
+        {
+            Debug.LogError("기기 ID 연동 실패: " + error.GenerateErrorReport());
+            TestText.text = "기기 ID 연동 실패";
+        });
+    }
+
+    public void AutoLoginWithDeviceID() // 연동된 기기를 통해 자동로그인 수행
+    {
+        var request = new LoginWithAndroidDeviceIDRequest
+        {
+            AndroidDeviceId = SystemInfo.deviceUniqueIdentifier,
+            CreateAccount = false // 이미 존재하는 계정만 로그인 (새 계정 생성 X)
+        };
+
+        PlayFabClientAPI.LoginWithAndroidDeviceID(request, result =>
+        {
+            Debug.Log("기기 ID로 자동 로그인 성공: " + result.PlayFabId);
+            InitialTestText.text = "로그인 연결 상태";
+
+            // 마스터 서버접속 요청 및 로비로 이동
+            UserSetManager.OnClickConnect();
+        },
+        error =>
+        {
+            Debug.LogError("첫 로그인 감지. 자동 로그인 실패: " + error.GenerateErrorReport());
+            InitialTestText.text = "로그아웃 상태";
+        });
+    }
+
     // 회원가입 실패 시
     public void OnRegisterFailure(PlayFabError error)
     {
@@ -188,6 +219,9 @@ public class LoginManager : MonoBehaviour
         print("회원가입 성공");
         UpdateText("회원가입에 성공하였습니다.");
         SetUIState(true, true, false, false, false, false); // 회원가입 성공 시 UI 상태 설정
+
+        // 회원가입 성공 후, 기기 ID와 연동 실행
+        LinkDeviceID();
     }
 
     // 팝업 텍스트 상태 업데이트
@@ -261,8 +295,7 @@ public class LoginManager : MonoBehaviour
             }
         }
     }
-
-    
+ 
     public void ValidateUserID(string input) //유저 ID 입력 조건 검사에 따른 경고메시지 표시
     {
         // 규칙이 틀리면 오류 메시지 표시
