@@ -18,7 +18,7 @@ public class Countdown : MonoBehaviour
 
     private void StartCountDown()
     {
-        StartCoroutine(CountDownRoutine(3));
+        StartCoroutine(CountDownRoutine(1));
     }
 
     private IEnumerator CountDownRoutine(int count)
@@ -44,6 +44,7 @@ public class Countdown : MonoBehaviour
     {
         userCard.FirstUserCardArea();
         fieldCard.FirstFieldCard();
-        //userCard.SelectedUserCard();
+        userCard.SelectedUserCard();
+        fieldCard.CreateDropArea();
     }
 }
