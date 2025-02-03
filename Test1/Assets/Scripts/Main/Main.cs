@@ -5,6 +5,7 @@ using PlayFab.ClientModels;
 using Photon.Pun;
 using static UnityEngine.EventSystems.EventTrigger;
 using UnityEngine.SceneManagement;
+using System;
 
 // 메인에 존재하는 기능에 관한 스크립트
 public class Main : MonoBehaviour
@@ -14,10 +15,10 @@ public class Main : MonoBehaviour
     private InputField inputField; //프로필 패널 안의 이름입력필드
     private Text SaveText; //프로필 패널 안의 저장메시지
     private Sprite[] ProfileImg; //프로필 이미지 배열
+    private Image ProfileCenImg; //프로필 패널 중심 이미지
 
     // --------------메인에 보여질 오브젝트------------------
     public Text displayNameText; // DisplayName을 표시할 UI 텍스트
-    public InputField profileInputField; //메인의 프로필 이름 입력란
     public Image centralImage;  // 메인 프로필 이미지
     public GameObject profilePanel; // 프로필 수정 패널
 
@@ -27,22 +28,12 @@ public class Main : MonoBehaviour
     public Text[] username; //유저 이름
     public Text[] wordcount; //단어완성횟수
 
-
+    public Text TestText, LogTestText; //빌드 테스트 텍스트 상태, 로그아웃 텍스트 상태
+    private const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
+    private const string IMAGEINDEX_KEY = "ImageIndex"; // 유저의 이미지 인덱스
     private const string PROFILE_IMAGE_INDEX_KEY = "ProfileImageIndex";  // 저장 키
 
     private void Awake()
-    {
-        // PlayFab에서 저장된 이미지 인덱스를 불러와 이미지 업데이트
-        LoadProfileImageIndex();
-
-        //유저 네임 불러와서 텍스트로 표시
-        GetUserDisplayName();
-
-        RankActiveFalse(); //순위 오브젝트 모두 비활성화
-        GetLeaderBoard(); //순위 업데이트
-    }
-
-    void Start()
     {
         // UserSetManager 컴포넌트 참조
         UserSetManager userSetManager = FindObjectOfType<UserSetManager>();
@@ -50,72 +41,42 @@ public class Main : MonoBehaviour
         // UserSetManager에서 InputField를 가져옴
         inputField = userSetManager.inputText;
         SaveText = userSetManager.saveText;
-        ProfileImg = userSetManager.profileImages; //프로필 이미지 배열을 가져옴
+        ProfileImg = userSetManager.profileImages; //프로필 이미지 배열
+        ProfileCenImg = userSetManager.centralImage; //프로필 패널 중심사진
+    }
 
-        profileInputField.interactable = false; //메인의 프로필 인풋란은 항상 비활
+    void Start()
+    {
         profilePanel.SetActive(false); //프로필 패널 비활성화
-  
+
+        GetProfileImageIndex(); // PlayFab에서 저장된 이미지 인덱스를 불러와 이미지 업데이트
+        GetUserDisplayName(); //유저 네임 불러와서 텍스트로 표시
+
+        RankActiveFalse(); //순위 오브젝트 모두 비활성화
+        GetLeaderBoard(); //순위 업데이트
     }
 
 
     // 프로필 이미지 인덱스 불러오기 함수
-    // PlayFab에서 저장된 이미지 인덱스를 불러오는 함수
-    // -> 커스텀프로퍼티에 저장된 값을 불러오기
-    private void LoadProfileImageIndex()
+    private void GetProfileImageIndex()
     {
-        PlayFabClientAPI.GetUserData(new GetUserDataRequest(), result =>
-        {
-            // PROFILE_IMAGE_INDEX_KEY가 존재하는지 확인
-            if (result.Data.ContainsKey(PROFILE_IMAGE_INDEX_KEY))
-            {
-                // 저장된 인덱스 값 불러오기
-                int index = int.Parse(result.Data[PROFILE_IMAGE_INDEX_KEY].Value);
-                // 인덱스 범위 체크 후 이미지 업데이트
-                centralImage.sprite = ProfileImg[index];
-            }
-            else
-            {
-                Debug.LogWarning("PROFILE_IMAGE_INDEX_KEY가 존재하지 않습니다. 기본 이미지로 설정합니다.");
-                centralImage.sprite = ProfileImg[0]; ;  // 기본 이미지로 설정
-            }
-        }, error =>
-        {
-            Debug.LogError($"유저 데이터 불러오기 실패: {error.GenerateErrorReport()}");
-        });
+        int imageIndex = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0);
+        centralImage.sprite = ProfileImg[imageIndex]; //메인 유저 이미지 교체
+        ProfileCenImg.sprite = ProfileImg[imageIndex]; //프로필 패널 중심 이미지 교체
+
+        TestText.text = "이미지 로딩 완료";
     }
     
 
-    // 이름 불러오기
     // DisplayName 불러오기 함수
     public void GetUserDisplayName()
     {
-        PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest(), OnGetAccountInfoSuccess, OnGetAccountInfoFailure);
+        string displayName = PlayerPrefs.GetString(DISPLAYNAME_KEY, "Guest");
+        displayNameText.text = displayName; //메인 패널 이름
+        inputField.text = displayName; //프로필 패널 이름
+
+        TestText.text = "DisplayName 로딩 완료";
     }
-
-    //성공적으로 DisplayName을 가져온 경우
-    private void OnGetAccountInfoSuccess(GetAccountInfoResult result)
-    {
-        string displayName = result.AccountInfo.TitleInfo.DisplayName;
-        profileInputField.text = displayName;
-
-        if (!string.IsNullOrEmpty(displayName))
-        {
-            Debug.Log($"유저의 DisplayName: {displayName}");
-            displayNameText.text = $"{displayName}";
-        }
-        else
-        {
-            Debug.Log("DisplayName이 설정되지 않았습니다.");
-            displayNameText.text = "이름없음";
-        }
-    }
-
-    // DisplayName 가져오기에 실패한 경우
-    private void OnGetAccountInfoFailure(PlayFabError error)
-    {
-        Debug.LogError($"DisplayName 가져오기 실패: {error.GenerateErrorReport()}");
-    }
-
 
     //프로필 패널의 닫기 버튼을 누르면(닫기 버튼에 연결해둠)
     public void ExitBtn() 
@@ -126,26 +87,40 @@ public class Main : MonoBehaviour
 
         //유저 프로필 이미지 재로드, 이름 재로드 텍스트 보여주기
         GetUserDisplayName();
-        LoadProfileImageIndex();
+        GetProfileImageIndex();
 
     }
-
 
     // 로그아웃 버튼을 누르면->playfab 인증을 로그아웃
     public void LogoutBtn()
     {
-        // PlayFab 인증 정보 초기화
-        PlayFabClientAPI.ForgetAllCredentials();
-
         // 서버와의 연결도 끊기
         if (PhotonNetwork.IsConnected)
         {
             PhotonNetwork.Disconnect(); // 현재 연결 끊기
         }
 
-        // 로그인 화면으로 이동
-        SceneManager.LoadScene("Login");
-        Debug.Log("로그아웃되었습니다. 인증 정보가 초기화되었습니다.");
+        // 안드로이드 기기 ID도 연동 해제
+        PlayFabClientAPI.UnlinkAndroidDeviceID(new UnlinkAndroidDeviceIDRequest(), result =>
+        {
+            Debug.Log("기기 ID 연동 해제 성공");
+
+            // PlayFab 인증 정보 초기화
+            PlayFabClientAPI.ForgetAllCredentials();
+            LogTestText.text = "기기 및 playfab 해제";
+
+            //로딩바 ui 애니메이션 보여주기(Login씬으로 이동)
+            LoadingSceneController.Instance.LoadScene("Login");
+        },
+        error =>
+        {
+            Debug.LogError("기기 ID 연동 해제 실패: " + error.GenerateErrorReport());
+            LogTestText.text = "기기 ID 연동 해제 실패";
+        });
+
+        
+
+        //Debug.Log("로그아웃되었습니다. 인증 정보가 초기화되었습니다.");
     }
 
     // 게임 종료 버튼을 누르면
@@ -171,7 +146,7 @@ public class Main : MonoBehaviour
         }
     }
 
-    //유저가 업데이트 버튼을 누르면
+    //유저가 리더보드 업데이트 버튼을 누르면
     public void UpdateBtn()
     {
         //순위오브젝트 비활성화

@@ -11,7 +11,4 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Main.unity
     guid: 13668a066d82c4a4a8c0dd88c03a7533
-  - enabled: 1
-    path: Assets/Scenes/MakeRoom.unity
-    guid: dc5c6f582d90b2744bf94438bffd584b
   m_configObjects: {}
