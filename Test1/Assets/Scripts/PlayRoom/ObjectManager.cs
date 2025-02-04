@@ -28,6 +28,7 @@ public class ObjectManager : MonoBehaviour
     public Vector2 movedCardPosition;
     public bool isDragged = false;
     public List<GameObject> emptyList;
+    public GameObject[,] grid = new GameObject[7, 7];
 
     public void SortAfterMove() {
         if (isFullPopup)

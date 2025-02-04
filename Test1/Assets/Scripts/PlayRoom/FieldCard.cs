@@ -17,41 +17,54 @@ public class FieldCard : MonoBehaviour
     public CardPool cardPool; // CardPool 참조
     public List<GameObject> fieldDisplayedCards;
     public Transform emptyArea;
-    public int gridCount = 7;
 
-    public void CreateDropArea()
+    public void CreateDropAreas()
     {
-        for (int i = 0; i < gridCount*gridCount; i++)
+        for (int x = 0; x < 7; x++)
         {
-            GameObject empty = new GameObject("");
-            empty.transform.SetParent(fieldContainer, false);
-            RectTransform rect = empty.AddComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(200, 200);
-            Image img = empty.AddComponent<Image>();
-            img.color = Color.white;
-            empty.AddComponent<CardDrop>();
-            ObjectManager.instance.emptyList.Add(empty);
-            Image image = empty.GetComponent<Image>();
-            image.color = Color.clear;
-        }
-    }
-
-    private void ChangeColor(int i)
-    {
-        Image image = ObjectManager.instance.emptyList[i].GetComponent<Image>();
-        image.color = Color.white;
-    }
-
-    public void OnOffDropArea()
-    {
-        for (int j = 0; j < ObjectManager.instance.emptyList.Count; j++)
-        {
-            if (ObjectManager.instance.emptyList[j].transform.childCount == 1)
+            for (int y = 0; y < 7; y++)
             {
-                ChangeColor(j - 1);
-                ChangeColor(j + 1);
+                GameObject empty = new GameObject("");
+                empty.transform.SetParent(fieldContainer, false);
+                RectTransform rect = empty.AddComponent<RectTransform>();
+                rect.sizeDelta = new Vector2(200, 200);
+                Image img = empty.AddComponent<Image>();
+                img.color = Color.white;
+                empty.AddComponent<CardDrop>();
+                ObjectManager.instance.emptyList.Add(empty);
+                Image image = empty.GetComponent<Image>();
+                image.color = Color.clear;
+                ObjectManager.instance.grid[x,y] = empty;
+
             }
         }
+    }
+
+    private void ChangeColorAreas(int x, int y)
+    {
+        Image image = ObjectManager.instance.grid[x,y].GetComponent<Image>();
+        if (image.color != Color.white)
+        {
+            image.color = Color.white;
+        }
+    }
+
+    public void OnOffDropAreas()
+    {
+        for (int x = 0; x < 7; x++) 
+        {
+            for (int y = 0; y < 7; y++) 
+            { 
+                if (ObjectManager.instance.grid[x,y].transform.childCount == 1)
+                {
+                    ChangeColorAreas(x - 1, y);
+                    ChangeColorAreas(x + 1, y);
+                    ChangeColorAreas(x, y - 1);
+                    ChangeColorAreas(x, y + 1);
+                }
+            }
+        }
+        
     }
 
     public void FirstFieldCard()
@@ -59,14 +72,11 @@ public class FieldCard : MonoBehaviour
         List<GameObject> randomCards = cardPool.GetRandomCards(1); // 1개의 랜덤 카드 얻기
         cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
 
-        int middleIndex = ObjectManager.instance.emptyList.Count / 2;
-
-        GameObject middleObject = ObjectManager.instance.emptyList[middleIndex];
-        GameObject firstCard = randomCards[0];
-
-        ObjectManager.instance.emptyList[middleIndex].SetActive(true);
-        firstCard.transform.SetParent(middleObject.transform, false);
-        ObjectManager.instance.emptyList[middleIndex] = firstCard;
+        GameObject middleObejcts = ObjectManager.instance.grid[3, 3];
+        GameObject firstCards = randomCards[0];
+        ObjectManager.instance.grid[3,3].SetActive(true);
+        firstCards.transform.SetParent(middleObejcts.transform, false);
+        ObjectManager.instance.grid[3,3] = firstCards;
     }
 
 }
