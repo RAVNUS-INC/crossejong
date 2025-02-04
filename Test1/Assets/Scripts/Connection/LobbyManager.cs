@@ -354,7 +354,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         //방 목록에 보이게 할것인가?
         options.IsVisible = true;
 
-
         //방 생성
         PhotonNetwork.CreateRoom(input_RoomName.text, options);
 
@@ -383,7 +382,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         //로딩바 ui 애니메이션 보여주기
         LoadingSceneController.Instance.LoadScene("MakeRoom");
     }
-
 
     public override void OnJoinRoomFailed(short returnCode, string message) // 방 입장에 실패했을 때
     {

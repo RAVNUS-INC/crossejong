@@ -17,7 +17,6 @@ using Photon.Pun.Demo.PunBasics;
 public class ChatRoomSet : MonoBehaviourPunCallbacks
 {
     public UserProfileLoad UserProfileLoad;
-    public ChatEditor ChatEditor;
     public ChatManager chatManager; 
 
     // 방 이름, 현재인원/최대인원, 난이도, 제한시간, 저장완료메시지
@@ -33,9 +32,12 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     // 난이도, 제한시간 선택 인덱스, 갱신된 제한시간(15초, 30초, 45초)(변경 전)
     private int selectedDifficultyIndex, selectedTimeLimitIndex, selectedTimeLimit;
 
-    private int myActorNum, myImgIndex, myMaster; //내 actornumber, 내 사진 인덱스, 방장인지 아닌지
+    private int myActorNum, myImgIndex; //내 actornumber, 내 사진 인덱스
     private string myDisplayName, myMesseages; //내 이름, 내가 보낸 메시지
     private Dictionary<int, bool> playerReadyStates = new Dictionary<int, bool>(); // 플레이어 준비 상태 저장
+
+    private const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
+    private const string IMAGEINDEX_KEY = "ImageIndex"; // 유저의 이미지 인덱스
 
     public InputField ChatField; //채팅입력창
     public Button ReadyBtn; //준비버튼
@@ -53,24 +55,20 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         // 난이도, 제한시간 text 업데이트
         txtDifficulty.text = selectedDifficulty; //ex. 초급
         txtTimelimit.text = selectedTimeLimit + "초"; //ex. 15초
-
         ChatField.text = ""; //채팅입력창은 항상 비워놓기
-
         ReadyBtn.interactable = true; // 처음에는 준비버튼 활성화
 
-        //내 정보 불러오기(내 이름, 내 고유번호, 프로필 인덱스)
-        var customProperties = PhotonNetwork.LocalPlayer.CustomProperties;
-        myDisplayName = customProperties.ContainsKey("Displayname") ? (string)customProperties["Displayname"] : "Unknown";
-        myActorNum = PhotonNetwork.LocalPlayer.ActorNumber;
-        myImgIndex = int.Parse(customProperties.ContainsKey("Imageindex") ? (string)customProperties["Imageindex"] : "Unknown");
-
-        //나의 입장 알리기("~님이 입장하였습니다.")
-        photonView.RPC("EnterState", RpcTarget.All, myDisplayName, true);
-        Debug.Log("나의 입장을 알렸습니다");
+        //내 정보 Playerprefs에서 불러오기
+        myDisplayName = PlayerPrefs.GetString(DISPLAYNAME_KEY, "Guest"); //이름
+        myImgIndex = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0); //이미지 인덱스
+        myActorNum = PhotonNetwork.LocalPlayer.ActorNumber; //액터넘버
     }
 
     private void Start()
     {
+        //나의 입장 알리기
+        photonView.RPC("EnterState", RpcTarget.All, myDisplayName, true);
+
         // 방장 여부에 따른 버튼 처리
         RoomSetBtn.interactable = PhotonNetwork.IsMasterClient;
 
@@ -110,9 +108,9 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         });
     }
 
-    public void LoadRoomInfo()
+    public void LoadRoomInfo() //현재 방 정보 불러오기(customProperties로부터)
     {
-        //현재 방 정보 불러오기(customProperties로부터)
+        
         if (PhotonNetwork.InRoom)
         {
             Room room = PhotonNetwork.CurrentRoom;
@@ -125,21 +123,17 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             txtRoomName.text = $"{room.Name}";
         }
     }
-
-    // 방장이 방 속성 변경 패널 열기 버튼을 눌렀을때 -> 버튼의 위치를 현재 속성에 맞게 초기화
-    public void RoomSetPanelOpenBtn()
+    public void RoomSetPanelOpenBtn() // 방장이 방 속성 변경 패널 열기 버튼을 눌렀을때 -> 버튼의 위치를 현재 속성에 맞게 초기화
     {
         LoadRoomInfo();
-        UnityEngine.Debug.Log("난이도: " + selectedDifficulty);
-        UnityEngine.Debug.Log("시간: " + selectedTimeLimit); 
+        //UnityEngine.Debug.Log("난이도: " + selectedDifficulty);
+        //UnityEngine.Debug.Log("시간: " + selectedTimeLimit); 
 
         // 처음 선택했던 버튼들(난이도, 제한시간)은 색상 다르게(바뀐 정보에만 노란색) 
         UpdateButtonColors(DifButton, selectedDifficultyIndex);
         UpdateButtonColors(TimeButton, selectedTimeLimitIndex);
     }
-
-    //현재인원과 최대인원 텍스트 정보 업데이트
-    private void PlayersUpdate()
+    private void PlayersUpdate()  //현재인원과 최대인원 텍스트 정보 업데이트
     {
         if (PhotonNetwork.InRoom)
         {
@@ -148,9 +142,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             txtPlayerCount.text = $"{room.PlayerCount}/{room.MaxPlayers}";
         }
     }
-
-    // --------------------------- 방 속성 버튼 클릭 시 ------------------------
-    public void DifficultySet(Button[] buttons)
+    public void DifficultySet(Button[] buttons) //난이도 버튼 반응
     {
         // Difficulty 버튼에 리스너 추가
         for (int i = 0; i < buttons.Length; i++)
@@ -159,8 +151,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             buttons[i].onClick.AddListener(() => OnDifficultyButtonClicked(index, buttons));
         }
     }
-
-    public void TimeLimitSet(Button[] buttons)
+    public void TimeLimitSet(Button[] buttons) //제한시간 버튼 반응
     {
         // TimeLimit 버튼에 리스너 추가
         for (int i = 0; i < buttons.Length; i++)
@@ -169,8 +160,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             buttons[i].onClick.AddListener(() => OnTimeLimitButtonClicked(index, buttons));
         }
     }
-
-    public void OnDifficultyButtonClicked(int index, Button[] difBtn)
+    public void OnDifficultyButtonClicked(int index, Button[] difBtn) //난이도 버튼 클릭 시 값 업데이트
     {
         switch (index) // 0: 초급, 1: 중급, 2: 고급
         {
@@ -188,8 +178,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         UpdateButtonColors(difBtn, index); //색상 업데이트
         UnityEngine.Debug.Log("Selected Difficulty: " + selectedDifficulty); //메시지 출력
     }
-
-    public void OnTimeLimitButtonClicked(int index, Button[] TimBtn)
+    public void OnTimeLimitButtonClicked(int index, Button[] TimBtn) //제한시간 버튼 클릭 시 값 업데이트
     {
         switch (index) // 0: 15초, 1: 30초, 2: 45초
         {
@@ -208,10 +197,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         UpdateButtonColors(TimBtn, index); //색상 업데이트
         UnityEngine.Debug.Log("Selected Time Limit: " + selectedTimeLimit);
     }
-
-
-    // 선택한 버튼을 실제로 색칠하는 함수
-    private void UpdateButtonColors(Button[] buttons, int selectedIndex)
+    private void UpdateButtonColors(Button[] buttons, int selectedIndex) // 선택한 버튼을 색칠
     {
         // 초기화 작업 때 버튼 색상 표시하기 위해 쓰이는 반복문
         for (int i = 0; i < buttons.Length; i++)
@@ -223,9 +209,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             buttons[i].colors = colorBlockbg; //버튼에 색상 업데이트
         }
     }
-
-    // --------------------------- 방 속성 업데이트 시 ------------------------
-    public void UpdateRoomUI(string key, object value) // UI 업데이트 함수(난이도,시간)
+    public void UpdateRoomUI(string key, object value) // UI 텍스트 업데이트(난이도,시간)
     {
         switch (key)
         {
@@ -243,9 +227,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
                 break;
         }
     }
-
-    // 방 속성만 서버에 업데이트하는 함수 (UI 갱신은 하지 않음)
-    private void SaveRoomProperties(string key, object value)
+    private void SaveRoomProperties(string key, object value) // 방 속성만 서버에 업데이트하는 함수
     {
         // 변경할 속성 생성
         Hashtable propertiesToUpdate = new Hashtable
@@ -256,7 +238,6 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         // Photon을 통해 방 속성 업데이트
         PhotonNetwork.CurrentRoom.SetCustomProperties(propertiesToUpdate);
     }
-
     public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
     {
         foreach (DictionaryEntry entry in propertiesThatChanged)
@@ -270,11 +251,8 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             UpdateRoomUI(key, value);
         }
     }
-
-
-    // 내가 아닌 새로운 플레이어가 입장한 경우
-    public override void OnPlayerEnteredRoom(Player newPlayer)
-    {
+    public override void OnPlayerEnteredRoom(Player newPlayer) // 내가 아닌 새로운 플레이어가 입장한 경우
+    { 
         // 방장이 아닌 플레이어는 버튼 비활성화
         RoomSetBtn.interactable = PhotonNetwork.IsMasterClient;
 
@@ -282,9 +260,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         PlayersUpdate();
         UnityEngine.Debug.Log("새로운 플레이어 입장");
     }
-
-    // 플레이어가 방을 나갔을 때 호출되는 콜백
-    public override void OnPlayerLeftRoom(Player otherPlayer)
+    public override void OnPlayerLeftRoom(Player otherPlayer) // 플레이어가 방을 나갔을 때
     {
         // 방장이 아닌 플레이어는 버튼 비활성화
         RoomSetBtn.interactable = PhotonNetwork.IsMasterClient;
@@ -294,7 +270,6 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         UnityEngine.Debug.Log("다른 플레이어 방 나감");
     }
 
-
     // 방을 나갈때
     public void LeaveRoom()
     {
@@ -303,28 +278,21 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             //나의 퇴장을 모두에게 알리기
             photonView.RPC("EnterState", RpcTarget.All, myDisplayName, false);
 
-            //나 자신을 players리스트에서 제거(후 접속자에게도 정보 전달)
-            UserProfileLoad.photonView.RPC("RemoveUserInfo", RpcTarget.AllBuffered, myActorNum);
+            // 본인의 정보 삭제 요청을 방장에게 전달
+            UserProfileLoad.photonView.RPC("RequestRemoveUserInfo", RpcTarget.MasterClient, myActorNum);
 
             //나가기
-            PhotonNetwork.LeaveRoom();
-
-            //로딩바 ui 애니메이션 보여주기
-            LoadingSceneController.Instance.LoadScene("Main");
+            PhotonNetwork.LeaveRoom();   
         }
+        //로딩바 ui 애니메이션 보여주기
+        LoadingSceneController.Instance.LoadScene("Main");
     }
-
-    // 방을 성공적으로 나갔을 때 호출되는 콜백
-    public override void OnLeftRoom()
+ 
+    public override void OnLeftRoom() // 방을 성공적으로 나갔을 때 호출되는 콜백
     {
         Debug.Log("방을 성공적으로 퇴장했습니다.");
-
-        // 로비 씬 이름으로 이동
-        //SceneManager.LoadScene("Main");
     }
-
-    // 채팅 전송버튼에 직접 연결해 사용(메시지 전송 역할)
-    public void SendMyMessage()
+    public void SendMyMessage() // 메시지 전송 (채팅전송 버튼에 연결)
     {
         if (ChatField.text.Trim() != "")
         {
@@ -342,9 +310,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             ChatField.text = "";
         }
     }
-
-    //준비 버튼에 직접 연결(준비 상태 알리는 역할, 방장은 이동까지 수행)
-    public void UserReadyState()
+    public void UserReadyState() //준비 버튼에 직접 연결(준비 상태 알리는 역할, 방장은 이동까지 수행)
     {
         ReadyBtn.interactable = false; // 버튼 한번 눌렀으면 다음부턴 비활성화(준비 취소 불가능)
 
@@ -362,15 +328,13 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
                 return; 
         }
         //모두 준비 했을 경우
-        Debug.Log("모든 플레이어 준비. 플레이방으로 이동합니다.");
-        // 플레이룸 씬으로 이동(현재 방에서 준비버튼을 누른 모든 플레이어에 한하여)
+        //Debug.Log("모든 플레이어 준비. 플레이방으로 이동합니다.");
+        //플레이룸 씬으로 이동(현재 방에서 준비버튼을 누른 모든 플레이어에 한하여)
         photonView.RPC("ChangeScene", RpcTarget.All, "PlayRoom");
     }
 
-
     [PunRPC]
-    //채팅을 모두에게 보내고 ui업데이트까지 한번에 동기화
-    void SendChat(bool who, string chat, string senderName, int index)
+    void SendChat(bool who, string chat, string senderName, int index) //채팅을 모두에게 보내고 ui업데이트까지 한번에 동기화
     {
         //화면에 말풍선 띄우기(나: true, 상대방: false), index는 프로필이미지
         chatManager.Chat(who, chat, senderName, index);
@@ -378,8 +342,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    //유저의 입장 퇴장 메시지 알리미
-    void EnterState(string enteruserName, bool isbool)
+    void EnterState(string enteruserName, bool isbool) //유저의 입장 퇴장 메시지 알리미
     {
         // 내가 입장/퇴장했음을 알리는 메시지 띄우기
         chatManager.DisplayUserMessage(enteruserName, isbool);
@@ -387,15 +350,13 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    //모든 유저들의 준비 유무 알리미
-    void IsReady(string userName, int userNum)
+    void IsReady(string userName, int userNum) //모든 유저들의 준비 유무 알리미
     {
         playerReadyStates[userNum] = true; // 유저의 준비 상태 저장
     }
 
     [PunRPC]
-    //모든 유저가 준비하면 플레이룸으로 이동
-    void ChangeScene(string sceneName)
+    void ChangeScene(string sceneName) //모든 유저가 준비하면 플레이룸으로 이동
     {
         PhotonNetwork.LoadLevel(sceneName);
     }
