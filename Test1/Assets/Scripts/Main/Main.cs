@@ -47,6 +47,16 @@ public class Main : MonoBehaviour
 
     void Start()
     {
+        if (PhotonNetwork.InLobby)
+        {
+            Debug.Log("현재 로비에 있음.");
+        }
+        else
+        {
+            Debug.Log("현재 로비에 없음.");
+            PhotonNetwork.JoinLobby();  // 로비로 이동
+        }
+
         profilePanel.SetActive(false); //프로필 패널 비활성화
 
         GetProfileImageIndex(); // PlayFab에서 저장된 이미지 인덱스를 불러와 이미지 업데이트
