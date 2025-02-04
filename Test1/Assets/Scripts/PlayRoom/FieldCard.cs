@@ -77,6 +77,8 @@ public class FieldCard : MonoBehaviour
         ObjectManager.instance.grid[3,3].SetActive(true);
         firstCards.transform.SetParent(middleObejcts.transform, false);
         ObjectManager.instance.grid[3,3] = firstCards;
+
+        OnOffDropAreas();
     }
 
 }

@@ -29,11 +29,20 @@ public class CardDrop : MonoBehaviour, IDropHandler
             return false;
     }
 
+    private bool IsColorWhite()
+    {
+        Image image = transform.GetComponent<Image>();
+        if(image.color == Color.white)
+            return true;
+        else
+            return false;
+    }
+
     public void OnDrop(PointerEventData eventData)
     {
         GameObject card = ObjectManager.instance.moveCardObejct;
 
-        if (card != null && !HasCard())
+        if (card != null && !HasCard() && IsColorWhite())
         {
             card.GetComponent<Image>().raycastTarget = true;
             card.transform.position = this.transform.position;
@@ -59,6 +68,25 @@ public class CardDrop : MonoBehaviour, IDropHandler
             ObjectManager.instance.movedCardPosition = card.transform.position;
             ObjectManager.instance.isDragged = true;
             Debug.Log(ObjectManager.instance.movedCardPosition);
+
+            for (int x = 0; x < 7; x++)
+            {
+                for (int y = 0; y < 7; y++)
+                {
+                    if (card == ObjectManager.instance.grid[x, y])
+                    {
+                        ObjectManager.instance.cardIndexX = x;
+                        ObjectManager.instance.cardIndexY = y;
+                        Debug.Log(ObjectManager.instance.cardIndexX);
+                        Debug.Log(ObjectManager.instance.cardIndexY);
+                    }
+                    else
+                        Debug.Log("일치하지 않습니다");
+                }
+            }
+            fieldCard.OnOffDropAreas();
         }
+        else
+            Debug.Log("하얀색이 아닙니다");
     }
 }

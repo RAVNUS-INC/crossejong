@@ -85,10 +85,20 @@ public class CardPool : MonoBehaviour
             }
             else
             {
-                // 카드 배경 이미지 추가
-                Image cardFrontFeature = card.AddComponent<Image>();
-                cardFrontFeature.sprite = specialCardFrontColorImage; // 카드 앞면 이미지 설정
-                cardFrontFeature.type = Image.Type.Sliced;
+                if (cardList[i] == "컬러")
+                {
+                    // 카드 배경 이미지 추가
+                    Image cardFrontFeature = card.AddComponent<Image>();
+                    cardFrontFeature.sprite = specialCardFrontColorImage; // 카드 앞면 이미지 설정
+                    cardFrontFeature.type = Image.Type.Sliced;
+                }
+                else
+                {
+                    Image cardFrontFeature = card.AddComponent<Image>();
+                    cardFrontFeature.sprite = specialCardFrontBlackImage; // 카드 앞면 이미지 설정
+                    cardFrontFeature.type = Image.Type.Sliced;
+                }
+
             }
 
             // 카드 리스트에 추가
