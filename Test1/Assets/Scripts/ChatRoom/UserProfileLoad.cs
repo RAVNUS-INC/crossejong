@@ -14,11 +14,14 @@ using System.Globalization;
 using System.Threading.Tasks;
 using static UserProfileLoad;
 using System.Reflection;
+using System.Linq;
 
 // 현재 방/게임에 접속한 플레이어들의 프로필과 이름 표시하는 스크립트(PlayerView)
 // UI관련 RPC
 public class UserProfileLoad : MonoBehaviourPunCallbacks
 {
+    public static UserProfileLoad Instance;
+
     public GameObject[] InRoomUserList; // 현재 방에 접속한 유저들의 리스트
     public Image[] InRoomUserImg; // 현재 방에 접속한 유저들의 프로필사진
     public Text[] InRoomUserName; // 현재 방에 접속한 유저들의 닉네임
@@ -33,10 +36,12 @@ public class UserProfileLoad : MonoBehaviourPunCallbacks
     private const string IMAGEINDEX_KEY = "ImageIndex"; // 유저의 이미지 인덱스
     private const string PROFILE_IMAGE_INDEX_KEY = "ProfileImageIndex";  // 저장 키
 
-    private List<Player> players = new List<Player>(); // 플레이어 리스트 (방장과 일반 플레이어 구분 및 순서)
+    private List<Player> players = new List<Player>(); // 플레이어 리스트
 
     void Awake() 
     {
+        Instance = this;
+
         mydisplayname = PlayerPrefs.GetString(DISPLAYNAME_KEY, "Guest"); //유저이름 불러와 mydisplayname 변수에 저장
         myimgindex = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0);  //유저 이미지인덱스 불러와 myimgindex 변수에 저장
         myActNum = PhotonNetwork.LocalPlayer.ActorNumber; //액터넘버 저장
@@ -47,30 +52,56 @@ public class UserProfileLoad : MonoBehaviourPunCallbacks
         // 포톤뷰 등록
         PhotonNetwork.RegisterPhotonView(photonView);
 
-        //리스트에 유저 추가 요청
-        photonView.RPC("AddUserInfo", RpcTarget.All, mydisplayname, myimgindex, myActNum);
-
-        // 리스트 업데이트를 모든 클라이언트에 전파
-        photonView.RPC("UpdatePlayerList", RpcTarget.All, players);
-
-        // 방장이 UI를 갱신하고 모든 플레이어에게 업데이트 전달
-        photonView.RPC("UpdatePlayerViewUI", RpcTarget.All);
-
+        // 본인의 정보 추가를 방장에게 전달
+        photonView.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, mydisplayname, myimgindex, myActNum);
     }
 
-    //players 리스트에 추가하는 과정(나중 접속자에게도 이 정보 전달)-방장만 권한가짐
     [PunRPC]
-    void AddUserInfo(string userName, int imgIndex, int userNum)
+    public void RequestAddPlayerInfo(string displayName, int imgIndex, int myActNum)
     {
-        // 정보를 플레이어 리스트에 추가
-        Player newPlayer = new Player(userName, imgIndex, userNum);
-        players.Add(newPlayer);
-        Debug.Log($"새로운 플레이어 추가: {userName}, ActNum: {userNum}");
+        if (!PhotonNetwork.IsMasterClient) return; // 방장만 실행
+
+        // 방장이 플레이어 리스트에 추가
+        players.Add(new Player(displayName, imgIndex, myActNum));
+        Debug.Log($"플레이어 {myActNum}가 리스트에 추가됨.");
+
+        // 모든 유저에게 동기화 요청
+        SyncPlayerList();
     }
 
-    // 접속자 프로필 활성화
     [PunRPC]
-    void UpdatePlayerViewUI()
+    public void RequestRemoveUserInfo(int userNum) //players 리스트에서 삭제하는 과정
+    {
+        if (!PhotonNetwork.IsMasterClient) return; // 방장만 실행
+
+        //직접 삭제
+        players.RemoveAll(p => p.myActNum == userNum);
+        Debug.Log($"플레이어 {userNum}가 리스트에서 제거됨.");
+
+        // 모든 유저에게 동기화 요청
+        SyncPlayerList();
+    }
+
+    void SyncPlayerList() // 방장만 실행->모두에게 리스트 ui업뎃 요청
+    {
+        if (!PhotonNetwork.IsMasterClient) return;
+
+        photonView.RPC("UpdatePlayerList", RpcTarget.AllBuffered,
+            players.Select(p => p.displayName).ToArray(),
+            players.Select(p => p.imgIndex).ToArray(),
+            players.Select(p => p.myActNum).ToArray());
+    }
+
+    [PunRPC]
+    void UpdatePlayerList(string[] names, int[] imgIndexes, int[] actNums)
+    {
+        players.Clear(); //처음엔 초기화
+        players = names.Select((t, i) => new Player(t, imgIndexes[i], actNums[i])).ToList();
+        Debug.Log($"플레이어 리스트 업데이트됨.");
+        UpdatePlayerViewUI();
+    }
+
+    void UpdatePlayerViewUI() // 접속자 프로필 활성화
     {
         // 초기에 모든 프로필 오브젝트 비활성화
         SetActive();
@@ -100,44 +131,13 @@ public class UserProfileLoad : MonoBehaviourPunCallbacks
                 Debug.Log("다른 유저 정보 업데이트 완료");
                 myIndex++;
             }
-            
+
         }
     }
-
-
-    // 플레이어 리스트 업데이트를 모든 클라이언트에게 전파하는 RPC 함수
-    [PunRPC]
-    void UpdatePlayerList(List<Player> updatedPlayerList)
-    {
-        // 모든 클라이언트에서 플레이어 리스트를 업데이트
-        players = updatedPlayerList;
-        foreach (Player player in players)
-        {
-            Debug.Log($"Display Name: {player.displayName}, Img Index: {player.imgIndex}, Act Num: {player.myActNum}");
-        }
-    }
-
-
-
-    //players 리스트에서 삭제하는 과정(나중 접속자에게도 이 정보 전달)
-    [PunRPC]
-    public void RemoveUserInfo(int userNum)
-    {
-        //직접 삭제
-        players.RemoveAll(p => p.myActNum == userNum);
-        Debug.Log($"플레이어 {userNum}가 리스트에서 제거됨.");
-
-        // 리스트 업데이트를 모든 클라이언트에 전파
-        photonView.RPC("UpdatePlayerList", RpcTarget.AllBuffered, players);
-
-        // 방장이 UI를 갱신하고 모든 플레이어에게 업데이트 전달
-        photonView.RPC("UpdatePlayerViewUI", RpcTarget.AllBuffered);
-    }
-
 
 
     // 플레이어 정보를 관리하는 클래스
-    [System.Serializable]  // Photon이 직렬화할 수 있도록 지정
+    [System.Serializable]
     public class Player
     {
         public string displayName;

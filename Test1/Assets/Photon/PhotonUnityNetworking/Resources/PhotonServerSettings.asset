@@ -51,6 +51,9 @@ MonoBehaviour:
   - RemoveUserInfo
   - UpdatePlayerViewUI
   - SyncPlayerList
+  - UpdatePlayerList
+  - RequestAddPlayerInfo
+  - RequestRemoveUserInfo
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
