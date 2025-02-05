@@ -1,22 +1,28 @@
 using UnityEngine;
 using TMPro; // TextMeshPro를 사용하기 위한 네임스페이스
 using System.Collections;
+using UnityEngine.UI;
 
 public class Countdown : MonoBehaviour
 {
     public TMP_Text countDownText; // TextMeshPro 사용
     public UserCard userCard;  // UserCard 참조
     public float startDelay = 1f; // 시작 딜레이
+    public Button startGameButton; //게임 시작버튼
+    public FieldCard fieldCard; 
 
     private void Start()
     {
-        StartCoroutine(CountDownRoutine());
+        startGameButton.onClick.AddListener(StartCountDown);
     }
 
-    private IEnumerator CountDownRoutine()
+    private void StartCountDown()
     {
-        int count = 3;
+        StartCoroutine(CountDownRoutine(1));
+    }
 
+    private IEnumerator CountDownRoutine(int count)
+    {
         // 카운트다운 표시
         while (count > 0)
         {
@@ -36,6 +42,9 @@ public class Countdown : MonoBehaviour
 
     private void StartGame()
     {
-        userCard.MoveUserCardArea();
+        userCard.FirstUserCardArea();
+        fieldCard.CreateDropAreas();
+        fieldCard.FirstFieldCard();
+        userCard.SelectedUserCard();
     }
 }
