@@ -34,8 +34,8 @@ public class TurnChange : MonoBehaviour
 
     }
 
-    public void CreatedWord()
+    public void CreateWord()
     {
-        
+
     }
 }
