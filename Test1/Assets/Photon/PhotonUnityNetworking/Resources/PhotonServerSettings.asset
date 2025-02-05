@@ -54,6 +54,9 @@ MonoBehaviour:
   - UpdatePlayerList
   - RequestAddPlayerInfo
   - RequestRemoveUserInfo
+  - StartCountDown
+  - StartGame
+  - FirstFieldCard
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

@@ -4,6 +4,7 @@ using TMPro;
 using System.Collections.Generic;
 using PlayFab.DataModels;
 using DG.Tweening;
+using Photon.Pun;
 
 public class CardPool : MonoBehaviour
 {
@@ -133,7 +134,6 @@ public class CardPool : MonoBehaviour
         return randomCards;
     }
 
-
     // 카드 이동
     public void MoveCardToParent(GameObject card, Transform parent)
     {
@@ -183,6 +183,7 @@ public class CardPool : MonoBehaviour
 
         SortCardIndex(targetList);
     }
+
 
     public void SortCardIndex(List<GameObject> cardList)
     {
