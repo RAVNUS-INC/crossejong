@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using static UserProfileLoad;
 using System.Reflection;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 // 현재 방/게임에 접속한 플레이어들의 프로필과 이름 표시하는 스크립트(PlayerView)
 // UI관련 RPC
@@ -41,7 +42,7 @@ public class UserProfileLoad : MonoBehaviourPunCallbacks
     void Awake() 
     {
         Instance = this;
-
+        
         mydisplayname = PlayerPrefs.GetString(DISPLAYNAME_KEY, "Guest"); //유저이름 불러와 mydisplayname 변수에 저장
         myimgindex = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0);  //유저 이미지인덱스 불러와 myimgindex 변수에 저장
         myActNum = PhotonNetwork.LocalPlayer.ActorNumber; //액터넘버 저장
@@ -53,8 +54,11 @@ public class UserProfileLoad : MonoBehaviourPunCallbacks
         PhotonNetwork.RegisterPhotonView(photonView);
 
         // 본인의 정보 추가를 방장에게 전달
-        photonView.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, mydisplayname, myimgindex, myActNum);
+        //-----------(서버 연결 시 주석해제), 스크립트에 photonview 추가------------
+        // photonView.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, mydisplayname, myimgindex, myActNum);
     }
+
+
 
     [PunRPC]
     public void RequestAddPlayerInfo(string displayName, int imgIndex, int myActNum)
@@ -176,4 +180,5 @@ public class UserProfileLoad : MonoBehaviourPunCallbacks
         }
         return masterActorNumber;
     }
+
 }

@@ -2,20 +2,35 @@ using UnityEngine;
 using TMPro; // TextMeshPro를 사용하기 위한 네임스페이스
 using System.Collections;
 using UnityEngine.UI;
+using Photon.Pun;
 
 public class Countdown : MonoBehaviour
+
+    ////-----------(서버 연결 시 주석해제)------------
+    //MonoBehaviourPun
+
 {
     public TMP_Text countDownText; // TextMeshPro 사용
     public UserCard userCard;  // UserCard 참조
     public float startDelay = 1f; // 시작 딜레이
     public Button startGameButton; //게임 시작버튼
-    public FieldCard fieldCard; 
+    public FieldCard fieldCard;
 
     private void Start()
     {
         startGameButton.onClick.AddListener(StartCountDown);
+
+        ////-----------(서버 연결 시 주석해제)------------
+        //// 방장만 시작버튼 활성화, 실행 가능
+        //if (PhotonNetwork.IsMasterClient) 
+        //{
+        //    startGameButton.onClick.AddListener(() => 
+        //    photonView.RPC("StartCountDown", RpcTarget.All));
+        //}
     }
 
+    //-----------(서버 연결 시 주석해제)------------
+    // [PunRPC]
     private void StartCountDown()
     {
         StartCoroutine(CountDownRoutine(1));
@@ -40,11 +55,16 @@ public class Countdown : MonoBehaviour
 
     }
 
+    //-----------(서버 연결 시 주석해제)------------
+    // [PunRPC]
     private void StartGame()
     {
         userCard.FirstUserCardArea();
         fieldCard.CreateDropAreas();
         fieldCard.FirstFieldCard();
         userCard.SelectedUserCard();
+
+        //-----------(서버 연결 시 주석해제)------------
+        //fieldCard.photonView.RPC("FirstFieldCard", RpcTarget.All);
     }
 }
