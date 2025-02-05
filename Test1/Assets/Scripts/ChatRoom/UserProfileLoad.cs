@@ -54,7 +54,7 @@ public class UserProfileLoad : MonoBehaviourPunCallbacks
         PhotonNetwork.RegisterPhotonView(photonView);
 
         // 본인의 정보 추가를 방장에게 전달
-        photonView.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, mydisplayname, myimgindex, myActNum);
+        //photonView.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, mydisplayname, myimgindex, myActNum);
     }
 
 
