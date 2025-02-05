@@ -16,58 +16,55 @@ public class FieldCard : MonoBehaviour
     public Transform fieldContainer; // FieldArea의 Contents
     public CardPool cardPool; // CardPool 참조
     public List<GameObject> fieldDisplayedCards;
-    public List<GameObject> fieldList;
-    public List<GameObject> emptyList;
-    public Transform fieldArea;
     public Transform emptyArea;
-    public Vector2[] emptyPosition = new Vector2[]
-            {
-                new Vector2(0, 200),
-                new Vector2(-200, 0),
-                new Vector2(0, -200),
-                new Vector2(200, 0)
-            };
-    public Vector2[] updatePosition = new Vector2[1]
-                    { new Vector2 (0, -200) };
 
-
-    public void CreateCapableArea()
+    public void CreateDropAreas()
     {
-        for (int i = 0; i < fieldDisplayedCards.Count; i++)
+        for (int x = 0; x < 7; x++)
         {
+            for (int y = 0; y < 7; y++)
+            {
+                GameObject empty = new GameObject("");
+                empty.transform.SetParent(fieldContainer, false);
+                RectTransform rect = empty.AddComponent<RectTransform>();
+                rect.sizeDelta = new Vector2(200, 200);
+                Image img = empty.AddComponent<Image>();
+                img.color = Color.white;
+                empty.AddComponent<CardDrop>();
+                ObjectManager.instance.emptyList.Add(empty);
+                Image image = empty.GetComponent<Image>();
+                image.color = Color.clear;
+                ObjectManager.instance.grid[x,y] = empty;
 
+            }
         }
     }
 
-    public void CreateDropArea()
+    private void ChangeColorAreas(int x, int y)
     {
-        if (ObjectManager.instance.isDragged) 
+        Image image = ObjectManager.instance.grid[x,y].GetComponent<Image>();
+        if (image.color != Color.white)
         {
-            float x = ObjectManager.instance.movedCardPosition.x;
-            float y = ObjectManager.instance.movedCardPosition.y;
+            image.color = Color.white;
+        }
+    }
 
-            if (-200 < y & y <= 0)
-            {
-
-            }
-
-            for (int i = 0;i < emptyPosition.Length; i++)
-            {
-                emptyPosition[i] += updatePosition[0];
+    public void OnOffDropAreas()
+    {
+        for (int x = 0; x < 7; x++) 
+        {
+            for (int y = 0; y < 7; y++) 
+            { 
+                if (ObjectManager.instance.grid[x,y].transform.childCount == 1)
+                {
+                    ChangeColorAreas(x - 1, y);
+                    ChangeColorAreas(x + 1, y);
+                    ChangeColorAreas(x, y - 1);
+                    ChangeColorAreas(x, y + 1);
+                }
             }
         }
-
-        for (int i = 0; i < 4; i++)
-        {
-            GameObject empty = new GameObject("");
-            empty.transform.SetParent(fieldArea, false);
-            RectTransform rect = empty.AddComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(200, 200);
-            rect.anchoredPosition = emptyPosition[i];
-            Image img = empty.AddComponent<Image>();
-            img.color = Color.white;
-            empty.AddComponent<CardDrop>();
-        }
+        
     }
 
     public void FirstFieldCard()
@@ -75,9 +72,13 @@ public class FieldCard : MonoBehaviour
         List<GameObject> randomCards = cardPool.GetRandomCards(1); // 1개의 랜덤 카드 얻기
         cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
 
-        RectTransform rect = randomCards[0].GetComponent<RectTransform>();
-        rect.anchoredPosition = Vector2.zero; // 부모의 기준점에서 (0,0)으로 설정
-        fieldDisplayedCards.Add(randomCards[0]);
+        GameObject middleObejcts = ObjectManager.instance.grid[3, 3];
+        GameObject firstCards = randomCards[0];
+        ObjectManager.instance.grid[3,3].SetActive(true);
+        firstCards.transform.SetParent(middleObejcts.transform, false);
+        ObjectManager.instance.grid[3,3] = firstCards;
+
+        OnOffDropAreas();
     }
 
 }

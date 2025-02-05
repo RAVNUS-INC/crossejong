@@ -27,6 +27,11 @@ public class ObjectManager : MonoBehaviour
     public int time;
     public Vector2 movedCardPosition;
     public bool isDragged = false;
+    public List<GameObject> emptyList;
+    public GameObject[,] grid = new GameObject[7, 7];
+    public int cardIndexX;
+    public int cardIndexY;
+    public string createdWord;
 
     public void SortAfterMove() {
         if (isFullPopup)
