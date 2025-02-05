@@ -46,6 +46,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     private const int MaxLength = 12; 
     // 방 목록을 가지고 있는 Dictionary 변수
     Dictionary<string, RoomInfo> dicRoomInfo = new Dictionary<string, RoomInfo>();
+    // 생성된 방 이름을 저장하는 변수
+    private string selectedRoomName = null;
 
 
     private void Awake() 
@@ -69,8 +71,12 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         // 방 이름 입력 필드 초기화
         input_RoomName.text = ""; //방 이름 기본 공백 상태
         warningText.text = ""; // 초기 경고 메시지 비우기
+        selectedRoomName = null; //생성된 방 저장 변수 비우기
         btn_CreateRoom.interactable = false; // 처음에는 방 생성 버튼 비활성화
+        btn_JoinRoom.interactable = false; // 처음에는 방 참여 버튼 비활성화
         input_RoomName.onValueChanged.AddListener(ValidateRoomName); //방 이름 작성할 시, 방 이름 규칙 검사
+
+        UnityEngine.Debug.Log("메인화면 초기화 완료");
     }
 
     private void MaxPlayerSet(Button[] buttons)
@@ -170,8 +176,11 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         }
 
         // 선택한 방 이름을 전달
-        input_RoomName.text = roomName;
+        selectedRoomName = roomName;
+        // 참여 버튼 활성화
+        btn_JoinRoom.interactable = true; 
     }
+
 
     // 방 옵션 선택 시 이뤄지는 ui와 index 업데이트에 관한 코드
     void OnMaxPlayersButtonClicked(int index, Button[] PlayBtn)
@@ -296,9 +305,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     // 생성된 방 목록을 스크롤 뷰에 보여줄 때
     void CreateRoomListItem()
     {
- 
         int count = 0;
-
         foreach (RoomInfo info in dicRoomInfo.Values)
         {
             //방 정보 생성과 동시에 ScrollView-> Content의 자식으로 하자
@@ -377,8 +384,10 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     public void OnClickJoinRoom() // 방 입장
     {
-        PhotonNetwork.JoinRoom(input_RoomName.text);
-
+        if (!string.IsNullOrEmpty(selectedRoomName)) //방이름이 뭐라도 있으면
+        {
+            PhotonNetwork.JoinRoom(selectedRoomName);
+        }
         //로딩바 ui 애니메이션 보여주기
         LoadingSceneController.Instance.LoadScene("MakeRoom");
     }
