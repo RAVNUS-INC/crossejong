@@ -6,7 +6,9 @@ using PlayFab.DataModels;
 using DG.Tweening;
 using Photon.Pun;
 
-public class CardPool : MonoBehaviour
+public class CardPool : //MonoBehaviour
+    //서버 연결 시 주석 해제------------------------------------
+    MonoBehaviourPun
 {
     public static CardPool instance = null;
 
@@ -115,24 +117,59 @@ public class CardPool : MonoBehaviour
         CreateCards(cardLists.cardFrontSpecial, Color.white);
     }
 
-    // 랜덤으로 11개의 카드 선택
-    public List<GameObject> GetRandomCards(int count)
-    {
-        List<GameObject> randomCards = new List<GameObject>();
-        HashSet<int> usedIndices = new HashSet<int>();
 
-        while (randomCards.Count < count)
+    // 랜덤으로 11개의 카드 선택
+    //public List<GameObject> GetRandomCards(int count)
+    //{
+    //    List<GameObject> randomCards = new List<GameObject>();
+    //    HashSet<int> usedIndices = new HashSet<int>();
+
+    //    while (randomCards.Count < count)
+    //    {
+    //        int randomIndex = Random.Range(0, cards.Count);
+    //        if (!usedIndices.Contains(randomIndex))
+    //        {
+    //            usedIndices.Add(randomIndex);
+    //            randomCards.Add(cards[randomIndex]);
+    //        }
+    //    }
+    //    return randomCards;
+    //}
+
+
+    //서버 연결 시 주석 해제------------------------------------
+    // 랜덤으로 11개의 카드 선택(change) 인덱스반환(방장만 수행)
+    public int[] GetRandomCardsIndex(int count)
+    {
+        int currentCount = 0; //처음엔 0개부터 시작
+        List<int> usedIndicesEx = new List<int>(); //지금 막 뽑은 인덱스를 저장
+        while (currentCount < count)
         {
             int randomIndex = Random.Range(0, cards.Count);
-            if (!usedIndices.Contains(randomIndex))
+            if (!ObjectManager.instance.usedIndices.Contains(randomIndex)) //이전 인덱스와 다른 값이라면(새로운 값이라면)
             {
-                usedIndices.Add(randomIndex);
-                randomCards.Add(cards[randomIndex]);
+                usedIndicesEx.Add(randomIndex); //전역변수 usedIndices업데이트 됨
             }
+            currentCount++;
         }
+        ObjectManager.instance.usedIndices = usedIndicesEx; //뽑은 리스트들 기존 변수에 저장
+        return usedIndicesEx.ToArray(); //int[] 형태로 반환
+    }
 
+    // 받은 인덱스 리스트를 토대로 카드 gameobject 생성(방장 포함 각 유저마다 수행)
+    public List<GameObject> GetRandomCardsObject(int[] usedIndicesEx)
+    {
+        List<GameObject> randomCards = new List<GameObject>();
+        foreach (int index in usedIndicesEx)
+        {
+            randomCards.Add(cards[index]);
+        }
+        Debug.Log("랜덤카드 생성됨");
         return randomCards;
     }
+    //서버 연결 시 주석 해제------------------------------------
+
+
 
     // 카드 이동
     public void MoveCardToParent(GameObject card, Transform parent)

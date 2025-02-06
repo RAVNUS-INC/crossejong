@@ -18,7 +18,13 @@ public class GetCard : MonoBehaviour
     {
         if (cardPool.cards.Count > 0)
         {
-            List<GameObject> randomCards = cardPool.GetRandomCards(1); // 1개의 랜덤 카드 얻기
+            //List<GameObject> randomCards = cardPool.GetRandomCards(1); // 1개의 랜덤 카드 얻기
+
+            //서버 연결 시 주석 해제------------------------------------
+            int[] OneCardIndex = cardPool.GetRandomCardsIndex(1);
+            List<GameObject> randomCards = cardPool.GetRandomCardsObject(OneCardIndex);
+            //서버 연결 시 주석 해제------------------------------------
+
             cardPool.GetCardsToTarGetArea(randomCards, userCard.userCardContainer, userCard.displayedCards);
 
             cardDrag = randomCards[0].GetComponent<CardDrag>();

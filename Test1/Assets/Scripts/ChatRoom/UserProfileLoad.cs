@@ -55,10 +55,14 @@ public class UserProfileLoad : MonoBehaviourPunCallbacks
 
         // 본인의 정보 추가를 방장에게 전달
         //-----------(서버 연결 시 주석해제), 스크립트에 photonview 추가------------
-        // photonView.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, mydisplayname, myimgindex, myActNum);
+         photonView.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, mydisplayname, myimgindex, myActNum);
     }
 
-
+    // players 리스트를 외부에서 접근할 수 있도록 메서드 제공
+    public List<Player> GetPlayers()
+    {
+        return players;
+    }
 
     [PunRPC]
     public void RequestAddPlayerInfo(string displayName, int imgIndex, int myActNum)
