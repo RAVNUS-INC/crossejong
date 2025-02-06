@@ -10,6 +10,7 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.VisualScripting.Antlr3.Runtime.Collections;
 using Unity.VisualScripting;
 using System.Xml.Linq;
+using System.Linq;
 
 public class FieldCard : MonoBehaviour
 {
@@ -20,9 +21,10 @@ public class FieldCard : MonoBehaviour
 
     public void CreateDropAreas()
     {
-        for (int x = 0; x < 7; x++)
+        ObjectManager.instance.grid = new GameObject[ObjectManager.instance.gridCount, ObjectManager.instance.gridCount];
+        for (int x = 0; x < ObjectManager.instance.gridCount; x++)
         {
-            for (int y = 0; y < 7; y++)
+            for (int y = 0; y < ObjectManager.instance.gridCount; y++)
             {
                 GameObject empty = new GameObject("");
                 empty.transform.SetParent(fieldContainer, false);
@@ -51,9 +53,9 @@ public class FieldCard : MonoBehaviour
 
     public void OnOffDropAreas()
     {
-        for (int x = 0; x < 7; x++) 
+        for (int x = 0; x < ObjectManager.instance.gridCount; x++) 
         {
-            for (int y = 0; y < 7; y++) 
+            for (int y = 0; y < ObjectManager.instance.gridCount; y++) 
             { 
                 if (ObjectManager.instance.grid[x,y].transform.childCount == 1)
                 {
@@ -69,9 +71,9 @@ public class FieldCard : MonoBehaviour
 
     public void createdWordEnd()
     {
-        for (int x = 0; x < 7; x++)
+        for (int x = 0; x < ObjectManager.instance.gridCount; x++)
         {
-            for (int y = 0; y < 7; y++)
+            for (int y = 0; y < ObjectManager.instance.gridCount; y++)
             {
                 if (ObjectManager.instance.createdWord == ObjectManager.instance.grid[x, y].transform.name)
                 {
@@ -83,80 +85,39 @@ public class FieldCard : MonoBehaviour
             }
         }
 
-        //if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + 1, ObjectManager.instance.cardIndexY].transform.childCount == 1)
-        //{
-        //    ObjectManager.instance.createdWords = ObjectManager.instance.createdWord + ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + 1, ObjectManager.instance.cardIndexY].transform.name;
-        //    Debug.Log(ObjectManager.instance.createdWords);
-        //}
-        //if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + 2, ObjectManager.instance.cardIndexY].transform.childCount == 1)
-        //{
-        //    ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + 2, ObjectManager.instance.cardIndexY].transform.name;
-        //    Debug.Log(ObjectManager.instance.createdWords);
-        //}
-
-        //if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - 1, ObjectManager.instance.cardIndexY].transform.childCount == 1)
-        //{
-        //    ObjectManager.instance.createdWords = ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - 1, ObjectManager.instance.cardIndexY].transform.name + ObjectManager.instance.createdWord;
-        //    Debug.Log(ObjectManager.instance.createdWords);
-        //}
-
-        //if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + 1].transform.childCount == 1)
-        //{
-        //    ObjectManager.instance.createdWords = ObjectManager.instance.createdWord + ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + 1].transform.name;
-        //    Debug.Log(ObjectManager.instance.createdWords);
-        //}
-
-        //if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - 1].transform.childCount == 1)
-        //{
-        //    ObjectManager.instance.createdWords = ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - 1].transform.name + ObjectManager.instance.createdWord;
-        //    Debug.Log(ObjectManager.instance.createdWords);
-        //}
-
-
-        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + 1, ObjectManager.instance.cardIndexY].transform.childCount == 1)
+        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + 1, ObjectManager.instance.cardIndexY].transform.childCount == 1)  // 오른쪽에 글자가 있을 때
         {
-            for (int i = 1; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + i, ObjectManager.instance.cardIndexY].transform.childCount == 1; i++)  // 오른쪽에 글자가 있을 때
+            for (int i = 1; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + i, ObjectManager.instance.cardIndexY].transform.childCount == 1; i++)  
             {
                 ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + i, ObjectManager.instance.cardIndexY].transform.name;
             }
-
         }
 
-        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - 1, ObjectManager.instance.cardIndexY].transform.childCount == 1)
+        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - 1, ObjectManager.instance.cardIndexY].transform.childCount == 1)  // 왼쪽에 글자가 있을 때
         {
-            for (int i = 1; i < ObjectManager.instance.grid.Length; i--)  // 왼쪽에 글자가 있을 때
+            for (int i = 1; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - i, ObjectManager.instance.cardIndexY].transform.childCount == 1; i++)  
             {
-                if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - i, ObjectManager.instance.cardIndexY].transform.childCount == 1)
-                {
-                    ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - i, ObjectManager.instance.cardIndexY].transform.name;
-                }
-                else
-                    break;
+                ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - i, ObjectManager.instance.cardIndexY].transform.name;
             }
-            ObjectManager.instance.createdWords += ObjectManager.instance.createdWord;
+            ObjectManager.instance.createdWords = new string(ObjectManager.instance.createdWords.Reverse().ToArray());
         }
 
-        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + 1].transform.childCount == 1)
+        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + 1].transform.childCount == 1)  // 아래에 글자가 있을 때
         {
-            for (int i = 1; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + i].transform.childCount == 1; i++)  // 아래에 글자가 있을 때
+            for (int i = 1; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + i].transform.childCount == 1; i++)  
             {
                 ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + i].transform.name;
             }
 
         }
 
-        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - 1].transform.childCount == 1)
+        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - 1].transform.childCount == 1)  // 위에 글자가 있을 때
         {
-            ObjectManager.instance.createdWords += ObjectManager.instance.createdWord;
-            for (int i = 1; i < ObjectManager.instance.grid.Length; i--)  // 위에 글자가 있을 때
+            for (int i = 1; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - i].transform.childCount == 1; i++)  
             {
-                if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - i].transform.childCount == 1)
-                {
-                    ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - i].transform.name;
-                }
-                else
-                    break;
+                ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - i].transform.name;
             }
+            ObjectManager.instance.createdWords = new string(ObjectManager.instance.createdWords.Reverse().ToArray());
         }
 
         Debug.Log(ObjectManager.instance.createdWords);
@@ -169,8 +130,8 @@ public class FieldCard : MonoBehaviour
         cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
 
         GameObject firstCards = randomCards[0];
-        firstCards.transform.SetParent(ObjectManager.instance.grid[3, 3].transform, false);
-        ObjectManager.instance.grid[3,3] = firstCards;
+        firstCards.transform.SetParent(ObjectManager.instance.grid[ObjectManager.instance.gridCount/2, ObjectManager.instance.gridCount/2].transform, false);
+        ObjectManager.instance.grid[ObjectManager.instance.gridCount / 2, ObjectManager.instance.gridCount/2] = firstCards;
         firstCards.transform.parent.name = firstCards.transform.name;
 
         OnOffDropAreas();
