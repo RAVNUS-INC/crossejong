@@ -321,19 +321,6 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         photonView.RPC("IsReady", RpcTarget.MasterClient, myDisplayName, myActorNum);
         Debug.Log("방장에게 준비 완료 상태를 알렸습니다.");
 
-        //방장인 경우에만 아래의 코드를 수행
-        if (!PhotonNetwork.IsMasterClient) return;
-
-        // 플레이어들 중 한 명이라도 준비하지 않았다면 종료
-        foreach (Player player in PhotonNetwork.PlayerList)
-        {
-            if (!playerReadyStates.ContainsKey(player.ActorNumber) || !playerReadyStates[player.ActorNumber])
-                return; 
-        }
-        //모두 준비 했을 경우
-        //Debug.Log("모든 플레이어 준비. 플레이방으로 이동합니다.");
-        //플레이룸 씬으로 이동(현재 방에서 준비버튼을 누른 모든 플레이어에 한하여)
-        photonView.RPC("ChangeScene", RpcTarget.All, "PlayRoom");
     }
 
     [PunRPC]
@@ -356,6 +343,18 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     void IsReady(string userName, int userNum) //모든 유저들의 준비 유무 알리미
     {
         playerReadyStates[userNum] = true; // 유저의 준비 상태 저장
+
+        //방장인 경우에만 아래의 코드를 수행
+        if (!PhotonNetwork.IsMasterClient) return;
+
+        //플레이어들 중 한 명이라도 준비하지 않았다면 종료
+        foreach (Player player in PhotonNetwork.PlayerList)
+        {
+            if (!playerReadyStates.ContainsKey(player.ActorNumber) || !playerReadyStates[player.ActorNumber])
+                return;
+        }
+        //플레이룸 씬으로 이동(현재 방에서 준비버튼을 누른 모든 플레이어에 한하여)
+        photonView.RPC("ChangeScene", RpcTarget.All, "PlayRoom");
     }
 
     [PunRPC]
