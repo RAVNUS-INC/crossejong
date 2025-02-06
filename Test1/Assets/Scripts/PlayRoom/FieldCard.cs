@@ -18,6 +18,10 @@ public class FieldCard : MonoBehaviour
     public CardPool cardPool; // CardPool 참조
     public List<GameObject> fieldDisplayedCards;
     public Transform emptyArea;
+    private bool isRight;
+    private bool isLeft;
+    private bool isTop;
+    private bool isBottom;
 
     public void CreateDropAreas()
     {
@@ -69,6 +73,46 @@ public class FieldCard : MonoBehaviour
         
     }
 
+
+    private void IsRight()
+    {
+        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + 1, ObjectManager.instance.cardIndexY].transform.childCount == 1)
+            isRight = true;
+        else
+            isRight = false;
+    }
+
+    private void IsLeft()
+    {
+        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - 1, ObjectManager.instance.cardIndexY].transform.childCount == 1)
+            isLeft = true;
+        else
+            isLeft = false;
+    }
+    private void IsBottom()
+    {
+        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + 1].transform.childCount == 1)
+            isBottom = true;
+        else
+            isBottom = false;
+    }
+    private void IsTop()
+    {
+        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - 1].transform.childCount == 1)
+            isTop = true;
+        else
+            isTop = false;
+    }
+
+    private void IsPosition()
+    {
+        IsLeft();
+        IsRight();
+        IsBottom();
+        IsTop();
+    }
+
+
     public void createdWordEnd()
     {
         for (int x = 0; x < ObjectManager.instance.gridCount; x++)
@@ -85,35 +129,50 @@ public class FieldCard : MonoBehaviour
             }
         }
 
-        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + 1, ObjectManager.instance.cardIndexY].transform.childCount == 1)  // 오른쪽에 글자가 있을 때
+        IsPosition();
+        
+
+        if (isRight)  // 오른쪽에 글자가 있을 때
         {
-            for (int i = 1; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + i, ObjectManager.instance.cardIndexY].transform.childCount == 1; i++)  
+            for (int i = 0; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + i, ObjectManager.instance.cardIndexY].transform.childCount == 1; i++)  
             {
                 ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + i, ObjectManager.instance.cardIndexY].transform.name;
             }
+            if (isLeft)
+            {
+                ObjectManager.instance.createdWords = new string(ObjectManager.instance.createdWords.Reverse().ToArray());
+            }
         }
 
-        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - 1, ObjectManager.instance.cardIndexY].transform.childCount == 1)  // 왼쪽에 글자가 있을 때
+        if (isLeft)  // 왼쪽에 글자가 있을 때
         {
-            for (int i = 1; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - i, ObjectManager.instance.cardIndexY].transform.childCount == 1; i++)  
+            int j = 0;
+            if (isRight) j = 1;
+            for (int i = j; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - i, ObjectManager.instance.cardIndexY].transform.childCount == 1; i++)  
             {
                 ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - i, ObjectManager.instance.cardIndexY].transform.name;
             }
             ObjectManager.instance.createdWords = new string(ObjectManager.instance.createdWords.Reverse().ToArray());
         }
 
-        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + 1].transform.childCount == 1)  // 아래에 글자가 있을 때
+        if (isBottom)  // 아래에 글자가 있을 때
         {
-            for (int i = 1; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + i].transform.childCount == 1; i++)  
+            for (int i = 0; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + i].transform.childCount == 1; i++)  
             {
                 ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + i].transform.name;
+            }
+            if (isTop)
+            {
+                ObjectManager.instance.createdWords = new string(ObjectManager.instance.createdWords.Reverse().ToArray());
             }
 
         }
 
-        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - 1].transform.childCount == 1)  // 위에 글자가 있을 때
+        if (isTop)  // 위에 글자가 있을 때
         {
-            for (int i = 1; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - i].transform.childCount == 1; i++)  
+            int j = 0;
+            if (isBottom) j = 1;
+            for (int i = j; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - i].transform.childCount == 1; i++)  
             {
                 ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - i].transform.name;
             }
@@ -121,6 +180,7 @@ public class FieldCard : MonoBehaviour
         }
 
         Debug.Log(ObjectManager.instance.createdWords);
+        ObjectManager.instance.createdWords = "";
 
     }
 

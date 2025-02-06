@@ -68,7 +68,6 @@ public class CardDrop : MonoBehaviour, IDropHandler
             ObjectManager.instance.isDragged = true;
 
             ObjectManager.instance.createdWord = card.name;
-            ObjectManager.instance.createdWords = ObjectManager.instance.createdWord;
 
             fieldCard.OnOffDropAreas();
         }
