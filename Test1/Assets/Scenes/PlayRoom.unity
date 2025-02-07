@@ -207,6 +207,7 @@ GameObject:
   m_Component:
   - component: {fileID: 11155625}
   - component: {fileID: 11155626}
+  - component: {fileID: 11155627}
   m_Layer: 0
   m_Name: UserCard
   m_TagString: Untagged
@@ -246,6 +247,29 @@ MonoBehaviour:
   cardDrag: {fileID: 0}
   userCardContainer: {fileID: 1145204212}
   displayedCards: []
+--- !u!114 &11155627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 11155624}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 0
+  ObservedComponents:
+  - {fileID: 0}
+  sceneViewId: 5
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &60336279
 GameObject:
   m_ObjectHideFlags: 0
@@ -1614,6 +1638,7 @@ MonoBehaviour:
   cardIndexX: 0
   cardIndexY: 0
   createdWord: 
+  usedIndices: 
 --- !u!1 &453961798
 GameObject:
   m_ObjectHideFlags: 0
@@ -2533,13 +2558,14 @@ GameObject:
   m_Component:
   - component: {fileID: 617193424}
   - component: {fileID: 617193425}
+  - component: {fileID: 617193426}
   m_Layer: 0
   m_Name: UserProfileLoad
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &617193424
 Transform:
   m_ObjectHideFlags: 0
@@ -2589,6 +2615,29 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 2febe3c46f2ec1e4e84107fb832a748e, type: 3}
   - {fileID: 21300000, guid: ed578dfef7418ff48aca7cba340ede9b, type: 3}
   - {fileID: 21300000, guid: f1dd6b8b6c5254c45b0f97346843c2c0, type: 3}
+--- !u!114 &617193426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 617193423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 0
+  ObservedComponents:
+  - {fileID: 0}
+  sceneViewId: 4
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &621765170
 GameObject:
   m_ObjectHideFlags: 0
@@ -3150,6 +3199,7 @@ GameObject:
   m_Component:
   - component: {fileID: 910563714}
   - component: {fileID: 910563715}
+  - component: {fileID: 910563716}
   m_Layer: 0
   m_Name: FieldCard
   m_TagString: Untagged
@@ -3188,6 +3238,29 @@ MonoBehaviour:
   cardPool: {fileID: 1342198615}
   fieldDisplayedCards: []
   emptyArea: {fileID: 523384446}
+--- !u!114 &910563716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910563713}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 0
+  ObservedComponents:
+  - {fileID: 0}
+  sceneViewId: 2
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &926444175
 GameObject:
   m_ObjectHideFlags: 0
@@ -5972,7 +6045,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u200B"
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b628b8af7e2297b44afd8e9727f533e1, type: 2}
   m_sharedMaterial: {fileID: 6182413630241164209, guid: b628b8af7e2297b44afd8e9727f533e1, type: 2}

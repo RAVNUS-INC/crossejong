@@ -33,6 +33,10 @@ public class ObjectManager : MonoBehaviour
     public int cardIndexY;
     public string createdWord;
 
+    //서버 연결 시 주석 해제------------------------------------
+    public List<string> usedIndices = new List<string>();
+    //서버 연결 시 주석 해제------------------------------------
+
     public void SortAfterMove() {
         if (isFullPopup)
         {

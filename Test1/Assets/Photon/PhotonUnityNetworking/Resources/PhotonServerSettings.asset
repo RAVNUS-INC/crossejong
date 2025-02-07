@@ -57,6 +57,11 @@ MonoBehaviour:
   - StartCountDown
   - StartGame
   - FirstFieldCard
+  - FirstFieldCardRequestAll
+  - AddCardObjectToAll
+  - SyncSortedPlayers
+  - FirstFieldCompleted
+  - FirstUserCompleted
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

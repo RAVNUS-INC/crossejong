@@ -4,10 +4,10 @@ using System.Collections;
 using UnityEngine.UI;
 using Photon.Pun;
 
-public class Countdown : MonoBehaviour
+public class Countdown : //MonoBehaviour
 
-    ////-----------(서버 연결 시 주석해제)------------
-    //MonoBehaviourPun
+    //-----------(서버 연결 시 주석해제)------------
+    MonoBehaviourPun
 
 {
     public TMP_Text countDownText; // TextMeshPro 사용
@@ -16,21 +16,24 @@ public class Countdown : MonoBehaviour
     public Button startGameButton; //게임 시작버튼
     public FieldCard fieldCard;
 
+    //private void Start()
+    //{
+    //    startGameButton.onClick.AddListener(StartCountDown);
+    //}
+
+    //서버 연결 시 주석 해제------------------------------------
     private void Start()
     {
-        startGameButton.onClick.AddListener(StartCountDown);
-
-        ////-----------(서버 연결 시 주석해제)------------
-        //// 방장만 시작버튼 활성화, 실행 가능
-        //if (PhotonNetwork.IsMasterClient) 
-        //{
-        //    startGameButton.onClick.AddListener(() => 
-        //    photonView.RPC("StartCountDown", RpcTarget.All));
-        //}
+        // 방장만 시작버튼 활성화, 실행 가능
+        if (PhotonNetwork.IsMasterClient)
+        {
+            startGameButton.onClick.AddListener(() =>
+            photonView.RPC("StartCountDown", RpcTarget.All));
+        }
     }
 
-    //-----------(서버 연결 시 주석해제)------------
-    // [PunRPC]
+    //서버 연결 시 주석 해제------------------------------------
+    [PunRPC]
     private void StartCountDown()
     {
         StartCoroutine(CountDownRoutine(1));
@@ -55,16 +58,48 @@ public class Countdown : MonoBehaviour
 
     }
 
-    //-----------(서버 연결 시 주석해제)------------
-    // [PunRPC]
+    //private void StartGame()
+    //{
+    //    userCard.FirstUserCardArea();
+    //    fieldCard.CreateDropAreas();
+    //    fieldCard.FirstFieldCard();
+    //    userCard.SelectedUserCard();
+    //}
+
+
+    //서버 연결 시 주석 해제------------------------------------
     private void StartGame()
     {
-        userCard.FirstUserCardArea();
-        fieldCard.CreateDropAreas();
-        fieldCard.FirstFieldCard();
-        userCard.SelectedUserCard();
+        //서버 연결 시 주석 해제------------------------------------
+        //방장만 먼저 첫번째 카드를 고른다
+        if (PhotonNetwork.IsMasterClient)
+        {
+            userCard.FirstUserCardArea();
+            // 방장이 완료되었음을 알림 (RPC 호출)
+            photonView.RPC("FirstUserCompleted", RpcTarget.All);
+        }
 
-        //-----------(서버 연결 시 주석해제)------------
-        //fieldCard.photonView.RPC("FirstFieldCard", RpcTarget.All);
+        if (PhotonNetwork.IsMasterClient)
+        {
+            fieldCard.FirstFieldCard();
+            // 방장이 완료되었음을 알림 (RPC 호출)
+            photonView.RPC("FirstFieldCompleted", RpcTarget.All);
+        }
     }
+
+    [PunRPC]
+    private void FirstUserCompleted()
+    {
+        Debug.Log("FirstUserCompleted 완료, 다음 진행");
+        fieldCard.CreateDropAreas();
+    }
+
+    [PunRPC]
+    private void FirstFieldCompleted()
+    {
+        Debug.Log("FirstFieldCompleted 완료, 다음 진행");
+        userCard.SelectedUserCard();
+    }
+
+    //서버 연결 시 주석 해제------------------------------------
 }
