@@ -4,13 +4,11 @@ using TMPro;
 using System.Collections.Generic;
 using PlayFab.DataModels;
 using DG.Tweening;
-using Photon.Pun;
 using System;
 using System.Reflection;
 
-public class CardPool : //MonoBehaviour
-    //서버 연결 시 주석 해제------------------------------------
-    MonoBehaviourPun
+public class CardPool : MonoBehaviour
+
 {
     public static CardPool instance = null;
 
@@ -140,24 +138,6 @@ public class CardPool : //MonoBehaviour
 
 
     //서버 연결 시 주석 해제------------------------------------
-    // 랜덤으로 11개의 카드 선택(change) 인덱스반환(방장만 수행)
-    //public int[] GetRandomCardsIndex(int count)
-    //{
-    //    List<int> usedIndicesEx = new List<int>(); //지금 막 뽑은 인덱스를 저장
-    //    while (usedIndicesEx.Count < count)
-    //    {
-    //        int randomIndex = UnityEngine.Random.Range(0, cards.Count);
-    //        if (!ObjectManager.instance.usedIndices.Contains(randomIndex)) //이전 인덱스와 다른 값이라면(새로운 값이라면)
-    //        {
-    //            usedIndicesEx.Add(randomIndex); //전역변수 usedIndices업데이트 됨
-    //            ObjectManager.instance.usedIndices.Add(randomIndex);
-    //        }
-    //    }
-        
-    //    Debug.Log(string.Join(", ", ObjectManager.instance.usedIndices)); // 리스트 내용 디버그 출력
-    //    int[] usedIndicesExArray = usedIndicesEx.ToArray(); //int[] 형태로 변환
-    //    return usedIndicesExArray; //int[] 반환
-    //}
 
     // 랜덤으로 1개의 카드 선택(change) 문자열 리스트 반환(방장만 수행)
     public string[] GetRandomCardsName(int count)

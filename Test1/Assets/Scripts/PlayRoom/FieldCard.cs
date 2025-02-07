@@ -90,9 +90,6 @@ MonoBehaviourPun
     //서버 연결 시 주석 해제------------------------------------
     public void FirstFieldCard()
     {
-        // 방장만 처음 1장의 카드 인덱스를 뽑음
-        //int[] randomIndex = cardPool.GetRandomCardsIndex(1);
-
         // 방장만 처음 1장의 카드 이름을 뽑음
         string[] randomCardNames = cardPool.GetRandomCardsName(1); // 이름을 받는 함수로 변경
 

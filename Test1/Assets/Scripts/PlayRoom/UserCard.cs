@@ -12,7 +12,7 @@ using System.Linq;
 using Photon.Realtime;
 
 public class UserCard : //MonoBehaviour
-                        //서버 연결 시 주석 해제------------------------------------
+   //서버 연결 시 주석 해제------------------------------------
     MonoBehaviourPun
 {
     public static UserCard instance = null;
