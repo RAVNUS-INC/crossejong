@@ -315,6 +315,12 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     }
     public void UserReadyState() //준비 버튼에 직접 연결(준비 상태 알리는 역할, 방장은 이동까지 수행)
     {
+        if (PhotonNetwork.CurrentRoom.PlayerCount <= 1)
+        {
+            Debug.Log("방에 1명 이하만 존재하므로 실행하지 않음.");
+            return;
+        }
+
         ReadyBtn.interactable = false; // 버튼 한번 눌렀으면 다음부턴 비활성화(준비 취소 불가능)
 
         //방장에게만 나의 준비 상태 전달

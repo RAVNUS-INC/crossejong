@@ -62,8 +62,6 @@ public class Main : MonoBehaviour
         GetProfileImageIndex(); // PlayFab에서 저장된 이미지 인덱스를 불러와 이미지 업데이트
         GetUserDisplayName(); //유저 네임 불러와서 텍스트로 표시
 
-        RankActiveFalse(); //순위 오브젝트 모두 비활성화
-        GetLeaderBoard(); //순위 업데이트
     }
 
 
@@ -166,7 +164,7 @@ public class Main : MonoBehaviour
 
     }
 
-    // 리더보드 리스트에 들어갈 정보 불러오기
+    // 리더보드 리스트에 들어갈 정보 불러오기(로딩과정이 눈에 보임)
     public void GetLeaderBoard()
     {
         // playfab에서 리더보드 정보 요청
@@ -204,14 +202,29 @@ public class Main : MonoBehaviour
             if (result.Data.ContainsKey(PROFILE_IMAGE_INDEX_KEY))
             {
                 // 저장된 인덱스 값 불러오기
-                int imgindex = int.Parse(result.Data[PROFILE_IMAGE_INDEX_KEY].Value);
-                // 인덱스 범위 체크 후 랭킹 유저 이미지 업데이트
-                userimage[index].sprite = ProfileImg[imgindex];
+                int imgindex;
+                if (int.TryParse(result.Data[PROFILE_IMAGE_INDEX_KEY].Value, out imgindex))
+                {
+                    // 인덱스 범위 체크 후 랭킹 유저 이미지 업데이트
+                    if (imgindex >= 0 && imgindex < ProfileImg.Length)
+                    {
+                        userimage[index].sprite = ProfileImg[imgindex];
+                    }
+                    else
+                    {
+                        Debug.LogWarning("유효하지 않은 이미지 인덱스입니다. 기본 이미지로 설정합니다.");
+                        userimage[index].color = Color.white;  // 기본 이미지로 설정
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("이미지 인덱스 변환 실패. 기본 이미지로 설정합니다.");
+                    userimage[index].color = Color.white;  // 기본 이미지로 설정
+                }
             }
             else
             {
-                Debug.LogWarning("PROFILE_IMAGE_INDEX_KEY가 존재하지 않습니다. 기본 이미지로 설정합니다.");
-                userimage[index].sprite = ProfileImg[0];  // 기본 이미지로 설정
+                Debug.LogWarning("이미지 key가 존재하지 않습니다.");
             }
         }, error =>
         {

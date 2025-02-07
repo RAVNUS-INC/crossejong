@@ -19,10 +19,8 @@ using UnityEngine.SceneManagement;
 
 // 현재 방/게임에 접속한 플레이어들의 프로필과 이름 표시하는 스크립트(PlayerView)
 // UI관련 RPC
-public class UserProfileLoad : MonoBehaviourPunCallbacks
+public class UserProfileLoad : MonoBehaviourPun
 {
-    public static UserProfileLoad Instance;
-
     public GameObject[] InRoomUserList; // 현재 방에 접속한 유저들의 리스트
     public Image[] InRoomUserImg; // 현재 방에 접속한 유저들의 프로필사진
     public Text[] InRoomUserName; // 현재 방에 접속한 유저들의 닉네임
@@ -41,7 +39,7 @@ public class UserProfileLoad : MonoBehaviourPunCallbacks
 
     void Awake() 
     {
-        Instance = this;
+        //Instance = this;
         
         mydisplayname = PlayerPrefs.GetString(DISPLAYNAME_KEY, "Guest"); //유저이름 불러와 mydisplayname 변수에 저장
         myimgindex = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0);  //유저 이미지인덱스 불러와 myimgindex 변수에 저장
@@ -50,9 +48,6 @@ public class UserProfileLoad : MonoBehaviourPunCallbacks
 
     void Start()
     {
-        // 포톤뷰 등록
-        PhotonNetwork.RegisterPhotonView(photonView);
-
         // 본인의 정보 추가를 방장에게 전달
         //-----------(서버 연결 시 주석해제), 스크립트에 photonview 추가------------
          photonView.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, mydisplayname, myimgindex, myActNum);
@@ -65,9 +60,9 @@ public class UserProfileLoad : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    public void RequestAddPlayerInfo(string displayName, int imgIndex, int myActNum)
+    public void RequestAddPlayerInfo(string displayName, int imgIndex, int myActNum) // 방장만 실행
     {
-        if (!PhotonNetwork.IsMasterClient) return; // 방장만 실행
+        //if (!PhotonNetwork.IsMasterClient) return; 
 
         // 방장이 플레이어 리스트에 추가
         players.Add(new Player(displayName, imgIndex, myActNum));
