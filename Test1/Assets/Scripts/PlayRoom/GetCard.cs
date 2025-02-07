@@ -21,8 +21,8 @@ public class GetCard : MonoBehaviour
             //List<GameObject> randomCards = cardPool.GetRandomCards(1); // 1개의 랜덤 카드 얻기
 
             //서버 연결 시 주석 해제------------------------------------
-            int[] OneCardIndex = cardPool.GetRandomCardsIndex(1);
-            List<GameObject> randomCards = cardPool.GetRandomCardsObject(OneCardIndex);
+            string[] OneCardName = cardPool.GetRandomCardsName(1);
+            List<GameObject> randomCards = cardPool.GetRandomCardsObject(OneCardName);
             //서버 연결 시 주석 해제------------------------------------
 
             cardPool.GetCardsToTarGetArea(randomCards, userCard.userCardContainer, userCard.displayedCards);

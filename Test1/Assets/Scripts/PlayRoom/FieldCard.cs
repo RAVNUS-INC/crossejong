@@ -11,6 +11,7 @@ using Unity.VisualScripting.Antlr3.Runtime.Collections;
 using Unity.VisualScripting;
 using System.Xml.Linq;
 using Photon.Pun;
+using System.Reflection;
 
 public class FieldCard : //MonoBehaviour
 //서버 연결 시 주석 해제------------------------------------
@@ -89,22 +90,28 @@ MonoBehaviourPun
     //서버 연결 시 주석 해제------------------------------------
     public void FirstFieldCard()
     {
-        if (PhotonNetwork.IsMasterClient)
-        {
-            // 방장만 처음 1장의 카드 인덱스를 뽑음
-            int[] randomIndex = cardPool.GetRandomCardsIndex(1);
-            // 모든 플레이어들에게 인덱스리스트를 넘겨 첫 카드 오브젝트를 생성하도록 요청
-            photonView.RPC("FirstFieldCardRequestAll", RpcTarget.All, randomIndex);
-        }
+        // 방장만 처음 1장의 카드 인덱스를 뽑음
+        //int[] randomIndex = cardPool.GetRandomCardsIndex(1);
+
+        // 방장만 처음 1장의 카드 이름을 뽑음
+        string[] randomCardNames = cardPool.GetRandomCardsName(1); // 이름을 받는 함수로 변경
+
+        // 모든 플레이어들에게 인덱스리스트를 넘겨 첫 카드 오브젝트를 생성하도록 요청(배열->문자열)
+        photonView.RPC("FirstFieldCardRequestAll", RpcTarget.All, string.Join(",", randomCardNames));
     }
-     
+
     //방장 포함 모두가 첫 카드 추가를 수행하는 함수
     [PunRPC]
-    public void FirstFieldCardRequestAll(int[] indices)
+    public void FirstFieldCardRequestAll(string names)
     {
-        List<GameObject> randomCards = cardPool.GetRandomCardsObject(indices);
-        cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
+        string[] usedNames = names.Split(','); // 다시 배열로 변환
+        foreach (string i in usedNames)
+        {
+            Debug.Log($"첫 카드 '{i}' 받음");
+        }
+        List<GameObject> randomCards = cardPool.GetRandomCardsObject(usedNames);
 
+        cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
         GameObject middleObejcts = ObjectManager.instance.grid[3, 3];
         GameObject firstCards = randomCards[0];
         ObjectManager.instance.grid[3, 3].SetActive(true);
