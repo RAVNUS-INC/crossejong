@@ -4,13 +4,12 @@ using TMPro;
 using System.Collections.Generic;
 using PlayFab.DataModels;
 using DG.Tweening;
-using Photon.Pun;
 using System;
 using System.Reflection;
+using Random = UnityEngine.Random;
 
-public class CardPool : //MonoBehaviour
-    //서버 연결 시 주석 해제------------------------------------
-    MonoBehaviourPun
+public class CardPool : MonoBehaviour
+
 {
     public static CardPool instance = null;
 
@@ -121,78 +120,60 @@ public class CardPool : //MonoBehaviour
 
 
     // 랜덤으로 11개의 카드 선택
-    //public List<GameObject> GetRandomCards(int count)
-    //{
-    //    List<GameObject> randomCards = new List<GameObject>();
-    //    HashSet<int> usedIndices = new HashSet<int>();
-
-    //    while (randomCards.Count < count)
-    //    {
-    //        int randomIndex = Random.Range(0, cards.Count);
-    //        if (!usedIndices.Contains(randomIndex))
-    //        {
-    //            usedIndices.Add(randomIndex);
-    //            randomCards.Add(cards[randomIndex]);
-    //        }
-    //    }
-    //    return randomCards;
-    //}
-
-
-    //서버 연결 시 주석 해제------------------------------------
-    // 랜덤으로 11개의 카드 선택(change) 인덱스반환(방장만 수행)
-    //public int[] GetRandomCardsIndex(int count)
-    //{
-    //    List<int> usedIndicesEx = new List<int>(); //지금 막 뽑은 인덱스를 저장
-    //    while (usedIndicesEx.Count < count)
-    //    {
-    //        int randomIndex = UnityEngine.Random.Range(0, cards.Count);
-    //        if (!ObjectManager.instance.usedIndices.Contains(randomIndex)) //이전 인덱스와 다른 값이라면(새로운 값이라면)
-    //        {
-    //            usedIndicesEx.Add(randomIndex); //전역변수 usedIndices업데이트 됨
-    //            ObjectManager.instance.usedIndices.Add(randomIndex);
-    //        }
-    //    }
-        
-    //    Debug.Log(string.Join(", ", ObjectManager.instance.usedIndices)); // 리스트 내용 디버그 출력
-    //    int[] usedIndicesExArray = usedIndicesEx.ToArray(); //int[] 형태로 변환
-    //    return usedIndicesExArray; //int[] 반환
-    //}
-
-    // 랜덤으로 1개의 카드 선택(change) 문자열 리스트 반환(방장만 수행)
-    public string[] GetRandomCardsName(int count)
-    {
-        List<string> usedCardNames = new List<string>(); // 지금 막 뽑은 카드 이름을 저장
-        while (usedCardNames.Count < count)
-        {
-            int randomIndex = UnityEngine.Random.Range(0, cards.Count);
-            string cardName = cards[randomIndex].name; // 카드의 이름을 사용
-
-            // 카드 이름이 이미 사용되었는지 확인
-            if (!ObjectManager.instance.usedIndices.Contains(cardName))
-            {
-                usedCardNames.Add(cardName); // 카드 이름을 추가
-                ObjectManager.instance.usedIndices.Add(cardName); // 방장만 이 리스트를 관리
-            }
-        }
-
-        return usedCardNames.ToArray(); // 카드 이름 배열을 반환
-    }
-
-
-    // 받은 인덱스 리스트를 토대로 카드 gameobject 생성(방장 포함 각 유저마다 수행)
-    public List<GameObject> GetRandomCardsObject(string[] usednames)
+    public List<GameObject> GetRandomCards(int count)
     {
         List<GameObject> randomCards = new List<GameObject>();
-        foreach (string name in usednames)
-        {
-            GameObject foundCard = cards.Find(c => c.name == name); // 이름으로 검색
+        HashSet<int> usedIndices = new HashSet<int>();
 
-            randomCards.Add(foundCard);
-            Debug.Log($"랜덤카드 '{name}' 생성됨");
+        while (randomCards.Count < count)
+        {
+            int randomIndex = Random.Range(0, cards.Count);
+            if (!usedIndices.Contains(randomIndex))
+            {
+                usedIndices.Add(randomIndex);
+                randomCards.Add(cards[randomIndex]);
+            }
         }
         return randomCards;
     }
+
+
+    //서버 연결 시 주석 해제------------------------------------
+
+    // 랜덤으로 1개의 카드 선택(change) 문자열 리스트 반환(방장만 수행)
+    //public string[] GetRandomCardsName(int count)
+    //{
+    //    List<string> usedCardNames = new List<string>(); // 지금 막 뽑은 카드 이름을 저장
+    //    while (usedCardNames.Count < count)
+    //    {
+    //        int randomIndex = UnityEngine.Random.Range(0, cards.Count);
+    //        string cardName = cards[randomIndex].name; // 카드의 이름을 사용
+
+    //        // 카드 이름이 이미 사용되었는지 확인
+    //        if (!ObjectManager.instance.usedIndices.Contains(cardName))
+    //        {
+    //            usedCardNames.Add(cardName); // 카드 이름을 추가
+    //            ObjectManager.instance.usedIndices.Add(cardName); // 방장만 이 리스트를 관리
+    //        }
+    //    }
+
+    //    return usedCardNames.ToArray(); // 카드 이름 배열을 반환
+    //}
+
+
+    //// 받은 인덱스 리스트를 토대로 카드 gameobject 생성(방장 포함 각 유저마다 수행)
+    //public List<GameObject> GetRandomCardsObject(string[] usednames)
+    //{
+    //    List<GameObject> randomCards = new List<GameObject>();
+    //    foreach (string name in usednames)
+    //    {
+    //        GameObject foundCard = cards.Find(c => c.name == name); // 이름으로 검색
+
+    //        randomCards.Add(foundCard);
+    //        Debug.Log($"랜덤카드 '{name}' 생성됨");
+    //    }
+    //    return randomCards;
+    //}
     //서버 연결 시 주석 해제------------------------------------
 
 
