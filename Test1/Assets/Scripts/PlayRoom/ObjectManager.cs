@@ -33,6 +33,7 @@ public class ObjectManager : MonoBehaviour
     public string createdWords;
     public int gridCount = 9;
     public GameObject[,] grid;
+    public int dropCount = 0;
 
     public void SortAfterMove() {
         if (isFullPopup)

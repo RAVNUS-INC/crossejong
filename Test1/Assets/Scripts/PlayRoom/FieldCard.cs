@@ -129,6 +129,8 @@ public class FieldCard : MonoBehaviour
 
         IsPosition();
 
+        ObjectManager.instance.createdWords = "";
+
         if (isLeft)  // 왼쪽에 글자가 있을 때
         {
             int x = 0;
@@ -176,7 +178,6 @@ public class FieldCard : MonoBehaviour
         }
 
         Debug.Log(ObjectManager.instance.createdWords);
-        ObjectManager.instance.createdWords = "";
 
     }
 

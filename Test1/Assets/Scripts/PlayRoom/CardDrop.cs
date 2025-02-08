@@ -70,6 +70,8 @@ public class CardDrop : MonoBehaviour, IDropHandler
             ObjectManager.instance.createdWord = card.name;
 
             fieldCard.OnOffDropAreas();
+
+            ObjectManager.instance.dropCount += 1;
         }
     }
 }
