@@ -47,7 +47,7 @@ public class CardDrop : MonoBehaviour, IDropHandler
             card.GetComponent<Image>().raycastTarget = true;
             card.transform.position = this.transform.position;
             card.transform.SetParent(transform);
-
+            card.transform.parent.name = card.transform.name;
 
             fieldCard.fieldDisplayedCards.Add(card);
             userCard.displayedCards.Remove(card);
@@ -65,28 +65,13 @@ public class CardDrop : MonoBehaviour, IDropHandler
             CardDrag CD = card.GetComponent<CardDrag>();
             if (CD != null) Destroy(card.GetComponent<CardDrag>());
 
-            ObjectManager.instance.movedCardPosition = card.transform.position;
             ObjectManager.instance.isDragged = true;
-            Debug.Log(ObjectManager.instance.movedCardPosition);
 
-            for (int x = 0; x < 7; x++)
-            {
-                for (int y = 0; y < 7; y++)
-                {
-                    if (card == ObjectManager.instance.grid[x, y])
-                    {
-                        ObjectManager.instance.cardIndexX = x;
-                        ObjectManager.instance.cardIndexY = y;
-                        Debug.Log(ObjectManager.instance.cardIndexX);
-                        Debug.Log(ObjectManager.instance.cardIndexY);
-                    }
-                    else
-                        Debug.Log("일치하지 않습니다");
-                }
-            }
+            ObjectManager.instance.createdWord = card.name;
+
             fieldCard.OnOffDropAreas();
+
+            ObjectManager.instance.dropCount += 1;
         }
-        else
-            Debug.Log("하얀색이 아닙니다");
     }
 }
