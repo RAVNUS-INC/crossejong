@@ -14,19 +14,19 @@ public class TurnChange : MonoBehaviour
     public TMP_InputField cardInputField;
     public string wordInput;
     public Text resultText;
-    public List<char> wordList1 = new List<char>();
-    public List<char> wordList2 = new List<char>();
-    public List<char> wordList3 = new List<char>();
+    public List<char> wordLists1 = new List<char>();
+    public List<char> wordLists2 = new List<char>();
+    public List<char> wordLists3 = new List<char>();
 
     // "가"의 문자코드 44032에 587을 더하면 "깋"이 나옴
     // "아"의 문자코드 50500
-    // "하"의 문자코드 55204
+    // "하"의 문자코드 54616
 
     private void Start()
     {
-        WordList(44032, wordList1);
-        WordList(50500, wordList2);
-        WordList(55204, wordList3);
+        WordList(44032, wordLists1);
+        WordList(50500, wordLists2);
+        WordList(54616, wordLists3);
     }
 
     public void WordList(int x, List<char> wordList)
@@ -46,8 +46,6 @@ public class TurnChange : MonoBehaviour
         {
             wordList.Add((char)list[i]);
         }
-
-        Debug.Log(new string(wordList.ToArray()));
     }
 
     public void IsCreateWord()
