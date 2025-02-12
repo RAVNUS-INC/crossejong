@@ -95,12 +95,44 @@ public class CardPool : MonoBehaviour
                     Image cardFrontFeature = card.AddComponent<Image>();
                     cardFrontFeature.sprite = specialCardFrontColorImage; // 카드 앞면 이미지 설정
                     cardFrontFeature.type = Image.Type.Sliced;
+
+                    GameObject textObject = new GameObject("컬러");
+                    textObject.transform.SetParent(card.transform, false);
+                    RectTransform textRect = textObject.AddComponent<RectTransform>();
+                    textRect.anchorMin = Vector2.zero;
+                    textRect.anchorMax = Vector2.one;
+                    textRect.offsetMin = Vector2.zero;
+                    textRect.offsetMax = Vector2.zero;
+
+                    TextMeshProUGUI tmpText = textObject.AddComponent<TextMeshProUGUI>();
+                    tmpText.font = newFont;
+                    tmpText.text = cardList[i]; // 텍스트 설정
+                    tmpText.fontSize = 120;
+                    tmpText.alignment = TextAlignmentOptions.Center;
+                    tmpText.color = Color.clear;
+                    tmpText.raycastTarget = false; // 텍스트 레이캐스트 제거
                 }
                 else
                 {
                     Image cardFrontFeature = card.AddComponent<Image>();
                     cardFrontFeature.sprite = specialCardFrontBlackImage; // 카드 앞면 이미지 설정
                     cardFrontFeature.type = Image.Type.Sliced;
+
+                    GameObject textObject = new GameObject("흑백");
+                    textObject.transform.SetParent(card.transform, false);
+                    RectTransform textRect = textObject.AddComponent<RectTransform>();
+                    textRect.anchorMin = Vector2.zero;
+                    textRect.anchorMax = Vector2.one;
+                    textRect.offsetMin = Vector2.zero;
+                    textRect.offsetMax = Vector2.zero;
+
+                    TextMeshProUGUI tmpText = textObject.AddComponent<TextMeshProUGUI>();
+                    tmpText.font = newFont;
+                    tmpText.text = cardList[i]; // 텍스트 설정
+                    tmpText.fontSize = 120;
+                    tmpText.alignment = TextAlignmentOptions.Center;
+                    tmpText.color = Color.clear;
+                    tmpText.raycastTarget = false; // 텍스트 레이캐스트 제거
                 }
 
             }

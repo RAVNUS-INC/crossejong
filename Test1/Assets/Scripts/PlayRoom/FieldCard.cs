@@ -12,6 +12,7 @@ using Unity.VisualScripting;
 using System.Xml.Linq;
 using Photon.Pun;
 using System.Reflection;
+using System.Linq;
 
 public class FieldCard : MonoBehaviour
 //서버 연결 시 주석 해제------------------------------------
@@ -21,12 +22,18 @@ public class FieldCard : MonoBehaviour
     public CardPool cardPool; // CardPool 참조
     public List<GameObject> fieldDisplayedCards;
     public Transform emptyArea;
+    private bool isRight;
+    private bool isLeft;
+    private bool isTop;
+    private bool isBottom;
+
 
     public void CreateDropAreas()
     {
-        for (int x = 0; x < 7; x++)
+        ObjectManager.instance.grid = new GameObject[ObjectManager.instance.gridCount, ObjectManager.instance.gridCount];
+        for (int x = 0; x < ObjectManager.instance.gridCount; x++)
         {
-            for (int y = 0; y < 7; y++)
+            for (int y = 0; y < ObjectManager.instance.gridCount; y++)
             {
                 GameObject empty = new GameObject("");
                 empty.transform.SetParent(fieldContainer, false);
@@ -71,16 +78,123 @@ public class FieldCard : MonoBehaviour
 
     }
 
+    private void IsRight()
+    {
+        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + 1, ObjectManager.instance.cardIndexY].transform.childCount == 1)
+            isRight = true;
+        else
+            isRight = false;
+    }
+
+    private void IsLeft()
+    {
+        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - 1, ObjectManager.instance.cardIndexY].transform.childCount == 1)
+            isLeft = true;
+        else
+            isLeft = false;
+    }
+    private void IsBottom()
+    {
+        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + 1].transform.childCount == 1)
+            isBottom = true;
+        else
+            isBottom = false;
+    }
+    private void IsTop()
+    {
+        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - 1].transform.childCount == 1)
+            isTop = true;
+        else
+            isTop = false;
+    }
+
+    private void IsPosition()
+    {
+        IsLeft();
+        IsRight();
+        IsBottom();
+        IsTop();
+    }
+
+
+    public void createdWordEnd()
+    {
+        for (int x = 0; x < ObjectManager.instance.gridCount; x++)
+        {
+            for (int y = 0; y < ObjectManager.instance.gridCount; y++)
+            {
+                if (ObjectManager.instance.createdWord == ObjectManager.instance.grid[x, y].transform.name)
+                {
+                    ObjectManager.instance.cardIndexX = x;
+                    ObjectManager.instance.cardIndexY = y;
+                }
+            }
+        }
+
+        IsPosition();
+
+        ObjectManager.instance.createdWords = "";
+
+        if (isLeft)  // 왼쪽에 글자가 있을 때
+        {
+            int x = 0;
+            for (int i = 1; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - i, ObjectManager.instance.cardIndexY].transform.childCount == 1; i++)
+            {
+                x = i;
+            }
+            for (int i = 0; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - x + i, ObjectManager.instance.cardIndexY].transform.childCount == 1; i++)
+            {
+                ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - x + i, ObjectManager.instance.cardIndexY].transform.name;
+            }
+            isLeft = false;
+            isRight = false;
+        }
+
+        if (isRight)  // 오른쪽에 글자가 있을 때
+        {
+            for (int i = 0; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + i, ObjectManager.instance.cardIndexY].transform.childCount == 1; i++)
+            {
+                ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + i, ObjectManager.instance.cardIndexY].transform.name;
+            }
+        }
+
+        if (isTop)  // 위에 글자가 있을 때
+        {
+            int y = 0;
+            for (int i = 1; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - i].transform.childCount == 1; i++)
+            {
+                y = i;
+            }
+            for (int i = 0; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - y + i].transform.childCount == 1; i++)
+            {
+                ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - y + i].transform.name;
+            }
+            isTop = false;
+            isBottom = false;
+        }
+
+        if (isBottom)  // 아래에 글자가 있을 때
+        {
+            for (int i = 0; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + i].transform.childCount == 1; i++)
+            {
+                ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + i].transform.name;
+            }
+        }
+
+        Debug.Log(ObjectManager.instance.createdWords);
+
+    }
+
     public void FirstFieldCard()
     {
         List<GameObject> randomCards = cardPool.GetRandomCards(1); // 1개의 랜덤 카드 얻기
         cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
 
-        GameObject middleObejcts = ObjectManager.instance.grid[3, 3];
         GameObject firstCards = randomCards[0];
-        ObjectManager.instance.grid[3, 3].SetActive(true);
-        firstCards.transform.SetParent(middleObejcts.transform, false);
-        ObjectManager.instance.grid[3, 3] = firstCards;
+
+        firstCards.transform.SetParent(ObjectManager.instance.grid[ObjectManager.instance.gridCount / 2, ObjectManager.instance.gridCount / 2].transform, false);
+        ObjectManager.instance.grid[ObjectManager.instance.gridCount / 2, ObjectManager.instance.gridCount / 2] = firstCards;
+        firstCards.transform.parent.name = firstCards.transform.name;
 
         OnOffDropAreas();
     }
