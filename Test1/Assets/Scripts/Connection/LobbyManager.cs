@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -21,11 +22,11 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 {
 
     // 방 생성 관련 UI
-    [SerializeField] InputField input_RoomName; //방 이름
+    [SerializeField] TMP_InputField input_RoomName; //방 이름
     [SerializeField] Button[] btn_MaxPlayers, btn_Difficulty, btn_TimeLimit; // 최대인원, 난이도, 제한시간 버튼
 
     // 방 생성 시 이름 규칙 경고메시지
-    [SerializeField] Text warningText;
+    [SerializeField] TMP_Text warningText;
 
     // 방 생성 버튼과 방 참여 버튼, 방 목록을 표시할 스크롤뷰
     [SerializeField] Button btn_CreateRoom, btn_JoinRoom; // 방 만들기, 참여 버튼

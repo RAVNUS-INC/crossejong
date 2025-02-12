@@ -13,6 +13,7 @@ using PlayFab.ClientModels;
 using PlayFab;
 using System.Reflection;
 using Photon.Pun.Demo.PunBasics;
+using TMPro;
 
 public class ChatRoomSet : MonoBehaviourPunCallbacks
 {
@@ -20,7 +21,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     public ChatManager chatManager; 
 
     // 방 이름, 현재인원/최대인원, 난이도, 제한시간, 저장완료메시지
-    public Text txtRoomName, txtPlayerCount, txtDifficulty, txtTimelimit, Savetext; 
+    public TMP_Text txtRoomName, txtPlayerCount, txtDifficulty, txtTimelimit, Savetext; 
     // 난이도, 제한시간 버튼 배열
     public Button[] DifButton, TimeButton;
     // 방장만 사용할 수 있는 방 속성 변경 버튼, 저장버튼
@@ -39,7 +40,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     private const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
     private const string IMAGEINDEX_KEY = "ImageIndex"; // 유저의 이미지 인덱스
 
-    public InputField ChatField; //채팅입력창
+    public TMP_InputField ChatField; //채팅입력창
     public Button ReadyBtn; //준비버튼
 
 

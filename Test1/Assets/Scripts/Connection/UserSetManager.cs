@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,10 +16,10 @@ using UnityEngine.UI;
 // 유저 프로필 설정 화면에서 작동하는 코드(닉네임, 유저프로필사진 변경 저장)
 public class UserSetManager : MonoBehaviourPunCallbacks
 {
-    [SerializeField] public InputField inputText; //닉네임 입력(나중에 바꿀 수 있는 Displayname)
-    [SerializeField] Button confirmButton; //제출(저장) 버튼
-    [SerializeField] Text warningText; // 경고 메시지를 출력할 UI 텍스트
-    [SerializeField] public Text saveText; // 저장완료 메시지를 출력할 UI 텍스트(profile panel에만 존재)
+    [SerializeField] public TMP_InputField inputText; //닉네임 입력(나중에 바꿀 수 있는 Displayname)
+    [SerializeField] public Button confirmButton; //제출(저장) 버튼
+    [SerializeField] TMP_Text warningText; // 경고 메시지를 출력할 UI 텍스트
+    [SerializeField] public TMP_Text saveText; // 저장완료 메시지를 출력할 UI 텍스트(profile panel에만 존재)
 
     // displayname 조건
     private const int MinLength = 3; // 최소 입력 길이(2글자 이상)
@@ -189,12 +190,32 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         currentIndex--;
         if (currentIndex < 0) currentIndex = profileImages.Length - 1;  // 순환 (맨 처음으로 돌아감)
         centralImage.sprite = profileImages[currentIndex];  // 인덱스에 해당하는 이미지로 업데이트
+
+        int Index = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0);
+        if (Index == currentIndex) //만약 현재 인덱스 이미지와 기존 이미지 인덱스가 같다면
+        {
+            confirmButton.interactable = false; //저장버튼 비활성화
+        }
+        else
+        {
+            confirmButton.interactable = true;
+        }
     }
 
     public void OnRightButtonClicked() // 오른쪽 버튼 클릭 시 호출
     {
         currentIndex = (currentIndex + 1) % profileImages.Length;
         centralImage.sprite = profileImages[currentIndex];  // 인덱스에 해당하는 이미지로 업데이트
+
+        int Index = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0);
+        if (Index == currentIndex) //만약 현재 인덱스 이미지와 기존 이미지 인덱스가 같다면
+        {
+            confirmButton.interactable = false; //저장버튼 비활성화
+        }
+        else
+        {
+            confirmButton.interactable = true;
+        }
     }
 
     public void ChangeNameBtn() //이름 변경 버튼 클릭할 때 -> 이름 입력 인풋 활성화
