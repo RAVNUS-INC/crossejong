@@ -7,13 +7,13 @@ using TMPro;
 using Photon.Pun.Demo.PunBasics;
 using Photon.Pun;
 //서버 연결 시 주석 해제------------------------------------
-//using static UserProfileLoad;
-//using System.Linq;
+using static UserProfileLoad;
+using System.Linq;
 using Photon.Realtime;
 
 public class UserCard : MonoBehaviour
    //서버 연결 시 주석 해제------------------------------------
-    //MonoBehaviourPun
+   //MonoBehaviourPun
 {
     public static UserCard instance = null;
 
@@ -37,13 +37,13 @@ public class UserCard : MonoBehaviour
     public List<GameObject> displayedCards; // UserCardArea에서 보여지는 카드 리스트
 
     //서버 연결 시 주석 해제------------------------------------
-    //private UserProfileLoad userProfileLoad; // UserProfileLoad 참조
-    //private List<UserProfileLoad.Player> players; // 플레이어 리스트
-    //private int[] sortedPlayers; // 정렬된 플레이어 리스트
-    //서버 연결 시 주석 해제------------------------------------
+    private UserProfileLoad userProfileLoad; // UserProfileLoad 참조
+    private List<UserProfileLoad.Player> players; // 플레이어 리스트
+    private int[] sortedPlayers; // 정렬된 플레이어 리스트
+                                 //서버 연결 시 주석 해제------------------------------------
 
 
-    // UserCardArea로 11개의 랜덤 카드 이동
+    //UserCardArea로 11개의 랜덤 카드 이동
     public void FirstUserCardArea()
     {
         List<GameObject> randomCards = cardPool.GetRandomCards(11); // 11개의 랜덤 카드 얻기

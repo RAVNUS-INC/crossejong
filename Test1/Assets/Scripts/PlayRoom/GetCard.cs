@@ -41,7 +41,7 @@ public class GetCard : MonoBehaviour
     //public void GetCardToUserCard()
     //{
     //    int Mynum = PhotonNetwork.LocalPlayer.ActorNumber;
-    //    photonView.RPC("RequestRandomCards", RpcTarget.MasterClient, 1, Mynum); 
+    //    photonView.RPC("RequestRandomCards", RpcTarget.MasterClient, 1, Mynum);
     //}
 
     //[PunRPC]

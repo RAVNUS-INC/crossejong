@@ -171,8 +171,7 @@ public class CardPool : MonoBehaviour
 
 
     //서버 연결 시 주석 해제------------------------------------
-
-    // 랜덤으로 1개의 카드 선택(change) 문자열 리스트 반환(방장만 수행)
+    //랜덤으로 1개의 카드 선택(change) 문자열 리스트 반환(방장만 수행)
     //public string[] GetRandomCardsName(int count)
     //{
     //    List<string> usedCardNames = new List<string>(); // 지금 막 뽑은 카드 이름을 저장
