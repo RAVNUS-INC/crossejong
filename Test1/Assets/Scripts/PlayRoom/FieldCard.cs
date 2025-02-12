@@ -27,6 +27,7 @@ public class FieldCard : MonoBehaviour
     private bool isTop;
     private bool isBottom;
 
+
     public void CreateDropAreas()
     {
         ObjectManager.instance.grid = new GameObject[ObjectManager.instance.gridCount, ObjectManager.instance.gridCount];
@@ -61,12 +62,11 @@ public class FieldCard : MonoBehaviour
 
     public void OnOffDropAreas()
     {
-
-        for (int x = 0; x < ObjectManager.instance.gridCount; x++) 
+        for (int x = 0; x < 7; x++)
         {
-            for (int y = 0; y < ObjectManager.instance.gridCount; y++) 
-            { 
-                if (ObjectManager.instance.grid[x,y].transform.childCount == 1)
+            for (int y = 0; y < 7; y++)
+            {
+                if (ObjectManager.instance.grid[x, y].transform.childCount == 1)
                 {
                     ChangeColorAreas(x - 1, y);
                     ChangeColorAreas(x + 1, y);
@@ -77,7 +77,6 @@ public class FieldCard : MonoBehaviour
         }
 
     }
-
 
     private void IsRight()
     {
@@ -139,7 +138,7 @@ public class FieldCard : MonoBehaviour
         if (isLeft)  // 왼쪽에 글자가 있을 때
         {
             int x = 0;
-            for (int i = 1; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - i, ObjectManager.instance.cardIndexY].transform.childCount == 1; i++)  
+            for (int i = 1; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - i, ObjectManager.instance.cardIndexY].transform.childCount == 1; i++)
             {
                 x = i;
             }
@@ -162,7 +161,7 @@ public class FieldCard : MonoBehaviour
         if (isTop)  // 위에 글자가 있을 때
         {
             int y = 0;
-            for (int i = 1; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - i].transform.childCount == 1; i++)  
+            for (int i = 1; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - i].transform.childCount == 1; i++)
             {
                 y = i;
             }
@@ -193,8 +192,8 @@ public class FieldCard : MonoBehaviour
 
         GameObject firstCards = randomCards[0];
 
-        firstCards.transform.SetParent(ObjectManager.instance.grid[ObjectManager.instance.gridCount/2, ObjectManager.instance.gridCount/2].transform, false);
-        ObjectManager.instance.grid[ObjectManager.instance.gridCount / 2, ObjectManager.instance.gridCount/2] = firstCards;
+        firstCards.transform.SetParent(ObjectManager.instance.grid[ObjectManager.instance.gridCount / 2, ObjectManager.instance.gridCount / 2].transform, false);
+        ObjectManager.instance.grid[ObjectManager.instance.gridCount / 2, ObjectManager.instance.gridCount / 2] = firstCards;
         firstCards.transform.parent.name = firstCards.transform.name;
 
         OnOffDropAreas();
