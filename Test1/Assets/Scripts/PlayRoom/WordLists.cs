@@ -26,9 +26,40 @@ public class WordLists : MonoBehaviour
     public List<char> wordList18 = new List<char>();
     public List<char> wordList19 = new List<char>();
 
+    public Dictionary<char, List<char>> choDictionary = new Dictionary<char, List<char>>();
+
     // "가"의 문자코드 44032에 587을 더하면 "깋"이 나옴
     // "아"의 문자코드 50500
     // "하"의 문자코드 54616
+
+    private void Start()
+    {
+        SavedWordList();
+        SavedWordDictionary();
+    }
+
+    public void SavedWordDictionary()
+    {
+        choDictionary.Add('ㄱ', wordList1);
+        choDictionary.Add('ㄲ', wordList2);
+        choDictionary.Add('ㄴ', wordList3);
+        choDictionary.Add('ㄷ', wordList4);
+        choDictionary.Add('ㄸ', wordList5);
+        choDictionary.Add('ㄹ', wordList6);
+        choDictionary.Add('ㅁ', wordList7);
+        choDictionary.Add('ㅂ', wordList8);
+        choDictionary.Add('ㅃ', wordList9);
+        choDictionary.Add('ㅅ', wordList10);
+        choDictionary.Add('ㅆ', wordList11);
+        choDictionary.Add('ㅇ', wordList12);
+        choDictionary.Add('ㅈ', wordList13);
+        choDictionary.Add('ㅉ', wordList14);
+        choDictionary.Add('ㅊ', wordList15);
+        choDictionary.Add('ㅋ', wordList16);
+        choDictionary.Add('ㅌ', wordList17);
+        choDictionary.Add('ㅍ', wordList18);
+        choDictionary.Add('ㅎ', wordList19);
+    }
 
     public void SavedWordList()
     {
