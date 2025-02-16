@@ -14,9 +14,8 @@ using Photon.Pun;
 using System.Reflection;
 using System.Linq;
 
-public class FieldCard : MonoBehaviour
-//서버 연결 시 주석 해제------------------------------------
-//MonoBehaviourPun
+public class FieldCard : MonoBehaviourPun
+
 {
     public Transform fieldContainer; // FieldArea의 Contents
     public CardPool cardPool; // CardPool 참조
@@ -183,53 +182,74 @@ public class FieldCard : MonoBehaviour
 
         Debug.Log(ObjectManager.instance.createdWords);
 
+        // 카드내기완료 버튼을 누르면 -> 현재 카드의 좌표와 이름을 RPC 함수로 전달(나를 제외한 모두에게)
+        photonView.RPC("SyncCardInfo", RpcTarget.Others, ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY, ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY].transform.name);
+        //Debug.Log($"놓인 카드의 x좌표: {ObjectManager.instance.cardIndexX}");
+        //Debug.Log($"놓인 카드의 y좌표: {ObjectManager.instance.cardIndexY}");
     }
+
 
     public void FirstFieldCard()
     {
-        List<GameObject> randomCards = cardPool.GetRandomCards(1); // 1개의 랜덤 카드 얻기
+        // 방장만 처음 1장의 카드 이름을 뽑음
+        string[] randomCardNames = cardPool.GetRandomCardsName(1); // 이름을 받는 함수로 변경
+
+        // 모든 플레이어들에게 인덱스리스트를 넘겨 첫 카드 오브젝트를 생성하도록 요청(배열->문자열)
+        photonView.RPC("FirstFieldCardRequestAll", RpcTarget.All, string.Join(",", randomCardNames));
+    }
+
+    //방장 포함 모두가 첫 카드 추가를 수행하는 함수
+    [PunRPC]
+    public void FirstFieldCardRequestAll(string names)
+    {
+        string[] usedNames = names.Split(','); // 다시 배열로 변환
+        foreach (string i in usedNames)
+        {
+            Debug.Log($"첫 카드 '{i}' 받음");
+        }
+        List<GameObject> randomCards = cardPool.GetRandomCardsObject(usedNames);
+
         cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
-
+        GameObject middleObejcts = ObjectManager.instance.grid[3, 3];
         GameObject firstCards = randomCards[0];
-
-        firstCards.transform.SetParent(ObjectManager.instance.grid[ObjectManager.instance.gridCount / 2, ObjectManager.instance.gridCount / 2].transform, false);
-        ObjectManager.instance.grid[ObjectManager.instance.gridCount / 2, ObjectManager.instance.gridCount / 2] = firstCards;
-        firstCards.transform.parent.name = firstCards.transform.name;
+        ObjectManager.instance.grid[3, 3].SetActive(true);
+        firstCards.transform.SetParent(middleObejcts.transform, false);
+        ObjectManager.instance.grid[3, 3] = firstCards;
 
         OnOffDropAreas();
     }
 
+    [PunRPC] //카드를 놓은 사람을 제외한 나머지는 모두 카드의 좌표, 이름을 전달받아 그리드에 추가 수행
+    public void SyncCardInfo(int cardIndexX, int cardIndexY, string cardName) //카드의 x,y좌표와 이름을 전달(자신을 제외한 모두에게)
+    {
+        // 그리드 내에서 x, y 좌표에 해당하는 오브젝트 찾기
+        GameObject targetGridObject = ObjectManager.instance.grid[cardIndexX, cardIndexY];
 
+        // 입력받은 카드 이름에 해당하는 오브젝트 찾기
+        GameObject targetCard = null;
+        foreach (GameObject card in cardPool.cards) // cardPool.cards는 카드들이 저장된 리스트로 가정
+        {
+            if (card.name == cardName) // 카드 이름이 일치하는지 확인
+            {
+                targetCard = card;
+                break; // 일치하는 카드 찾으면 종료
+            }
+        }
 
-    //서버 연결 시 주석 해제------------------------------------
-    //public void FirstFieldCard()
-    //{
-    //    // 방장만 처음 1장의 카드 이름을 뽑음
-    //    string[] randomCardNames = cardPool.GetRandomCardsName(1); // 이름을 받는 함수로 변경
+        if (targetCard != null && targetGridObject != null)
+        {
+            // 해당 카드의 오브젝트를 targetGridObject 위치로 이동시키기
+            targetCard.SetActive(true);
+            targetCard.transform.SetParent(targetGridObject.transform, false);
+            ObjectManager.instance.grid[cardIndexX, cardIndexY] = targetCard; // 그리드에 카드 정보 업데이트
+        }
+        else
+        {
+            Debug.LogError("카드를 찾을 수 없거나, 잘못된 그리드 위치입니다.");
+        }
 
-    //    // 모든 플레이어들에게 인덱스리스트를 넘겨 첫 카드 오브젝트를 생성하도록 요청(배열->문자열)
-    //    photonView.RPC("FirstFieldCardRequestAll", RpcTarget.All, string.Join(",", randomCardNames));
-    //}
+        // 그리드에 카드를 배치한 후, 드롭 영역 업데이트
+        OnOffDropAreas();
+    }
 
-    ////방장 포함 모두가 첫 카드 추가를 수행하는 함수
-    //[PunRPC]
-    //public void FirstFieldCardRequestAll(string names)
-    //{
-    //    string[] usedNames = names.Split(','); // 다시 배열로 변환
-    //    foreach (string i in usedNames)
-    //    {
-    //        Debug.Log($"첫 카드 '{i}' 받음");
-    //    }
-    //    List<GameObject> randomCards = cardPool.GetRandomCardsObject(usedNames);
-
-    //    cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
-    //    GameObject middleObejcts = ObjectManager.instance.grid[3, 3];
-    //    GameObject firstCards = randomCards[0];
-    //    ObjectManager.instance.grid[3, 3].SetActive(true);
-    //    firstCards.transform.SetParent(middleObejcts.transform, false);
-    //    ObjectManager.instance.grid[3, 3] = firstCards;
-
-    //    OnOffDropAreas();
-    //}
-    //서버 연결 시 주석 해제------------------------------------
 }

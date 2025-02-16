@@ -34,7 +34,6 @@ public class UserProfileLoad : MonoBehaviourPun
     //playerprefs 내용들(Key)
     private const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
     private const string IMAGEINDEX_KEY = "ImageIndex"; // 유저의 이미지 인덱스
-    private const string PROFILE_IMAGE_INDEX_KEY = "ProfileImageIndex";  // 저장 키
 
     private List<Player> players = new List<Player>(); // 플레이어 리스트
 
@@ -48,8 +47,7 @@ public class UserProfileLoad : MonoBehaviourPun
     void Start()
     {
         // 본인의 정보 추가를 방장에게 전달
-        //-----------(서버 연결 시 주석해제), 스크립트에 photonview 추가------------
-        //photonView.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, mydisplayname, myimgindex, myActNum);
+        photonView.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, mydisplayname, myimgindex, myActNum);
     }
 
     // players 리스트를 외부에서 접근할 수 있도록 메서드 제공
@@ -61,7 +59,7 @@ public class UserProfileLoad : MonoBehaviourPun
     [PunRPC]
     public void RequestAddPlayerInfo(string displayName, int imgIndex, int myActNum) // 방장만 실행
     {
-        //if (!PhotonNetwork.IsMasterClient) return; 
+        if (!PhotonNetwork.IsMasterClient) return; 
 
         // 방장이 플레이어 리스트에 추가
         players.Add(new Player(displayName, imgIndex, myActNum));
@@ -136,7 +134,6 @@ public class UserProfileLoad : MonoBehaviourPun
 
         }
     }
-
 
     // 플레이어 정보를 관리하는 클래스
     [System.Serializable]

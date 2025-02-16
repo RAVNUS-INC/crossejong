@@ -3,12 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 
 // 방 목록 표시 형태(프리팹)
 public class RoomListItem : MonoBehaviour
 {
-    public Text roomInfo;
+    public TMP_Text roomInfo;
 
     //클릭되었을때 호출되는 함수
     public Action<string> onDelegate;
@@ -17,7 +18,7 @@ public class RoomListItem : MonoBehaviour
     private void Awake()
     {
         // 프리팹 내 텍스트(자식요소) 연결
-        roomInfo = GetComponentInChildren<Text>();
+        roomInfo = GetComponentInChildren<TMP_Text>();
     }
     public void SetInfo(string roomName, int currPlayer, int maxPlayer, string difficulty, int timeLimit)
     {

@@ -1,8 +1,9 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectManager : MonoBehaviour
+public class ObjectManager : MonoBehaviourPun
 {
     public static ObjectManager instance = null;
 
@@ -50,16 +51,13 @@ public class ObjectManager : MonoBehaviour
         }
     }
 
-
-    // Start is called before the first frame update
-    void Start()
+    // 모든 플레이어에게 단어 전송
+    [PunRPC]
+    public void ShowCreatedWords(string word)
     {
-        
+        createdWords = word;
+        Debug.Log($"새 단어: {word}");
+
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

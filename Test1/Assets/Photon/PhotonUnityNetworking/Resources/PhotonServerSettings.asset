@@ -65,6 +65,10 @@ MonoBehaviour:
   - RequestUserCard
   - ReceiveRandomCards
   - RequestRandomCards
+  - ShowCreatedWords
+  - SyncDragPosition
+  - SyncCardPosition
+  - SyncCardInfo
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

@@ -4,6 +4,7 @@ using DG.Tweening;
 using UnityEngine.UI;
 using System.Drawing;
 using System;
+using Photon.Pun;
 
 // CardDrag 클래스는 Unity에서 드래그 가능한 카드를 구현하는 스크립트
 public class CardDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
@@ -15,7 +16,8 @@ public class CardDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDrag
     [HideInInspector] public Transform startParent; // 원래 부모
     public int cardIndex;
 
-public void OnBeginDrag(PointerEventData eventData)
+
+    public void OnBeginDrag(PointerEventData eventData)
     {
         if (eventData == null) return;
         if (eventData.pointerId >= 0) return;
@@ -42,8 +44,6 @@ public void OnBeginDrag(PointerEventData eventData)
         // 드래그 중에는 카드가 마우스 위치를 따르도록 설정
         transform.position = point;
 
-
-
         //eventData.position;
     }
 
@@ -63,5 +63,4 @@ public void OnBeginDrag(PointerEventData eventData)
             // 일단 카드 넣으면 그리드 개수 변경 알아서
         }
     }
-
 }
