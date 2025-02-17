@@ -1,6 +1,7 @@
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class ObjectManager : MonoBehaviourPun
@@ -35,12 +36,22 @@ public class ObjectManager : MonoBehaviourPun
     public int gridCount = 9;
     public GameObject[,] grid;
     public int dropCount = 0;
+    public string Displayname; //자신의 닉네임
+    public const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
+    public TMP_Text StatusMsg; //카드를 놓는 중의 상태 표시 텍스트
 
     //서버 연결 시 주석 해제------------------------------------
     public List<string> usedIndices = new List<string>();
     //서버 연결 시 주석 해제------------------------------------
 
-    public void SortAfterMove() {
+    private void Start()
+    {
+        Displayname = PlayerPrefs.GetString(DISPLAYNAME_KEY);
+        StatusMsg.text = ""; //상태메시지 비우기
+    }
+
+    public void SortAfterMove() 
+    {
         if (isFullPopup)
         {
             CardPool.instance.SortCardIndex(UserCardFullPopup.instance.fullDisplayedCards);
@@ -50,14 +61,24 @@ public class ObjectManager : MonoBehaviourPun
             CardPool.instance.SortCardIndex(UserCard.instance.displayedCards);
         }
     }
-
-    // 모든 플레이어에게 단어 전송
-    [PunRPC]
-    public void ShowCreatedWords(string word)
+    public void ShowCardSelectingMessage(bool isDragging)
     {
-        createdWords = word;
-        Debug.Log($"새 단어: {word}");
-
+        // 드래그 중(카드 고르는 중)을 알리는 메시지를 모두에게 표시
+        photonView.RPC("ShowDragStatus", RpcTarget.All, isDragging, ObjectManager.instance.Displayname);
+    }
+   
+    [PunRPC]
+    private void ShowDragStatus(bool isDragging, string name)
+    {
+        if (isDragging)
+        {
+            ObjectManager.instance.StatusMsg.text = $"{name}님이 카드를 고르는 중..";
+        }
+        else
+        {
+            ObjectManager.instance.StatusMsg.text = $"{name}님이 단어를 입력 중..";
+        }
+        
     }
 
 }

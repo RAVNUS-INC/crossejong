@@ -66,7 +66,7 @@ public class Main : MonoBehaviour
 
         GetProfileImageIndex(); // PlayFab에서 저장된 이미지 인덱스를 불러와 이미지 업데이트
         GetUserDisplayName(); //유저 네임 불러와서 텍스트로 표시
-        UpdateBtn(); //리더보드 업데이트
+        //UpdateBtn(); //리더보드 업데이트
     }
 
 
@@ -187,24 +187,12 @@ public class Main : MonoBehaviour
                 // 현재 로그인한 유저의 정보만 따로 가져옴
                 if (curBoard.PlayFabId == myPlayFabId)
                 {
-                    // 1부터 시작하는 순위 표시
-                    myRankText.text = $"현재 {(curBoard.Position + 1).ToString()}위"; 
-                }
-                if (ranklist[i] == null)
-                {
-                    //Debug.LogError($"ranklist[{i}]가 null입니다!");
-                }
-                else if (ranklist[i].IsDestroyed())
-                {
-                    Debug.LogError($"ranklist[{i}]가 Destroy된 상태입니다!");
-                }
-                else if (!ranklist[i].activeSelf)
-                {
-                    //Debug.Log($"ranklist[{i}]는 현재 비활성화 상태이며, 활성화합니다.");
-                    ranklist[i].SetActive(true);
+                    int actualRank = curBoard.Position + 1; // 0위는 1위로 변환
+                    myRankText.text = $"현재 {actualRank}위";
+                    Debug.Log($"현재 몇위: {curBoard.Position}");
                 }
                 //유저수, 순위에 따른 오브젝트 활성화
-                //ranklist[i].SetActive(true);
+                ranklist[i].SetActive(true);
                 //유저 단어완성횟수 업데이트
                 wordcount[i].text = "총 " + curBoard.StatValue.ToString() + "회";
                 //유저 이름 업데이트
@@ -242,8 +230,7 @@ public class Main : MonoBehaviour
                     {
                         Debug.LogWarning("유효하지 않은 이미지 인덱스입니다. 기본 이미지로 설정합니다.");
                         userimage[index].color = Color.white;  // 기본 이미지로 설정
-                    }
-                    
+                    }  
                 }
                 else
                 {
