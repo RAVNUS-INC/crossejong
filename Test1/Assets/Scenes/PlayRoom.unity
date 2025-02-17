@@ -2847,10 +2847,10 @@ Transform:
   - {fileID: 1926508069}
   - {fileID: 1768101436}
   - {fileID: 11155625}
+  - {fileID: 1463587109}
   - {fileID: 542433694}
   - {fileID: 2083685414}
   - {fileID: 617193424}
-  - {fileID: 1463587109}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &749620247
@@ -6116,6 +6116,7 @@ MonoBehaviour:
   wordList17: 
   wordList18: 
   wordList19: 
+  charList: 
 --- !u!1 &1498944012
 GameObject:
   m_ObjectHideFlags: 0

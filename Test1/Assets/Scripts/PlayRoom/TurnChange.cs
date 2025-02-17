@@ -13,82 +13,76 @@ public class TurnChange : MonoBehaviour
     public TMP_Text userCardCount; // TextMeshPro 사용
     public TMP_InputField cardInputField;
     public string wordInput;
+    public bool isCharWord;
+    public bool IsWord;
     public WordLists wordLists;
+
+    public List<char> charList = new List<char>
+    {'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'};
+
+
+
+
 
     public void IsCreateWord()
     {
+        Debug.Log(ObjectManager.instance.dropCount);
         wordInput = cardInputField.text;
+        isCharWord = false;
+        IsWord = false;
 
-        // 자음이 포함되어 있는지 확인
-        if (wordInput.Contains("ㄱ") || wordInput.Contains("ㅎ") || wordInput.Contains("ㅇ"))
+        for (int i = 0; i < ObjectManager.instance.createdWords.Length; i++) 
         {
-            List<string> possibleWords = GeneratePossibleWords(wordInput);
-
-            // 생성된 가능한 단어 중 일치하는 게 있는지 확인
-            foreach (string word in possibleWords)
+            for (int j = 0; j < 19; j++)
             {
-                if (word == ObjectManager.instance.createdWords)
+                if (ObjectManager.instance.createdWords[i] == charList[j])
                 {
-                    Debug.Log("일치합니다");
-                    return;
+                    List<char> words = wordLists.choDictionary[charList[j]];
+                    for (int k = 0; k < 587; k++)
+                    {
+                        if (wordInput[i] == words[k])
+                        {
+                            Debug.Log("초성이 일치합니다");
+                            isCharWord = true;
+                        }
+                    }
                 }
             }
-            Debug.Log("일치하는 단어가 없습니다.");
         }
-        else
+
+        if (wordInput.Length > ObjectManager.instance.dropCount)
         {
-            if (wordInput.Length > ObjectManager.instance.dropCount)
+            if (wordInput == ObjectManager.instance.createdWords)
             {
-                if (wordInput == ObjectManager.instance.createdWords)
-                {
-                    Debug.Log("일치합니다");
-                }
-                else
-                {
-                    if (ObjectManager.instance.createdWords.Contains(wordInput))
-                    {
-                        Debug.Log("있습니다");
-                    }
-                    else
-                        Debug.Log("있지않습니다");
-                }
+                Debug.Log("일치합니다");
+                IsWord = true;
             }
             else
             {
-                Debug.Log("오류입니다");
-            }
-        }
-    }
-
-    // 가능한 단어 리스트 생성
-    public List<string> GeneratePossibleWords(string input)
-    {
-        List<string> possibleWords = new List<string>();
-
-        // WordLists의 딕셔너리 가져오기
-        Dictionary<char, List<char>> choMap = wordLists.choDictionary;
-
-        // 자음 포함 단어에 대해 가능한 글자 생성
-        for (int i = 0; i < input.Length; i++)
-        {
-            char c = input[i];
-
-            // 초성인지 확인
-            if (choMap.ContainsKey(c))
-            {
-                // 해당 초성을 대체할 수 있는 모든 글자를 가져옴
-                List<char> possibleChars = choMap[c];
-                foreach (char pc in possibleChars)
+                if (ObjectManager.instance.createdWords.Contains(wordInput))
                 {
-                    string newWord = input.Substring(0, i) + pc + input.Substring(i + 1);
-                    possibleWords.Add(newWord);
+                    Debug.Log("있습니다");
+                    IsWord = true;
+                }
+                else
+                {
+                    Debug.Log("있지않습니다");
+                    IsWord= false;
                 }
             }
         }
-        return possibleWords;
+        else
+        {
+            Debug.Log("오류입니다");
+            IsWord = false;
+        }
+
+        if (isCharWord && IsWord) 
+        {
+            Debug.Log("사전 API 검사를 시작합니다");
+        }
+        
     }
-
-
 
     public void TurnEnd()
     {
@@ -101,5 +95,6 @@ public class TurnChange : MonoBehaviour
     {
         userCardCount.text = count.ToString(); // TMP_Text로 설정
     }
+
 
 }
