@@ -96,7 +96,7 @@ public class CardPool : MonoBehaviour
                     cardFrontFeature.sprite = specialCardFrontColorImage; // 카드 앞면 이미지 설정
                     cardFrontFeature.type = Image.Type.Sliced;
 
-                    GameObject textObject = new GameObject("컬러");
+                    GameObject textObject = new GameObject("*");
                     textObject.transform.SetParent(card.transform, false);
                     RectTransform textRect = textObject.AddComponent<RectTransform>();
                     textRect.anchorMin = Vector2.zero;
@@ -118,7 +118,7 @@ public class CardPool : MonoBehaviour
                     cardFrontFeature.sprite = specialCardFrontBlackImage; // 카드 앞면 이미지 설정
                     cardFrontFeature.type = Image.Type.Sliced;
 
-                    GameObject textObject = new GameObject("흑백");
+                    GameObject textObject = new GameObject("*");
                     textObject.transform.SetParent(card.transform, false);
                     RectTransform textRect = textObject.AddComponent<RectTransform>();
                     textRect.anchorMin = Vector2.zero;

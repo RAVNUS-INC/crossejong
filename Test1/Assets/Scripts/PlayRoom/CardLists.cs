@@ -19,7 +19,7 @@ public class CardLists : MonoBehaviour
         "하", "한", "해" };
 
     public List<string> cardFrontSpecial = new List<string>
-       {"컬러", "흑백"};
+       {"*", "*"};
 
     
     public void ChangeLevelLow()

@@ -14,7 +14,8 @@ public class TurnChange : MonoBehaviour
     public TMP_InputField cardInputField;
     public string wordInput;
     public bool isCharWord;
-    public bool IsWord;
+    public bool isWord;
+    public bool isSpecialWord;
     public WordLists wordLists;
 
     public List<char> charList = new List<char>
@@ -29,7 +30,8 @@ public class TurnChange : MonoBehaviour
         Debug.Log(ObjectManager.instance.dropCount);
         wordInput = cardInputField.text;
         isCharWord = false;
-        IsWord = false;
+        isWord = false;
+        isSpecialWord = false;
 
         for (int i = 0; i < ObjectManager.instance.createdWords.Length; i++) 
         {
@@ -47,37 +49,57 @@ public class TurnChange : MonoBehaviour
                         }
                     }
                 }
+                else
+                {
+                    Debug.Log("자음카드가 일치하지 않습니다");
+                    isCharWord = false;
+                }
+
+                if (ObjectManager.instance.createdWords[i] == '*')
+                {
+                    if (44032 <= wordInput[i] && wordInput[i] <= 54616)
+                    {
+                        Debug.Log("특수카드가 일치합니다");
+                        isSpecialWord = true; 
+                    }
+                }
+                else
+                {
+                    Debug.Log("특수카드가 일치하지 않습니다");
+                    isSpecialWord = false;
+                }
             }
         }
+
 
         if (wordInput.Length > ObjectManager.instance.dropCount)
         {
             if (wordInput == ObjectManager.instance.createdWords)
             {
                 Debug.Log("일치합니다");
-                IsWord = true;
+                isWord = true;
             }
             else
             {
                 if (ObjectManager.instance.createdWords.Contains(wordInput))
                 {
                     Debug.Log("있습니다");
-                    IsWord = true;
+                    isWord = true;
                 }
                 else
                 {
                     Debug.Log("있지않습니다");
-                    IsWord= false;
+                    isWord = false;
                 }
             }
         }
         else
         {
             Debug.Log("오류입니다");
-            IsWord = false;
+            isWord = false;
         }
 
-        if (isCharWord && IsWord) 
+        if (isCharWord && isWord && isSpecialWord) 
         {
             Debug.Log("사전 API 검사를 시작합니다");
         }
