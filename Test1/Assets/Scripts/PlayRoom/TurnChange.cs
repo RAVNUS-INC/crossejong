@@ -13,9 +13,7 @@ public class TurnChange : MonoBehaviour
     public TMP_Text userCardCount; // TextMeshPro 사용
     public TMP_InputField cardInputField;
     public string wordInput;
-    public bool isCharWord;
-    public bool isWord;
-    public bool isSpecialWord;
+    public bool isContinue;
     public WordLists wordLists;
 
     public List<char> charList = new List<char>
@@ -29,81 +27,66 @@ public class TurnChange : MonoBehaviour
     {
         Debug.Log(ObjectManager.instance.dropCount);
         wordInput = cardInputField.text;
-        isCharWord = false;
-        isWord = false;
-        isSpecialWord = false;
-
-        for (int i = 0; i < ObjectManager.instance.createdWords.Length; i++) 
-        {
-            for (int j = 0; j < 19; j++)
-            {
-                if (ObjectManager.instance.createdWords[i] == charList[j])
-                {
-                    List<char> words = wordLists.choDictionary[charList[j]];
-                    for (int k = 0; k < 587; k++)
-                    {
-                        if (wordInput[i] == words[k])
-                        {
-                            Debug.Log("초성이 일치합니다");
-                            isCharWord = true;
-                        }
-                    }
-                }
-                else
-                {
-                    Debug.Log("자음카드가 일치하지 않습니다");
-                    isCharWord = false;
-                }
-
-                if (ObjectManager.instance.createdWords[i] == '*')
-                {
-                    if (44032 <= wordInput[i] && wordInput[i] <= 54616)
-                    {
-                        Debug.Log("특수카드가 일치합니다");
-                        isSpecialWord = true; 
-                    }
-                }
-                else
-                {
-                    Debug.Log("특수카드가 일치하지 않습니다");
-                    isSpecialWord = false;
-                }
-            }
-        }
-
+        isContinue = true;
 
         if (wordInput.Length > ObjectManager.instance.dropCount)
         {
-            if (wordInput == ObjectManager.instance.createdWords)
+            if (ObjectManager.instance.createdWords.Contains(wordInput))  // 글자로 이루어진 단어일 경우
             {
-                Debug.Log("일치합니다");
-                isWord = true;
+                Debug.Log("글자로만 이루어진 단어를 사전 API 검사를 시작합니다");
+                // wordInput (사전 API 검사 돌리기)
+                ObjectManager.instance.dropCount = 0;
             }
-            else
+
+            for (int i = 0; i < ObjectManager.instance.createdWords.Length; i++)
             {
-                if (ObjectManager.instance.createdWords.Contains(wordInput))
+                if (isContinue == false)
                 {
-                    Debug.Log("있습니다");
-                    isWord = true;
+                    break;
                 }
                 else
                 {
-                    Debug.Log("있지않습니다");
-                    isWord = false;
+                    for (int j = 0; j < 19; j++)
+                    {
+                        if (ObjectManager.instance.createdWords[i] == charList[j])  // 자음카드가 포함된 경우
+                        {
+                            List<char> words = wordLists.choDictionary[charList[j]];
+                            for (int k = 0; k < 588; k++)
+                            {
+                                if (wordInput[i] == words[k])
+                                {
+                                    Debug.Log("자음 카드로 이루어진 단어를 사전 API 검사를 시작합니다");
+                                    // wordInput (사전 API 검사 돌리기)
+                                    isContinue = false;
+                                    ObjectManager.instance.dropCount = 0;
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
+            }
+
+            for (int i = 0; i < ObjectManager.instance.createdWords.Length; i++)
+            {
+                if (ObjectManager.instance.createdWords[i] == 'C' || ObjectManager.instance.createdWords[i] == 'B')  // 특수카드가 포함된 경우
+                {
+                    if (44032 <= wordInput[i] && wordInput[i] <= 54616)
+                    {
+                        Debug.Log("특수 카드로 이루어진 단어를 사전 API 검사를 시작합니다");
+                        // wordInput (사전 API 검사 돌리기)
+                        ObjectManager.instance.dropCount = 0;
+                        break;
+                    }
+                }
+                else
+                    break;
             }
         }
         else
         {
             Debug.Log("오류입니다");
-            isWord = false;
         }
-
-        if (isCharWord && isWord && isSpecialWord) 
-        {
-            Debug.Log("사전 API 검사를 시작합니다");
-        }
-        
     }
 
     public void TurnEnd()
