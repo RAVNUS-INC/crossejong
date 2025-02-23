@@ -39,6 +39,9 @@ public class ObjectManager : MonoBehaviourPun
     public string Displayname; //자신의 닉네임
     public const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
     public TMP_Text StatusMsg; //카드를 놓는 중의 상태 표시 텍스트
+    public List<string> cardFrontRed;
+    public List<string> cardFrontBlack;
+    public List<string> cardFrontSpecial;
 
     //서버 연결 시 주석 해제------------------------------------
     public List<string> usedIndices = new List<string>();
