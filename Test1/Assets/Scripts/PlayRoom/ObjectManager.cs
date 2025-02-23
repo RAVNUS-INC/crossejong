@@ -1,4 +1,5 @@
 using Photon.Pun;
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -39,18 +40,40 @@ public class ObjectManager : MonoBehaviourPun
     public string Displayname; //자신의 닉네임
     public const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
     public TMP_Text StatusMsg; //카드를 놓는 중의 상태 표시 텍스트
-    public List<string> cardFrontRed;
-    public List<string> cardFrontBlack;
-    public List<string> cardFrontSpecial;
-
-    //서버 연결 시 주석 해제------------------------------------
+    public List<string> cardFrontRed = new List<string> { "ㄱ", "ㅇ", "ㅎ" };
+    public List<string> cardFrontBlack; //난이도에 따라 내용이 달라짐
+    public List<string> cardFrontSpecial = new List<string> { "C", "B" };
     public List<string> usedIndices = new List<string>();
-    //서버 연결 시 주석 해제------------------------------------
 
     private void Start()
     {
+        // 방의 난이도 불러오기
+        if (PhotonNetwork.InRoom)
+        {
+            Room room = PhotonNetwork.CurrentRoom;
+
+            // 'DifficultyContents' 키에 저장된 값을 가져와서 바로 List<string>으로 변환
+            if (room.CustomProperties.ContainsKey("DifficultyContents"))
+            {
+                string[] difficultyContentsArray = (string[])room.CustomProperties["DifficultyContents"];
+
+                // string[]을 List<string>으로 변환
+                List<string> difficultyContentsList = new List<string>(difficultyContentsArray);
+
+                // 난이도 내용을 변수에 전달
+                cardFrontBlack = difficultyContentsList;
+
+                // 이제 List<string>으로 사용 가능
+                Debug.Log(string.Join(", ", cardFrontBlack));
+            }
+        }
+
+
+        //자신의 이름을 변수에 저장
         Displayname = PlayerPrefs.GetString(DISPLAYNAME_KEY);
-        StatusMsg.text = ""; //상태메시지 비우기
+
+        //상태메시지 비우기
+        StatusMsg.text = ""; 
     }
 
     public void SortAfterMove() 

@@ -2464,7 +2464,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 395.84998, y: -93.586945}
+  m_AnchoredPosition: {x: 395.84998, y: -93.586914}
   m_SizeDelta: {x: 472.279, y: 122.0181}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &497966646
@@ -4378,6 +4378,116 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 840458353}
   m_CullTransparentMesh: 1
+--- !u!1 &854792640
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 854792642}
+  - component: {fileID: 854792641}
+  m_Layer: 0
+  m_Name: ObjectManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &854792641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 854792640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8acb4309181884b4f893ca7b66869553, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveItemPanel: {fileID: 0}
+  moveCardObejct: {fileID: 0}
+  isFullPopup: 0
+  score: 0
+  time: 0
+  isDragged: 0
+  emptyList: []
+  cardIndexX: 0
+  cardIndexY: 0
+  createdWord: 
+  createdWords: 
+  gridCount: 9
+  dropCount: 0
+  Displayname: 
+  StatusMsg: {fileID: 0}
+  cardFrontRed: []
+  cardFrontBlack: []
+  cardFrontSpecial: []
+  usedIndices: []
+--- !u!4 &854792642
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 854792640}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 132.64491, y: 59.64008, z: -9.747578}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &855866991
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 855866993}
+  - component: {fileID: 855866992}
+  m_Layer: 0
+  m_Name: ChangeLevel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &855866992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 855866991}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31f2c1e4679ee154594010095baf2d23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardFrontRed: []
+  cardFrontSpecial: []
+  cardFrontBlack: []
+--- !u!4 &855866993
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 855866991}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 132.64491, y: 59.64008, z: -9.747578}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &881168553
 GameObject:
   m_ObjectHideFlags: 0
@@ -9861,6 +9971,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UserProfileLoad: {fileID: 1800025131}
   chatManager: {fileID: 1457311509}
+  Changelevel: {fileID: 855866992}
   txtRoomName: {fileID: 1625940823}
   txtPlayerCount: {fileID: 1014899361}
   txtDifficulty: {fileID: 86584025}
@@ -10271,6 +10382,8 @@ SceneRoots:
   - {fileID: 1457311510}
   - {fileID: 2046631742}
   - {fileID: 1800025130}
+  - {fileID: 855866993}
+  - {fileID: 854792642}
   - {fileID: 295395251}
   - {fileID: 272463197}
   - {fileID: 1187475337}

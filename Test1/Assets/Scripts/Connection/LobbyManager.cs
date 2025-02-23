@@ -49,14 +49,15 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     Dictionary<string, RoomInfo> dicRoomInfo = new Dictionary<string, RoomInfo>();
     // 생성된 방 이름을 저장하는 변수
     private string selectedRoomName = null;
-
+    // 난이도 변경 객체 참조
+    public ChangeLevel Changelevel; 
 
     private void Awake() 
     {
         ResetRoomSetPanel(); // 첫 메인 접속 시 최초 실행
     }
 
-    // 방 만들 때 선택 옵션 버튼과 방이름 규칙에 관한 초기화
+    // 방 만들 때 선택 옵션 버튼과 방이름 규칙에 관한 초기화(방 속성 x버튼 누를때도 실행-초기화)
     public void ResetRoomSetPanel()
     {
         // 기본 버튼 설정값 (0,0,0) 노란색으로 표시
@@ -77,6 +78,9 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         btn_JoinRoom.interactable = false; // 처음에는 방 참여 버튼 비활성화
         input_RoomName.onValueChanged.AddListener(ValidateRoomName); //방 이름 작성할 시, 방 이름 규칙 검사
 
+        // 기본 설정인 초급 난이도로 초기화
+        Changelevel.ChangeLevelLow();
+
         UnityEngine.Debug.Log("메인화면 초기화 완료");
     }
 
@@ -86,6 +90,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         for (int i = 0; i < buttons.Length; i++)
         {
             int index = i;
+            buttons[i].onClick.RemoveAllListeners(); // 기존 이벤트 제거
             buttons[i].onClick.AddListener(() => OnMaxPlayersButtonClicked(index, buttons)); //선택한 버튼의 색상 변경
         }
     }
@@ -96,6 +101,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         for (int i = 0; i < buttons.Length; i++)
         {
             int index = i;
+            buttons[i].onClick.RemoveAllListeners(); // 기존 이벤트 제거
             buttons[i].onClick.AddListener(() => OnDifficultyButtonClicked(index, buttons));
         }
     }
@@ -106,6 +112,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         for (int i = 0; i < buttons.Length; i++)
         {
             int index = i;
+            buttons[i].onClick.RemoveAllListeners(); // 기존 이벤트 제거
             buttons[i].onClick.AddListener(() => OnTimeLimitButtonClicked(index, buttons));
         }
     }
@@ -208,12 +215,18 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         {
             case 0:
                 selectedDifficulty = "초급";
+                // 데이터를 초급 난이도로 업데이트
+                Changelevel.ChangeLevelLow();
                 break;
             case 1:
                 selectedDifficulty = "중급";
+                // 데이터를 중급 난이도로 업데이트
+                Changelevel.ChangeLevelMiddle();
                 break;
             case 2:
                 selectedDifficulty = "고급";
+                // 데이터를 고급 난이도로 업데이트
+                Changelevel.ChangeLevelHigh();
                 break;
         }
         selectedDifficultyIndex = index;
@@ -351,9 +364,9 @@ public class LobbyManager : MonoBehaviourPunCallbacks
            //난이도, 제한시간 각각에 대한 인덱스와 실제 텍스트로 반영될 값들
             {"DifficultyIndex", selectedDifficultyIndex},  // 난이도 index
             {"difficulty", selectedDifficulty} ,  // 난이도 str값(초급,중급,고급)
+            {"DifficultyContents", Changelevel.cardFrontBlack.ToArray() }, // 난이도 카드 내용(가,갸,거..), 전달을 위해 배열로 형태변경
             {"TimeLimitIndex", selectedTimeLimitIndex},  // 제한시간 index
             {"timeLimit", selectedTimeLimit}  // 제한시간 int값(15,30,45)
-
         };
 
         //로비에도 보이게 할 것인가?(목록에)->건드리면 X

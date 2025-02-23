@@ -17,6 +17,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
 {
     public UserProfileLoad UserProfileLoad;
     public ChatManager chatManager;
+    public ChangeLevel Changelevel;
 
     // 방 이름, 현재인원/최대인원, 난이도, 제한시간, 저장완료메시지
     public TMP_Text txtRoomName, txtPlayerCount, txtDifficulty, txtTimelimit, Savetext;
@@ -89,7 +90,8 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
                     ("difficulty", selectedDifficulty),
                     ("timeLimit", selectedTimeLimit),
                     ("DifficultyIndex", selectedDifficultyIndex),
-                    ("TimeLimitIndex", selectedTimeLimitIndex)
+                    ("TimeLimitIndex", selectedTimeLimitIndex),
+                    ("DifficultyContents", Changelevel.cardFrontBlack.ToArray()) // 난이도 카드 내용(가,갸,거..), 전달을 위해 배열로 형태변경
                 };
                 foreach (var prop in properties)
                 {
@@ -175,12 +177,18 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         {
             case 0:
                 selectedDifficulty = "초급";
+                // 데이터를 초급 난이도로 업데이트
+                Changelevel.ChangeLevelLow();
                 break;
             case 1:
                 selectedDifficulty = "중급";
+                // 데이터를 중급 난이도로 업데이트
+                Changelevel.ChangeLevelMiddle();
                 break;
             case 2:
                 selectedDifficulty = "고급";
+                // 데이터를 고급 난이도로 업데이트
+                Changelevel.ChangeLevelHigh();
                 break;
         }
         selectedDifficultyIndex = index;
