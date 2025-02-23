@@ -13,71 +13,80 @@ public class TurnChange : MonoBehaviour
     public TMP_Text userCardCount; // TextMeshPro 사용
     public TMP_InputField cardInputField;
     public string wordInput;
-    public Text resultText;
-    public List<char> wordList1 = new List<char>();
-    public List<char> wordList2 = new List<char>();
-    public List<char> wordList3 = new List<char>();
+    public bool isContinue;
+    public WordLists wordLists;
 
-    // "가"의 문자코드 44032에 587을 더하면 "깋"이 나옴
-    // "아"의 문자코드 50500
-    // "하"의 문자코드 55204
+    public List<char> charList = new List<char>
+    {'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'};
 
-    private void Start()
-    {
-        WordList(44032, wordList1);
-        WordList(50500, wordList2);
-        WordList(55204, wordList3);
-    }
 
-    public void WordList(int x, List<char> wordList)
-    {
-        List<int> list = new List<int>();
 
-        for (int i = 1; i <= 21; i++)
-        {
-            for (int j = 1; j <= 28; j++)
-            {
-                list.Add(x);
-                x++;
-            }
-        }
 
-        for (int i = 0; i <list.Count; i++)
-        {
-            wordList.Add((char)list[i]);
-        }
-
-        Debug.Log(new string(wordList.ToArray()));
-    }
 
     public void IsCreateWord()
     {
         Debug.Log(ObjectManager.instance.dropCount);
         wordInput = cardInputField.text;
-
-        if (wordInput.Contains("ㄱ"))
-        {
-
-        }
+        isContinue = true;
 
         if (wordInput.Length > ObjectManager.instance.dropCount)
         {
-            if (wordInput == ObjectManager.instance.createdWords)
+            if (ObjectManager.instance.createdWords.Contains(wordInput))  // 글자로 이루어진 단어일 경우
             {
-                Debug.Log("일치합니다");
+                Debug.Log("글자로만 이루어진 단어를 사전 API 검사를 시작합니다");
+                // wordInput (사전 API 검사 돌리기)
+                ObjectManager.instance.dropCount = 0;
             }
-            else
+
+            for (int i = 0; i < ObjectManager.instance.createdWords.Length; i++)
             {
-                if (ObjectManager.instance.createdWords.Contains(wordInput))
+                if (isContinue == false)
                 {
-                    Debug.Log("있습니다");
+                    break;
                 }
                 else
-                    Debug.Log("있지않습니다");
+                {
+                    for (int j = 0; j < 19; j++)
+                    {
+                        if (ObjectManager.instance.createdWords[i] == charList[j])  // 자음카드가 포함된 경우
+                        {
+                            List<char> words = wordLists.choDictionary[charList[j]];
+                            for (int k = 0; k < 588; k++)
+                            {
+                                if (wordInput[i] == words[k])
+                                {
+                                    Debug.Log("자음 카드로 이루어진 단어를 사전 API 검사를 시작합니다");
+                                    // wordInput (사전 API 검사 돌리기)
+                                    isContinue = false;
+                                    ObjectManager.instance.dropCount = 0;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < ObjectManager.instance.createdWords.Length; i++)
+            {
+                if (ObjectManager.instance.createdWords[i] == 'C' || ObjectManager.instance.createdWords[i] == 'B')  // 특수카드가 포함된 경우
+                {
+                    if (44032 <= wordInput[i] && wordInput[i] <= 54616)
+                    {
+                        Debug.Log("특수 카드로 이루어진 단어를 사전 API 검사를 시작합니다");
+                        // wordInput (사전 API 검사 돌리기)
+                        ObjectManager.instance.dropCount = 0;
+                        break;
+                    }
+                }
+                else
+                    break;
             }
         }
         else
+        {
             Debug.Log("오류입니다");
+        }
     }
 
     public void TurnEnd()
@@ -91,5 +100,6 @@ public class TurnChange : MonoBehaviour
     {
         userCardCount.text = count.ToString(); // TMP_Text로 설정
     }
+
 
 }

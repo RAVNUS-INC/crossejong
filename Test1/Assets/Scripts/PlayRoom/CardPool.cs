@@ -44,6 +44,24 @@ public class CardPool : MonoBehaviour
 
     void Start()
     {
+        cardLists.cardFrontRed = new List<string>
+       {"ㄱ", "ㅇ", "ㅎ" };
+
+        cardLists.cardFrontBlack = new List<string>
+       {"가", "거", "고", "구", "그", "금", "기",
+        "나",
+        "다", "대", "도", "동", "드",
+        "라", "로", "리",
+        "마",
+        "보", "부", "비",
+        "사", "상", "생", "소", "수", "스", "시", "식",
+        "아", "안", "어", "오", "요", "우", "음", "이", "인", "일",
+        "자", "장", "전", "정", "제", "주", "지", "진",
+        "하", "한", "해" };
+
+        cardLists.cardFrontSpecial = new List<string>
+       {"C", "B"};
+
         // 카드 생성
         CreateCard();
     }
@@ -89,14 +107,14 @@ public class CardPool : MonoBehaviour
             }
             else
             {
-                if (cardList[i] == "컬러")
+                if (cardList[i] == "C")
                 {
                     // 카드 배경 이미지 추가
                     Image cardFrontFeature = card.AddComponent<Image>();
                     cardFrontFeature.sprite = specialCardFrontColorImage; // 카드 앞면 이미지 설정
                     cardFrontFeature.type = Image.Type.Sliced;
 
-                    GameObject textObject = new GameObject("컬러");
+                    GameObject textObject = new GameObject("C");
                     textObject.transform.SetParent(card.transform, false);
                     RectTransform textRect = textObject.AddComponent<RectTransform>();
                     textRect.anchorMin = Vector2.zero;
@@ -109,7 +127,7 @@ public class CardPool : MonoBehaviour
                     tmpText.text = cardList[i]; // 텍스트 설정
                     tmpText.fontSize = 120;
                     tmpText.alignment = TextAlignmentOptions.Center;
-                    tmpText.color = Color.clear;
+                    tmpText.color = color;
                     tmpText.raycastTarget = false; // 텍스트 레이캐스트 제거
                 }
                 else
@@ -118,7 +136,7 @@ public class CardPool : MonoBehaviour
                     cardFrontFeature.sprite = specialCardFrontBlackImage; // 카드 앞면 이미지 설정
                     cardFrontFeature.type = Image.Type.Sliced;
 
-                    GameObject textObject = new GameObject("흑백");
+                    GameObject textObject = new GameObject("B");
                     textObject.transform.SetParent(card.transform, false);
                     RectTransform textRect = textObject.AddComponent<RectTransform>();
                     textRect.anchorMin = Vector2.zero;
@@ -131,7 +149,7 @@ public class CardPool : MonoBehaviour
                     tmpText.text = cardList[i]; // 텍스트 설정
                     tmpText.fontSize = 120;
                     tmpText.alignment = TextAlignmentOptions.Center;
-                    tmpText.color = Color.clear;
+                    tmpText.color = color;
                     tmpText.raycastTarget = false; // 텍스트 레이캐스트 제거
                 }
 
@@ -146,7 +164,7 @@ public class CardPool : MonoBehaviour
     {
         CreateCards(cardLists.cardFrontRed, Color.red);
         CreateCards(cardLists.cardFrontBlack, Color.black);
-        CreateCards(cardLists.cardFrontSpecial, Color.white);
+        CreateCards(cardLists.cardFrontSpecial, Color.clear);
     }
 
 
