@@ -6,27 +6,31 @@ using Photon.Pun;
 using static UnityEngine.EventSystems.EventTrigger;
 using UnityEngine.SceneManagement;
 using System;
+using TMPro;
+using Unity.VisualScripting;
+using System.Collections;
 
 // 메인에 존재하는 기능에 관한 스크립트
 public class Main : MonoBehaviour
 {
 
     //usersetmanager에서 가져온 변수들    
-    private InputField inputField; //프로필 패널 안의 이름입력필드
-    private Text SaveText; //프로필 패널 안의 저장메시지
+    private TMP_InputField inputField; //프로필 패널 안의 이름입력필드
+    private TMP_Text SaveText; //프로필 패널 안의 저장메시지
     private Sprite[] ProfileImg; //프로필 이미지 배열
     private Image ProfileCenImg; //프로필 패널 중심 이미지
+    private Button SaveBtn; //프로필 패널 정보 변경 후 저장 버튼
 
     // --------------메인에 보여질 오브젝트------------------
-    public Text displayNameText; // DisplayName을 표시할 UI 텍스트
+    public TMP_Text displayNameText, myRankText; // DisplayName, 순위를 표시할 UI 텍스트
     public Image centralImage;  // 메인 프로필 이미지
     public GameObject profilePanel; // 프로필 수정 패널
 
     // ---------------대시보드에 보여질 랭킹 오브젝트---------------
     public GameObject[] ranklist; //활성화/비활성화를 위한 오브젝트
     public Image[] userimage; //유저 이미지
-    public Text[] username; //유저 이름
-    public Text[] wordcount; //단어완성횟수
+    public TMP_Text[] username; //유저 이름
+    public TMP_Text[] wordcount; //단어완성횟수
 
     public Text TestText, LogTestText; //빌드 테스트 텍스트 상태, 로그아웃 텍스트 상태
     private const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
@@ -43,6 +47,7 @@ public class Main : MonoBehaviour
         SaveText = userSetManager.saveText;
         ProfileImg = userSetManager.profileImages; //프로필 이미지 배열
         ProfileCenImg = userSetManager.centralImage; //프로필 패널 중심사진
+        SaveBtn = userSetManager.confirmButton; //프로필 패널 저장버튼
     }
 
     void Start()
@@ -61,7 +66,7 @@ public class Main : MonoBehaviour
 
         GetProfileImageIndex(); // PlayFab에서 저장된 이미지 인덱스를 불러와 이미지 업데이트
         GetUserDisplayName(); //유저 네임 불러와서 텍스트로 표시
-
+        //UpdateBtn(); //리더보드 업데이트
     }
 
 
@@ -92,6 +97,7 @@ public class Main : MonoBehaviour
         profilePanel.SetActive(false); //패널 비활성화
         inputField.interactable = false; //이름입력란 비활성화
         SaveText.text = ""; //저장 메시지 초기화
+        SaveBtn.interactable = false; //저장버튼 비활성화
 
         //유저 프로필 이미지 재로드, 이름 재로드 텍스트 보여주기
         GetUserDisplayName();
@@ -161,7 +167,6 @@ public class Main : MonoBehaviour
         RankActiveFalse();
         //유저들 간의 순위를 재갱신
         GetLeaderBoard();
-
     }
 
     // 리더보드 리스트에 들어갈 정보 불러오기(로딩과정이 눈에 보임)
@@ -173,9 +178,19 @@ public class Main : MonoBehaviour
           ProfileConstraints = new PlayerProfileViewConstraints() { ShowDisplayName = true } };
         PlayFabClientAPI.GetLeaderboard(request, (result) =>
         {
+            string myPlayFabId = PlayFabSettings.staticPlayer.PlayFabId; // 현재 로그인한 유저의 ID
+
             for (int i = 0; i < result.Leaderboard.Count; i++)
             {
                 var curBoard = result.Leaderboard[i];
+
+                // 현재 로그인한 유저의 정보만 따로 가져옴
+                if (curBoard.PlayFabId == myPlayFabId)
+                {
+                    int actualRank = curBoard.Position + 1; // 0위는 1위로 변환
+                    myRankText.text = $"현재 {actualRank}위";
+                    Debug.Log($"현재 몇위: {curBoard.Position}");
+                }
                 //유저수, 순위에 따른 오브젝트 활성화
                 ranklist[i].SetActive(true);
                 //유저 단어완성횟수 업데이트
@@ -205,6 +220,7 @@ public class Main : MonoBehaviour
                 int imgindex;
                 if (int.TryParse(result.Data[PROFILE_IMAGE_INDEX_KEY].Value, out imgindex))
                 {
+                    
                     // 인덱스 범위 체크 후 랭킹 유저 이미지 업데이트
                     if (imgindex >= 0 && imgindex < ProfileImg.Length)
                     {
@@ -214,7 +230,7 @@ public class Main : MonoBehaviour
                     {
                         Debug.LogWarning("유효하지 않은 이미지 인덱스입니다. 기본 이미지로 설정합니다.");
                         userimage[index].color = Color.white;  // 기본 이미지로 설정
-                    }
+                    }  
                 }
                 else
                 {
@@ -231,5 +247,6 @@ public class Main : MonoBehaviour
             Debug.LogError($"유저 데이터 불러오기 실패: {error.GenerateErrorReport()}");
         });
     }
+
 
 }

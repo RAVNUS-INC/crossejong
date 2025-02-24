@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using PlayFab;
 using PlayFab.ClientModels;
+using TMPro;
 
 
 // 로그인 화면 전체를 구성하는 코드
@@ -17,10 +18,10 @@ public class LoginManager : MonoBehaviour
     public GameObject emailPanel, registerPanel, playersetPanel, AlarmPanel; //이메일, 회원가입, 유저초기세팅, 알람 패널 4종류
 
     //인풋 관련 선언
-    public InputField EmailInput, PasswordInput, UseridInput;  // 이메일, 비밀번호, 아이디 인풋필드
+    public TMP_InputField EmailInput, PasswordInput, UseridInput;  // 이메일, 비밀번호, 아이디 인풋필드
 
     // 오류 메시지 텍스트(비밀번호, 이메일, ID)
-    public Text PasswordErrorText, EmailErrorText, IDErrorText;
+    public TMP_Text PasswordErrorText, EmailErrorText, IDErrorText;
 
     // 알림 창 내 버튼들
     public Button NextBtn, OkBtn, ReBtn;
@@ -32,7 +33,7 @@ public class LoginManager : MonoBehaviour
     private string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"; // 이메일 형식 확인을 위한 정규식
 
     // 로그인 시 팝업창에 표시할 알림 내용
-    public Text popupText;
+    public TMP_Text popupText;
 
     //playerprefs에 저장할 내용들
     private const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
@@ -385,11 +386,11 @@ public class LoginManager : MonoBehaviour
     {
         if (isOn) // Toggle이 활성화된 경우 (비밀번호 보기)
         {
-            PasswordInput.contentType = InputField.ContentType.Standard; // 일반 텍스트로 표시
+            PasswordInput.contentType = TMP_InputField.ContentType.Standard; // 일반 텍스트로 표시
         }
         else // Toggle이 비활성화된 경우 (비밀번호 숨기기)
         {
-            PasswordInput.contentType = InputField.ContentType.Password; // *로 표시
+            PasswordInput.contentType = TMP_InputField.ContentType.Password; // *로 표시
         }
 
         // ContentType 변경 후 InputField를 업데이트

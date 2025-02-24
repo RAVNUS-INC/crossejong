@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using UnityEngine.UI;
 using System.Collections.Specialized;
+using TMPro;
 
 public class ChatManager : MonoBehaviour
 {
@@ -24,7 +25,7 @@ public class ChatManager : MonoBehaviour
         AreaScript Area = Instantiate(isSend ? YellowArea : WhiteArea).GetComponent<AreaScript>();
         Area.transform.SetParent(ContentRect.transform, false);
         Area.BoxRect.sizeDelta = new Vector2(600, Area.BoxRect.sizeDelta.y);
-        Area.TextRect.GetComponent<Text>().text = text;
+        Area.TextRect.GetComponent<TMP_Text>().text = text;
         Fit(Area.BoxRect);
 
 

@@ -16,6 +16,7 @@ using static UserProfileLoad;
 using System.Reflection;
 using System.Linq;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 // 현재 방/게임에 접속한 플레이어들의 프로필과 이름 표시하는 스크립트(PlayerView)
 // UI관련 RPC
@@ -23,7 +24,7 @@ public class UserProfileLoad : MonoBehaviourPun
 {
     public GameObject[] InRoomUserList; // 현재 방에 접속한 유저들의 리스트
     public Image[] InRoomUserImg; // 현재 방에 접속한 유저들의 프로필사진
-    public Text[] InRoomUserName; // 현재 방에 접속한 유저들의 닉네임
+    public TMP_Text[] InRoomUserName; // 현재 방에 접속한 유저들의 닉네임
     public Sprite[] profileImages; // 3가지 기본 제공 이미지
 
     private string mydisplayname; //현재 유저 이름 저장 변수
@@ -33,14 +34,11 @@ public class UserProfileLoad : MonoBehaviourPun
     //playerprefs 내용들(Key)
     private const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
     private const string IMAGEINDEX_KEY = "ImageIndex"; // 유저의 이미지 인덱스
-    private const string PROFILE_IMAGE_INDEX_KEY = "ProfileImageIndex";  // 저장 키
 
     private List<Player> players = new List<Player>(); // 플레이어 리스트
 
     void Awake() 
     {
-        //Instance = this;
-        
         mydisplayname = PlayerPrefs.GetString(DISPLAYNAME_KEY, "Guest"); //유저이름 불러와 mydisplayname 변수에 저장
         myimgindex = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0);  //유저 이미지인덱스 불러와 myimgindex 변수에 저장
         myActNum = PhotonNetwork.LocalPlayer.ActorNumber; //액터넘버 저장
@@ -49,8 +47,7 @@ public class UserProfileLoad : MonoBehaviourPun
     void Start()
     {
         // 본인의 정보 추가를 방장에게 전달
-        //-----------(서버 연결 시 주석해제), 스크립트에 photonview 추가------------
-         //photonView.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, mydisplayname, myimgindex, myActNum);
+        photonView.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, mydisplayname, myimgindex, myActNum);
     }
 
     // players 리스트를 외부에서 접근할 수 있도록 메서드 제공
@@ -62,7 +59,7 @@ public class UserProfileLoad : MonoBehaviourPun
     [PunRPC]
     public void RequestAddPlayerInfo(string displayName, int imgIndex, int myActNum) // 방장만 실행
     {
-        //if (!PhotonNetwork.IsMasterClient) return; 
+        if (!PhotonNetwork.IsMasterClient) return; 
 
         // 방장이 플레이어 리스트에 추가
         players.Add(new Player(displayName, imgIndex, myActNum));
@@ -137,7 +134,6 @@ public class UserProfileLoad : MonoBehaviourPun
 
         }
     }
-
 
     // 플레이어 정보를 관리하는 클래스
     [System.Serializable]
