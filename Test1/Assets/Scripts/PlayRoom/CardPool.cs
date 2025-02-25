@@ -33,7 +33,6 @@ public class CardPool : MonoBehaviour
     public Sprite cardBackImage; // 카드 뒷면 이미지
     public Sprite specialCardFrontColorImage; // 카드 앞면 이미지
     public Sprite specialCardFrontBlackImage; // 카드 앞면 이미지
-    public CardLists cardLists; // NewCard 참조
 
     public TextMeshProUGUI tmpText; // TextMeshProUGUI 컴포넌트 참조
     public TMP_FontAsset newFont; // 변경할 새로운 Font Asset
@@ -44,10 +43,10 @@ public class CardPool : MonoBehaviour
 
     void Start()
     {
-        cardLists.cardFrontRed = new List<string>
+        ObjectManager.instance.cardFrontRed = new List<string>
        {"ㄱ", "ㅇ", "ㅎ" };
 
-        cardLists.cardFrontBlack = new List<string>
+        ObjectManager.instance.cardFrontBlack = new List<string>
        {"가", "거", "고", "구", "그", "금", "기",
         "나",
         "다", "대", "도", "동", "드",
@@ -59,7 +58,7 @@ public class CardPool : MonoBehaviour
         "자", "장", "전", "정", "제", "주", "지", "진",
         "하", "한", "해" };
 
-        cardLists.cardFrontSpecial = new List<string>
+        ObjectManager.instance.cardFrontSpecial = new List<string>
        {"C", "B"};
 
         // 카드 생성
@@ -81,7 +80,7 @@ public class CardPool : MonoBehaviour
             // Button 컴포넌트 추가
             //Button button = card.AddComponent<Button>();
 
-            if (cardList != cardLists.cardFrontSpecial)
+            if (cardList != ObjectManager.instance.cardFrontSpecial)
             {
                 // 카드 배경 이미지 추가
                 Image cardFrontFeature = card.AddComponent<Image>();
@@ -162,9 +161,9 @@ public class CardPool : MonoBehaviour
 
     private void CreateCard()
     {
-        CreateCards(cardLists.cardFrontRed, Color.red);
-        CreateCards(cardLists.cardFrontBlack, Color.black);
-        CreateCards(cardLists.cardFrontSpecial, Color.clear);
+        CreateCards(ObjectManager.instance.cardFrontRed, Color.red);
+        CreateCards(ObjectManager.instance.cardFrontBlack, Color.black);
+        CreateCards(ObjectManager.instance.cardFrontSpecial, Color.clear);
     }
 
 
