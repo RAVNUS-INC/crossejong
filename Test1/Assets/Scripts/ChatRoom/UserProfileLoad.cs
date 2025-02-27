@@ -36,7 +36,9 @@ public class UserProfileLoad : MonoBehaviourPun
     private const string IMAGEINDEX_KEY = "ImageIndex"; // 유저의 이미지 인덱스
 
     public List<Player> players = new List<Player>(); // 플레이어 리스트
-    public int[] sortedPlayers; // 정렬된 플레이어 리스트
+    public string[] userNameList; // 유저 닉네임 리스트(디스플레이네임)
+    public int[] userImageList; // 유저 이미지 리스트(프로필사진)
+    public int[] sortedPlayers; // 정렬된 플레이어 리스트(액터넘버)
 
     void Awake() 
     {
@@ -49,7 +51,6 @@ public class UserProfileLoad : MonoBehaviourPun
     {
         // 본인의 정보 추가를 방장에게 전달
         photonView.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, mydisplayname, myimgindex, myActNum);
-
 
     }
 
@@ -107,7 +108,14 @@ public class UserProfileLoad : MonoBehaviourPun
 
         //actnum 오름차순 리스트를 모두가 갱신받음
         sortedPlayers = playerList;
-        Debug.Log($"플레이어 리스트 업데이트됨.");
+
+        // 유저들 이름 리스트를 모두가 갱신받음
+        userNameList = names;
+
+        // 유저들 사진 리스트를 모두가 갱신받음
+        userImageList = imgIndexes;
+
+        Debug.Log($"플레이어 리스트 동기화됨.");
 
         UpdatePlayerViewUI();
     }
@@ -129,8 +137,8 @@ public class UserProfileLoad : MonoBehaviourPun
                 InRoomUserList[0].SetActive(true); // 프로필을 활성화
                 InRoomUserName[0].text = player.displayName; //이름 텍스트 표시
                 InRoomUserImg[0].sprite = profileImages[player.imgIndex]; // 이미지 표시
-                Debug.Log($"Display Name: {player.displayName}, Img Index: {player.imgIndex}, Actor Number: {player.myActNum}");
-                Debug.Log("방장 정보 업데이트 완료");
+                //Debug.Log($"Display Name: {player.displayName}, Img Index: {player.imgIndex}, Actor Number: {player.myActNum}");
+                //Debug.Log("방장 정보 업데이트 완료");
                 continue;
             }
             else //방장이 아니면
@@ -138,8 +146,8 @@ public class UserProfileLoad : MonoBehaviourPun
                 InRoomUserList[myIndex].SetActive(true); // 플레이어의 프로필 활성화
                 InRoomUserName[myIndex].text = player.displayName;  // 플레이어의 이름 텍스트 표시
                 InRoomUserImg[myIndex].sprite = profileImages[player.imgIndex]; // 플레이어의 이미지 표시
-                Debug.Log($"Display Name: {player.displayName}, Img Index: {player.imgIndex}, Actor Number: {player.myActNum}");
-                Debug.Log("다른 유저 정보 업데이트 완료");
+                //Debug.Log($"Display Name: {player.displayName}, Img Index: {player.imgIndex}, Actor Number: {player.myActNum}");
+                //Debug.Log("다른 유저 정보 업데이트 완료");
                 myIndex++;
             }
 

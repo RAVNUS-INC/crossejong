@@ -20,6 +20,7 @@ public class GetCard : MonoBehaviourPun
     {
         int Mynum = PhotonNetwork.LocalPlayer.ActorNumber;
         photonView.RPC("RequestRandomCards", RpcTarget.MasterClient, 1, Mynum);
+        Debug.Log("카드를 한 장 추가합니다.");
     }
 
     [PunRPC]

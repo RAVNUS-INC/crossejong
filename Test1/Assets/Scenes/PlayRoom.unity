@@ -3122,9 +3122,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1926508068}
-        m_TargetAssemblyTypeName: GetCard, Assembly-CSharp
-        m_MethodName: GetCardToUserCard
+      - m_Target: {fileID: 1884434056}
+        m_TargetAssemblyTypeName: TurnManager, Assembly-CSharp
+        m_MethodName: GoToNextTurnAndAddCard
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3501,6 +3501,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 623524c3b9ab0554cb61476f0063e6ee, type: 3}
   - {fileID: 21300000, guid: eebe400fed789c546b814d459be063ab, type: 3}
   players: []
+  userNameList: []
+  userImageList: 
   sortedPlayers: 
 --- !u!114 &617193426
 MonoBehaviour:
@@ -5660,7 +5662,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 98.725006, y: -166.255}
+  m_AnchoredPosition: {x: 268.725, y: -166.255}
   m_SizeDelta: {x: 197.45, y: 266.83}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1200990911
@@ -9378,6 +9380,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   userProfileLoad: {fileID: 617193425}
+  getCard: {fileID: 1926508068}
   InTurnUserList:
   - {fileID: 1200990909}
   - {fileID: 52237293}
@@ -9402,7 +9405,7 @@ MonoBehaviour:
   - {fileID: 610212343}
   - {fileID: 503067772}
   - {fileID: 1005369916}
-  overlayColor: {r: 0, g: 0, b: 0, a: 0.7}
+  overlayColor: {r: 0.3962264, g: 0.3962264, b: 0.3962264, a: 0.7}
   IsMyTurn: 0
 --- !u!1 &1926508067
 GameObject:

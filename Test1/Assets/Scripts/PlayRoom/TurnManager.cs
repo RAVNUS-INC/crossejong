@@ -14,13 +14,12 @@ using Unity.VisualScripting;
 public class TurnManager : MonoBehaviourPun
 {
     public UserProfileLoad userProfileLoad; // 유저프로필 이미지 참조를 위해 사용
+    public GetCard getCard; // 카드 한 장 먹을 때 참조 사용
 
     public GameObject[] InTurnUserList; // 턴에 있는 상태의 유저 이미지 배열
     public Image[] InTurnUserImg; // 턴에 있는 유저들의 프로필사진
-    public TMP_Text[] InTurnUserName; // 턴에 있는 유저들의 닉네임
-    public TMP_Text[] timerText; // 남은 시간을 보여주는 텍스트
-    public Color overlayColor = new Color(0, 0, 0, 0.7f); // 검정색 70%
-    //private float remainingTime = 5f; // 30초 타이머
+    public TMP_Text[] InTurnUserName, timerText; // 턴에 있는 유저들의 닉네임, 남은 시간을 보여주는 텍스트
+    public Color overlayColor = new Color(0, 0, 0, 0.3f); // 검정색 그림자
     private int MyNum, NextPlayerNum; // 다음 플레이어의 액터넘버
     public bool IsMyTurn = false; // 현재 턴인지 아닌지 확인
     Coroutine TurnRoutine;
@@ -29,6 +28,16 @@ public class TurnManager : MonoBehaviourPun
     {
         // 현재 내 액터넘버 찾기
         MyNum = PhotonNetwork.LocalPlayer.ActorNumber;
+
+        // 턴일 때의 모든 유저프로필 정보를 미리 반영해 표시하기
+        for (int i = 0; i < userProfileLoad.sortedPlayers.Length; i++)
+        {
+            int index = userProfileLoad.userImageList[i];
+            InTurnUserImg[i].sprite = userProfileLoad.profileImages[index];
+
+            string name = userProfileLoad.userNameList[i];
+            InTurnUserName[i].text = name;
+        }
     }
 
     // 카운트다운 3 2 1 후 실행
@@ -83,7 +92,7 @@ public class TurnManager : MonoBehaviourPun
 
     IEnumerator StartTimer()
     {
-        float remainingTime = 5f;
+        float remainingTime = 15f;
 
         while (remainingTime > 0)
         {
@@ -109,23 +118,23 @@ public class TurnManager : MonoBehaviourPun
 
         IsMyTurn = false;
 
-        //photonView.RPC("UpdateTimerRPC", RpcTarget.All, MyNum, 0);
-
         Debug.Log("시간 초과! 턴을 넘깁니다.");
+
+        // 카드 한 장 먹기
+        getCard.GetCardToUserCard();
 
         // 다음 턴의 플레이어 찾기 
         FindNextPlayer();
     }
 
-    public void FindNextPlayer()
+    public void FindNextPlayer() // 다음 플레이어의 넘버 찾기(마지막 플레이어일 경우 0번 인덱스로 순환)
     {
-        // 다음 플레이어의 넘버 찾기(마지막 플레이어일 경우 0번 인덱스로 순환)
         // 플레이어 목록에서 현재 플레이어의 인덱스를 찾음
-        Debug.Log(MyNum);
         int currentIndex = Array.IndexOf(userProfileLoad.sortedPlayers, MyNum);
-        Debug.Log(currentIndex);
+
         // 다음 플레이어의 인덱스를 계산 (마지막 플레이어일 경우 순환)
         int nextIndex = (currentIndex + 1) % userProfileLoad.sortedPlayers.Length;
+
         // 다음 플레이어의 액터 넘버
         int nextActorNumber = userProfileLoad.sortedPlayers[nextIndex];
         NextPlayerNum = nextActorNumber;
@@ -146,6 +155,48 @@ public class TurnManager : MonoBehaviourPun
         {
             return;
         }
+    }
 
+    // 낼 카드가 없어, 카드를 한 장 먹기로 결정 했을 때(카드 추가 버튼에 리스너 연결)
+    public void GoToNextTurnAndAddCard()
+    {
+        if (IsMyTurn) //현재 내 턴일 때
+        {
+            if (TurnRoutine != null)
+            {
+                StopCoroutine(TurnRoutine); // 현재 코루틴 중지
+            }
+            TurnRoutine = null;
+
+            IsMyTurn = false; // 턴 상태 비활성화
+
+            // 카드 한 장 먹기
+            getCard.GetCardToUserCard();
+
+            Debug.Log("카드를 추가하고 턴을 넘깁니다.");
+
+            FindNextPlayer(); // 다음 턴을 탐색
+        }
+    }
+
+    // API 검사 통과에 성공했을 때
+    public void TossNextTurn()
+    {
+        if (IsMyTurn) //현재 내 턴일 때
+        {
+            if (TurnRoutine != null)
+            {
+                StopCoroutine(TurnRoutine); // 현재 코루틴 중지
+            }
+            TurnRoutine = null;
+
+            IsMyTurn = false; // 턴 상태 비활성화
+
+            Debug.Log("단어 완성 성공! 턴을 넘깁니다.");
+
+            // 단어완성횟수 +1 증가시키기
+
+            FindNextPlayer(); // 다음 턴을 탐색
+        }
     }
 }

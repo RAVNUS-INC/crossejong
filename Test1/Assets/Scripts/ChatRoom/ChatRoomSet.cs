@@ -294,9 +294,8 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         PlayersUpdate();
         UnityEngine.Debug.Log("다른 플레이어 방 나감");
     }
-
-    // 방을 나갈때
-    public void LeaveRoom()
+ 
+    public void LeaveRoom() // 방을 나갈때
     {
         if (PhotonNetwork.InRoom)
         {
@@ -309,7 +308,6 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             //나가기
             PhotonNetwork.LeaveRoom();
         }
-
     }
 
     public override void OnLeftRoom() // 방을 성공적으로 나갔을 때 호출되는 콜백
