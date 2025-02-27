@@ -12,6 +12,7 @@ public class Countdown : MonoBehaviourPun
     public float startDelay = 1f; // 시작 딜레이
     public Button startGameButton; //게임 시작버튼
     public FieldCard fieldCard;
+    public TurnManager turnMananger;
 
     private void Start()
     {
@@ -64,19 +65,25 @@ public class Countdown : MonoBehaviourPun
             // 방장이 완료되었음을 알림 (RPC 호출)
             photonView.RPC("FirstFieldCompleted", RpcTarget.All);
         }
+
+        // 첫사람(방장)부터 30초 타이머 시작
+        if (PhotonNetwork.IsMasterClient)
+        {
+            turnMananger.AfterCountdown();
+        }
     }
 
     [PunRPC]
     private void FirstUserCompleted()
     {
-        Debug.Log("FirstUserCompleted 완료, 다음 진행");
+        //Debug.Log("FirstUserCompleted 완료, 다음 진행");
         fieldCard.CreateDropAreas();
     }
 
     [PunRPC]
     private void FirstFieldCompleted()
     {
-        Debug.Log("FirstFieldCompleted 완료, 다음 진행");
+        //Debug.Log("FirstFieldCompleted 완료, 다음 진행");
         userCard.SelectedUserCard();
     }
 

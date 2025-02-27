@@ -33,30 +33,15 @@ public class UserCard : MonoBehaviourPun
     public Transform userCardContainer; // UserCardArea의 Contents
     public List<GameObject> displayedCards; // UserCardArea에서 보여지는 카드 리스트
 
-    //서버 연결 시 주석 해제------------------------------------
-    private UserProfileLoad userProfileLoad; // UserProfileLoad 참조
-    private List<UserProfileLoad.Player> players; // 플레이어 리스트
-    private int[] sortedPlayers; // 정렬된 플레이어 리스트
-                                 //서버 연결 시 주석 해제------------------------------------
-
+    public UserProfileLoad userProfileLoad; // UserProfileLoad 참조
 
     //UserCardArea로 11개의 랜덤 카드 이동
     public void FirstUserCardArea()
     {
-        UserProfileLoad userProfileLoad = FindObjectOfType<UserProfileLoad>(); //  찾기
-        players = userProfileLoad.GetPlayers(); // players 리스트에 접근
-        Debug.Log($"players 리스트 길이: {players.Count}");
-
-        // players 리스트를 myActNum 기준으로 오름차순 정렬
-        sortedPlayers = players.OrderBy(player => player.myActNum)
-                                   .Select(player => player.myActNum)
-                                   .ToArray();
-        Debug.Log($"오름차순 정렬 완료: {string.Join(", ", sortedPlayers)}");
-
         // 정렬된 플레이어 리스트와 함께 모든 유저에게 전달
-        photonView.RPC("SyncSortedPlayers", RpcTarget.All, sortedPlayers);
+        //photonView.RPC("SyncSortedPlayers", RpcTarget.All, userProfileLoad.sortedPlayers);
 
-        for (int i = 0; i < sortedPlayers.Length; i++) //players수만큼 반복
+        for (int i = 0; i < userProfileLoad.sortedPlayers.Length; i++) //players수만큼 반복
         {
             // 방장만 랜덤으로 11장의 카드 인덱스를 뽑음
             // 직렬화(list->int[])수행(rpc함수는 list를 인자로 받지 못함)
@@ -74,8 +59,8 @@ public class UserCard : MonoBehaviourPun
         Debug.Log("카드 추가를 수행하는 중");
 
         // 정렬된 리스트를 반복문으로 순차적으로 처리
-        if (sortedPlayers[count] != PhotonNetwork.LocalPlayer.ActorNumber) return; //해당 인덱스 플레이어의 actnum이 나와 같다면 다음 수행
-        Debug.Log($"현재 {count}번째 유저: 액터넘버 {sortedPlayers[count]}");
+        if (userProfileLoad.sortedPlayers[count] != PhotonNetwork.LocalPlayer.ActorNumber) return; //해당 인덱스 플레이어의 actnum이 나와 같다면 다음 수행
+        Debug.Log($"현재 {count}번째 유저: 액터넘버 {userProfileLoad.sortedPlayers[count]}");
         foreach (string name in RandomNames) //뽑은 리스트들 기존 변수에 저장
         {
             Debug.Log($"{name}");
@@ -85,12 +70,12 @@ public class UserCard : MonoBehaviourPun
     }
 
     // 정렬된 플레이어 리스트 동기화
-    [PunRPC]
-    void SyncSortedPlayers(int[] sortedActNums)
-    {
-        sortedPlayers = sortedActNums;
-        Debug.Log("정렬된 플레이어 리스트 동기화 완료");
-    }
+    //[PunRPC]
+    //void SyncSortedPlayers(int[] sortedActNums)
+    //{
+    //    userProfileLoad.sortedPlayers = sortedActNums;
+    //    Debug.Log("정렬된 플레이어 리스트 동기화 완료");
+    //}
 
 
     public void SelectedUserCard()

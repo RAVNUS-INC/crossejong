@@ -35,7 +35,8 @@ public class UserProfileLoad : MonoBehaviourPun
     private const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
     private const string IMAGEINDEX_KEY = "ImageIndex"; // 유저의 이미지 인덱스
 
-    private List<Player> players = new List<Player>(); // 플레이어 리스트
+    public List<Player> players = new List<Player>(); // 플레이어 리스트
+    public int[] sortedPlayers; // 정렬된 플레이어 리스트
 
     void Awake() 
     {
@@ -48,6 +49,8 @@ public class UserProfileLoad : MonoBehaviourPun
     {
         // 본인의 정보 추가를 방장에게 전달
         photonView.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, mydisplayname, myimgindex, myActNum);
+
+
     }
 
     // players 리스트를 외부에서 접근할 수 있도록 메서드 제공
@@ -86,18 +89,26 @@ public class UserProfileLoad : MonoBehaviourPun
     {
         if (!PhotonNetwork.IsMasterClient) return;
 
+        // actnum 리스트 재정렬
+        OrderedPlayers();
+
         photonView.RPC("UpdatePlayerList", RpcTarget.AllBuffered,
             players.Select(p => p.displayName).ToArray(),
             players.Select(p => p.imgIndex).ToArray(),
-            players.Select(p => p.myActNum).ToArray());
+            players.Select(p => p.myActNum).ToArray(),
+            sortedPlayers);
     }
 
     [PunRPC]
-    void UpdatePlayerList(string[] names, int[] imgIndexes, int[] actNums)
+    void UpdatePlayerList(string[] names, int[] imgIndexes, int[] actNums, int[] playerList)
     {
         players.Clear(); //처음엔 초기화
         players = names.Select((t, i) => new Player(t, imgIndexes[i], actNums[i])).ToList();
+
+        //actnum 오름차순 리스트를 모두가 갱신받음
+        sortedPlayers = playerList;
         Debug.Log($"플레이어 리스트 업데이트됨.");
+
         UpdatePlayerViewUI();
     }
 
@@ -176,4 +187,12 @@ public class UserProfileLoad : MonoBehaviourPun
         return masterActorNumber;
     }
 
+    public void OrderedPlayers() //actnum을 오름차순으로 정렬한 int 리스트
+    { 
+        // players 리스트를 myActNum 기준으로 오름차순 정렬
+        sortedPlayers = players.OrderBy(player => player.myActNum)
+                                   .Select(player => player.myActNum)
+                                   .ToArray();
+        Debug.Log($"오름차순 정렬 완료: {string.Join(", ", sortedPlayers)}");
+    }
 }
