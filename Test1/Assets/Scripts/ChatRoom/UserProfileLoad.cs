@@ -117,7 +117,10 @@ public class UserProfileLoad : MonoBehaviourPun
 
         Debug.Log($"플레이어 리스트 동기화됨.");
 
+        //if (SceneManager.GetActiveScene().name == "MakeRoom")
+        //{
         UpdatePlayerViewUI();
+        //}
     }
 
     void UpdatePlayerViewUI() // 접속자 프로필 활성화
@@ -137,8 +140,6 @@ public class UserProfileLoad : MonoBehaviourPun
                 InRoomUserList[0].SetActive(true); // 프로필을 활성화
                 InRoomUserName[0].text = player.displayName; //이름 텍스트 표시
                 InRoomUserImg[0].sprite = profileImages[player.imgIndex]; // 이미지 표시
-                //Debug.Log($"Display Name: {player.displayName}, Img Index: {player.imgIndex}, Actor Number: {player.myActNum}");
-                //Debug.Log("방장 정보 업데이트 완료");
                 continue;
             }
             else //방장이 아니면
@@ -146,8 +147,6 @@ public class UserProfileLoad : MonoBehaviourPun
                 InRoomUserList[myIndex].SetActive(true); // 플레이어의 프로필 활성화
                 InRoomUserName[myIndex].text = player.displayName;  // 플레이어의 이름 텍스트 표시
                 InRoomUserImg[myIndex].sprite = profileImages[player.imgIndex]; // 플레이어의 이미지 표시
-                //Debug.Log($"Display Name: {player.displayName}, Img Index: {player.imgIndex}, Actor Number: {player.myActNum}");
-                //Debug.Log("다른 유저 정보 업데이트 완료");
                 myIndex++;
             }
 

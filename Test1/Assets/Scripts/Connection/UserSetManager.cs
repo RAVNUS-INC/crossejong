@@ -295,7 +295,6 @@ public class UserSetManager : MonoBehaviourPunCallbacks
 
     public override void OnConnectedToMaster() //마스터 서버 접속 되면
     {
-        base.OnConnectedToMaster();
         Debug.Log("마스터 서버 접속 성공");
 
         //나의 이름을 포톤에 설정
@@ -306,13 +305,7 @@ public class UserSetManager : MonoBehaviourPunCallbacks
     }
     public override void OnJoinedLobby() //Lobby 진입에 성공했으면 호출되는 함수
     {
-        base.OnJoinedLobby();
-
-        //메인 씬으로 이동
-        PhotonNetwork.LoadLevel("Main");
-
-        print("로비 진입 성공");
-
+        Debug.Log("로비 진입 성공");
     }
     public void OnClickConnect() // 마스터 서버 접속 요청(OkBtn에 연결)
     {

@@ -384,10 +384,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     public override void OnCreatedRoom() // 规 积己俊 己傍沁阑 锭
     {
-        //base.OnCreatedRoom();
-
         UnityEngine.Debug.Log("规 积己 己傍");
-        PhotonNetwork.LoadLevel("MakeRoom");
     }
 
     public override void OnCreateRoomFailed(short returnCode, string message) //规 积己俊 角菩沁阑 锭

@@ -305,6 +305,9 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             // 본인의 정보 삭제 요청을 방장에게 전달
             UserProfileLoad.photonView.RPC("RequestRemoveUserInfo", RpcTarget.MasterClient, myActorNum);
 
+            //로딩바 ui 애니메이션 보여주기
+            LoadingSceneController.Instance.LoadScene("Main");
+
             //나가기
             PhotonNetwork.LeaveRoom();
         }
@@ -313,9 +316,6 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     public override void OnLeftRoom() // 방을 성공적으로 나갔을 때 호출되는 콜백
     {
         Debug.Log("방을 성공적으로 퇴장했습니다.");
-
-        //로딩바 ui 애니메이션 보여주기
-        LoadingSceneController.Instance.LoadScene("Main");
     }
 
     public void SendMyMessage() // 메시지 전송 (채팅전송 버튼에 연결)
@@ -378,6 +378,9 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         //방장인 경우에만 아래의 코드를 수행
         if (!PhotonNetwork.IsMasterClient) return;
 
+        // 방 목록이 외부에서 보이지 않도록 하기 - 이미 게임이 시작된 방이므로
+        PhotonNetwork.CurrentRoom.IsVisible = false; // 방 목록에서 숨김
+
         //플레이어들 중 한 명이라도 준비하지 않았다면 종료
         foreach (Player player in PhotonNetwork.PlayerList)
         {
@@ -391,8 +394,6 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     [PunRPC]
     void ChangeScene(string sceneName) //모든 유저가 준비하면 플레이룸으로 이동
     {
-        PhotonNetwork.LoadLevel(sceneName);
-
         //로딩바 ui 애니메이션 보여주기
         LoadingSceneController.Instance.LoadScene($"{sceneName}");
     }
