@@ -109,6 +109,8 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             // UI 갱신 (저장 메시지 출력)
             Savetext.text = "저장되었습니다.";
         });
+
+        PhotonNetwork.AutomaticallySyncScene = true; // 씬 자동 동기화 활성화
     }
 
     public void LoadRoomInfo() //현재 방 정보 불러오기(customProperties로부터)
@@ -387,8 +389,11 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             if (!playerReadyStates.ContainsKey(player.ActorNumber) || !playerReadyStates[player.ActorNumber])
                 return;
         }
+
         //플레이룸 씬으로 이동(현재 방에서 준비버튼을 누른 모든 플레이어에 한하여)
         photonView.RPC("ChangeScene", RpcTarget.All, "PlayRoom");
+
+        //PhotonNetwork.LoadLevel("PlayRoom");
     }
 
     [PunRPC]

@@ -184,10 +184,9 @@ public class FieldCard : MonoBehaviourPun
 
         // 카드내기완료 버튼을 누르면 -> 현재 카드의 좌표와 이름을 RPC 함수로 전달(나를 제외한 모두에게)
         photonView.RPC("SyncCardInfo", RpcTarget.Others, ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY, ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY].transform.name);
+        
         // 단어 입력 중 상태메시지 전달
         ObjectManager.instance.ShowCardSelectingMessage(false);
-        //Debug.Log($"놓인 카드의 x좌표: {ObjectManager.instance.cardIndexX}");
-        //Debug.Log($"놓인 카드의 y좌표: {ObjectManager.instance.cardIndexY}");
     }
 
 

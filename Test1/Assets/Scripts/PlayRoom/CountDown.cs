@@ -13,6 +13,7 @@ public class Countdown : MonoBehaviourPun
     public Button startGameButton; //게임 시작버튼
     public FieldCard fieldCard;
     public TurnManager turnMananger;
+    public TurnChange turnChange;
 
     private void Start()
     {
@@ -66,11 +67,16 @@ public class Countdown : MonoBehaviourPun
             photonView.RPC("FirstFieldCompleted", RpcTarget.All);
         }
 
-        // 첫사람(방장)부터 30초 타이머 시작
+        // 첫사람(방장)부터 타이머 시작
         if (PhotonNetwork.IsMasterClient)
         {
+            // 각자 모두 현재 카드 개수 세기 요청
+            photonView.RPC("LetsCardCount", RpcTarget.All);
+
+            // 방장부터 첫 카운트 다운 시작
             turnMananger.AfterCountdown();
         }
+
     }
 
     [PunRPC]
@@ -87,4 +93,9 @@ public class Countdown : MonoBehaviourPun
         userCard.SelectedUserCard();
     }
 
+    [PunRPC]
+    private void LetsCardCount() // 자신의 카드 개수 업데이트
+    {
+        turnChange.TurnEnd(); 
+    }
 }

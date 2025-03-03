@@ -74,6 +74,16 @@ MonoBehaviour:
   - AfterCountdown
   - UpdateTimerRPC
   - RequestNextPlayer
+  - LeftUserActive
+  - UpdatePlayerListNotUI
+  - LetsCardCount
+  - SyncAllCardCount
+  - ShowResultPanel
+  - ShowEndGameMsg
+  - ShowResultPopup
+  - StopTurnCoroutine
+  - UpdatePlayerInfo
+  - UpdateResultData
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

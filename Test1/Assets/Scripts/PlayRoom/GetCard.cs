@@ -15,6 +15,7 @@ public class GetCard : MonoBehaviourPun
     public UserCard userCard;
     public CardDrag cardDrag;
     public Button getCardButton;
+    public TurnChange turnChange; // 카드 개수 업데이트를 위해 사용
 
     public void GetCardToUserCard()
     {
@@ -59,5 +60,8 @@ public class GetCard : MonoBehaviourPun
         {
             getCardButton.interactable = false;
         }
+
+        // 카드 개수 UI 업데이트 요청
+        turnChange.TurnEnd();
     }
 }

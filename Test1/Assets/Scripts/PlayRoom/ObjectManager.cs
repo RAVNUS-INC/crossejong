@@ -44,6 +44,7 @@ public class ObjectManager : MonoBehaviourPun
     public List<string> cardFrontBlack; //난이도에 따라 내용이 달라짐
     public List<string> cardFrontSpecial = new List<string> { "C", "B" };
     public List<string> usedIndices = new List<string>();
+    public bool IsFirstTurn = true; // 첫 시작을 알리는 bool 변수
 
     private void Start()
     {
@@ -103,8 +104,8 @@ public class ObjectManager : MonoBehaviourPun
         else
         {
             ObjectManager.instance.StatusMsg.text = $"{name}님이 단어를 입력 중..";
-        }
-        
+        }  
     }
+
 
 }

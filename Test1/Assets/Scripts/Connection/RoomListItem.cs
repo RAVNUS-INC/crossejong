@@ -40,7 +40,7 @@ public class RoomListItem : MonoBehaviour
         if (onDelegate != null)
         {
             onDelegate(name);
-            Debug.Log("onDelegate executed for room: " + name);
+            //Debug.Log("onDelegate executed for room: " + name);
         }
     }
 }

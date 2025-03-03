@@ -42,6 +42,8 @@ public class UserProfileLoad : MonoBehaviourPun
 
     void Awake() 
     {
+        SetActive(); // 리스트 표시 비활성화
+
         mydisplayname = PlayerPrefs.GetString(DISPLAYNAME_KEY, "Guest"); //유저이름 불러와 mydisplayname 변수에 저장
         myimgindex = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0);  //유저 이미지인덱스 불러와 myimgindex 변수에 저장
         myActNum = PhotonNetwork.LocalPlayer.ActorNumber; //액터넘버 저장
@@ -51,7 +53,6 @@ public class UserProfileLoad : MonoBehaviourPun
     {
         // 본인의 정보 추가를 방장에게 전달
         photonView.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, mydisplayname, myimgindex, myActNum);
-
     }
 
     // players 리스트를 외부에서 접근할 수 있도록 메서드 제공
@@ -82,8 +83,25 @@ public class UserProfileLoad : MonoBehaviourPun
         players.RemoveAll(p => p.myActNum == userNum);
         Debug.Log($"플레이어 {userNum}가 리스트에서 제거됨.");
 
-        // 모든 유저에게 동기화 요청
-        SyncPlayerList();
+        // 만약 플레이방에서 누군가 퇴장했을 때 - UI의 변화는 제외해야 함
+        if (SceneManager.GetActiveScene().name == "PlayRoom")
+        {
+            if (!PhotonNetwork.IsMasterClient) return;
+
+            // actnum 리스트 재정렬
+            OrderedPlayers();
+
+            photonView.RPC("UpdatePlayerListNotUI", RpcTarget.AllBuffered,
+                players.Select(p => p.displayName).ToArray(),
+                players.Select(p => p.imgIndex).ToArray(),
+                players.Select(p => p.myActNum).ToArray(),
+                sortedPlayers);
+        }
+        else
+        {
+            // 모든 유저에게 동기화 요청
+            SyncPlayerList();
+        }
     }
 
     void SyncPlayerList() // 방장만 실행->모두에게 리스트 ui업뎃 요청
@@ -117,10 +135,26 @@ public class UserProfileLoad : MonoBehaviourPun
 
         Debug.Log($"플레이어 리스트 동기화됨.");
 
-        //if (SceneManager.GetActiveScene().name == "MakeRoom")
-        //{
         UpdatePlayerViewUI();
-        //}
+    }
+
+    [PunRPC]
+    void UpdatePlayerListNotUI(string[] names, int[] imgIndexes, int[] actNums, int[] playerList)
+    {
+        players.Clear(); //처음엔 초기화
+        players = names.Select((t, i) => new Player(t, imgIndexes[i], actNums[i])).ToList();
+
+        //actnum 오름차순 리스트를 모두가 갱신받음
+        sortedPlayers = playerList;
+
+        // 유저들 이름 리스트를 모두가 갱신받음
+        userNameList = names;
+
+        // 유저들 사진 리스트를 모두가 갱신받음
+        userImageList = imgIndexes;
+
+        Debug.Log($"플레이어 리스트 동기화됨.");
+
     }
 
     void UpdatePlayerViewUI() // 접속자 프로필 활성화
@@ -160,12 +194,14 @@ public class UserProfileLoad : MonoBehaviourPun
         public string displayName;
         public int imgIndex;
         public int myActNum;
+        public int completeCount;   // 단어 완성 횟수 (추가된 필드)
 
         public Player(string displayName, int imgIndex, int myActNum)
         {
             this.displayName = displayName;
             this.imgIndex = imgIndex;
             this.myActNum = myActNum;
+            this.completeCount = -1;  // 기본값 -1로 초기화
         }
     }
 

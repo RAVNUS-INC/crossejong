@@ -6,11 +6,17 @@ using Unity.Collections.LowLevel.Unsafe;
 using TMPro;
 using JetBrains.Annotations;
 using System;
+using Photon.Pun;
+using UnityEditor;
+using Unity.VisualScripting;
 
 public class TurnChange : MonoBehaviour
 {
     public UserCard userCard;
-    public TMP_Text userCardCount; // TextMeshPro 사용
+    public TurnManager turnManager; // 자신의 인덱스 번호 알기 위해 사용
+    public GameResult gameResult; // 결과 판넬 활성화를 위해 사용
+
+    public int userCardCount; // 본인의 카드 개수
     public TMP_InputField cardInputField;
     public string wordInput;
     public bool isContinue;
@@ -18,9 +24,6 @@ public class TurnChange : MonoBehaviour
 
     public List<char> charList = new List<char>
     {'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'};
-
-
-
 
 
     public void IsCreateWord()
@@ -93,13 +96,39 @@ public class TurnChange : MonoBehaviour
     {
         ObjectManager.instance.dropCount = 0;
 
+        // 자신의 UI 인덱스 확인 및 업데이트
+        turnManager.FindMyIndex();
+
         CountUserCard(userCard.displayedCards.Count);
     }
 
-    public void CountUserCard(int count)
+    public void CountUserCard(int count) //자신의 카드 개수 업데이트
     {
-        userCardCount.text = count.ToString(); // TMP_Text로 설정
-    }
+        userCardCount = count; // 변수에 개수 저장
 
+        Debug.Log($"내 카드 개수: {userCardCount}");
+        Debug.Log($"내 인덱스: {turnManager.MyIndexNum}");
+
+        // 모두에게 자신의 카드 개수 전달 요청하기 - 자신의 카드개수, 자신의 인덱스 번호
+        turnManager.photonView.RPC("SyncAllCardCount", RpcTarget.All, userCardCount, turnManager.MyIndexNum);
+
+        if (userCardCount == 0) // 카드를 다 소진했을 때 - 카드 개수가 현재 0개이면
+        {
+            // 놀이가 종료되었음을 알리는 메시지 1초 정도 표시 후 결과 창 띄우기
+            gameResult.EndGameDelay();
+        }
+        else if ((userCardCount > 0) && (ObjectManager.instance.IsFirstTurn)) // 카드는 남아있고 지금이 첫 턴에서의 함수 호출이라면
+        {
+            // 턴 넘기기 방지를 위한 변수를 이제는 false로 변경
+            ObjectManager.instance.IsFirstTurn = false;
+
+            return; // 턴을 넘기지 않음
+        }
+        else // 첫 턴이 아닌 재호출이라면 턴을 넘김
+        {
+            turnManager.FindNextPlayer();
+        }
+
+    }
 
 }
