@@ -19,6 +19,9 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     public ChatManager chatManager;
     public ChangeLevel Changelevel;
 
+    // 인스펙터에서 PhotonView를 할당
+    public PhotonView PV;
+
     // 방 이름, 현재인원/최대인원, 난이도, 제한시간, 저장완료메시지
     public TMP_Text txtRoomName, txtPlayerCount, txtDifficulty, txtTimelimit, Savetext;
     // 난이도, 제한시간 버튼 배열
@@ -44,15 +47,35 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     public TMP_InputField ChatField; //채팅입력창
     public Button ReadyBtn; //준비버튼
 
-
-
     void Awake()
     {
+        //내 정보 Playerprefs에서 불러오기
+        myDisplayName = PlayerPrefs.GetString(DISPLAYNAME_KEY, "Guest"); //이름
+        myImgIndex = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0); //이미지 인덱스
+        myActorNum = PhotonNetwork.LocalPlayer.ActorNumber; //액터넘버
+
+        // 씬이 완전히 로드된 후에 메시지 큐 재개
+        StartCoroutine(EnableMessageQueue());
+    }
+
+    private IEnumerator EnableMessageQueue()
+    {
+
+        // 씬 로딩 후 딜레이를 추가하여 메시지 큐 재개
+        yield return new WaitForSeconds(0.1f); // 씬 로딩 딜레이
+
+        PhotonNetwork.IsMessageQueueRunning = true;
+
+        Debug.Log("메시지 큐 재개 완료");
+
         // property에 있는 방 정보 불러와 변수에 저장(방이름도 저장)
         LoadRoomInfo();
 
         // 현재 인원 업데이트
         PlayersUpdate();
+
+        //나의 입장 알리기
+        PV.RPC("EnterState", RpcTarget.All, myDisplayName, true);
 
         // 난이도, 제한시간 text 업데이트
         txtDifficulty.text = selectedDifficulty; //ex. 초급
@@ -60,17 +83,13 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         ChatField.text = ""; //채팅입력창은 항상 비워놓기
         ReadyBtn.interactable = true; // 처음에는 준비버튼 활성화
 
-        //내 정보 Playerprefs에서 불러오기
-        myDisplayName = PlayerPrefs.GetString(DISPLAYNAME_KEY, "Guest"); //이름
-        myImgIndex = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0); //이미지 인덱스
-        myActorNum = PhotonNetwork.LocalPlayer.ActorNumber; //액터넘버
+        // 본인의 정보 추가를 방장에게 전달 - userProfileLoad 내 함수 실행
+        UserProfileLoad.PV.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, myDisplayName, myImgIndex, myActorNum);
+
     }
 
     private void Start()
     {
-        //나의 입장 알리기
-        photonView.RPC("EnterState", RpcTarget.All, myDisplayName, true);
-
         // 방장 여부에 따른 버튼 처리
         RoomSetBtn.interactable = PhotonNetwork.IsMasterClient;
 
@@ -110,12 +129,11 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             Savetext.text = "저장되었습니다.";
         });
 
-        PhotonNetwork.AutomaticallySyncScene = true; // 씬 자동 동기화 활성화
     }
 
     public void LoadRoomInfo() //현재 방 정보 불러오기(customProperties로부터)
     {
-        if (PhotonNetwork.InRoom)
+        if ((PhotonNetwork.InRoom) && (PhotonNetwork.IsMessageQueueRunning))
         {
             Room room = PhotonNetwork.CurrentRoom;
             selectedDifficultyIndex = (int)room.CustomProperties["DifficultyIndex"]; //난이도 인덱스를 불러오기
@@ -148,7 +166,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     }
     private void PlayersUpdate()  //현재인원과 최대인원 텍스트 정보 업데이트
     {
-        if (PhotonNetwork.InRoom)
+        if ((PhotonNetwork.InRoom) && (PhotonNetwork.IsMessageQueueRunning))
         {
             Room room = PhotonNetwork.CurrentRoom;
             // 현재 인원 / 최대 인원
@@ -302,10 +320,10 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         if (PhotonNetwork.InRoom)
         {
             //나의 퇴장을 모두에게 알리기
-            photonView.RPC("EnterState", RpcTarget.All, myDisplayName, false);
+            PV.RPC("EnterState", RpcTarget.All, myDisplayName, false);
 
             // 본인의 정보 삭제 요청을 방장에게 전달
-            UserProfileLoad.photonView.RPC("RequestRemoveUserInfo", RpcTarget.MasterClient, myActorNum);
+            UserProfileLoad.PV.RPC("RequestRemoveUserInfo", RpcTarget.MasterClient, myActorNum);
 
             //로딩바 ui 애니메이션 보여주기
             LoadingSceneController.Instance.LoadScene("Main");
@@ -328,7 +346,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             myMesseages = ChatField.text;
 
             //나를 제외한 다른 유저들에게 내 채팅 전달
-            photonView.RPC("SendChat", RpcTarget.Others, false, myMesseages, myDisplayName, myImgIndex);
+            PV.RPC("SendChat", RpcTarget.Others, false, myMesseages, myDisplayName, myImgIndex);
             Debug.Log($"내 채팅과 정보를 다른 유저에게 전달했습니다");
 
             //내 채팅에 내 메시지 업데이트
@@ -351,7 +369,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         ReadyBtn.interactable = false; // 버튼 한번 눌렀으면 다음부턴 비활성화(준비 취소 불가능)
 
         //방장에게만 나의 준비 상태 전달
-        photonView.RPC("IsReady", RpcTarget.MasterClient, myDisplayName, myActorNum);
+        PV.RPC("IsReady", RpcTarget.MasterClient, myDisplayName, myActorNum);
         Debug.Log("방장에게 준비 완료 상태를 알렸습니다.");
 
     }
@@ -391,7 +409,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         }
 
         //플레이룸 씬으로 이동(현재 방에서 준비버튼을 누른 모든 플레이어에 한하여)
-        photonView.RPC("ChangeScene", RpcTarget.All, "PlayRoom");
+        PV.RPC("ChangeScene", RpcTarget.All, "PlayRoom");
 
         //PhotonNetwork.LoadLevel("PlayRoom");
     }

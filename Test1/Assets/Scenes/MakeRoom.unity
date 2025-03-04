@@ -3292,7 +3292,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 924.5878, y: -209.13654}
+  m_AnchoredPosition: {x: 924.5878, y: -209.1366}
   m_SizeDelta: {x: 205.4437, y: 129.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &653006050
@@ -4426,6 +4426,7 @@ MonoBehaviour:
   cardFrontBlack: []
   cardFrontSpecial: []
   usedIndices: []
+  IsFirstTurn: 1
 --- !u!4 &854792642
 Transform:
   m_ObjectHideFlags: 0
@@ -7968,7 +7969,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 441.71002, y: -209.13654}
+  m_AnchoredPosition: {x: 441.71002, y: -209.1366}
   m_SizeDelta: {x: 760.32, y: 129.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1480903754
@@ -9176,6 +9177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82efdbc7f3bdddb4dbea920dfcb83238, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PV: {fileID: 1800025133}
   InRoomUserList:
   - {fileID: 214884618}
   - {fileID: 120885189}
@@ -9976,6 +9978,7 @@ MonoBehaviour:
   UserProfileLoad: {fileID: 1800025131}
   chatManager: {fileID: 1457311509}
   Changelevel: {fileID: 855866992}
+  PV: {fileID: 2046631744}
   txtRoomName: {fileID: 1625940823}
   txtPlayerCount: {fileID: 1014899361}
   txtDifficulty: {fileID: 86584025}

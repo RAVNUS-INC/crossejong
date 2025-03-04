@@ -10,6 +10,8 @@ using Photon.Realtime;
 using static UserProfileLoad;
 using PlayFab.ClientModels;
 using Unity.VisualScripting;
+using UnityEngine.UIElements;
+using Image = UnityEngine.UI.Image;
 
 public class TurnManager : MonoBehaviourPunCallbacks
 {
@@ -26,6 +28,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
     public bool IsMyTurn = false; // 현재 턴인지 아닌지 확인
     public TMP_Text[] CardCount, InTurnCardCount; // 턴에 없을 때와 있을 때의 카드 개수 표시 텍스트 배열
     private int MyCompleteWordCount = 0; // 나의 단어 완성 횟수 변수
+    private float remainingTime = 0f;
     Coroutine TurnRoutine;
 
     private void Start()
@@ -33,16 +36,6 @@ public class TurnManager : MonoBehaviourPunCallbacks
         // 현재 내 액터넘버 찾기
         MyNum = PhotonNetwork.LocalPlayer.ActorNumber;
     }
-
-    //// 게임의 시작을 알리는 코루틴 시작 - 카드 개수가 0이 될때까지 수행
-    //public void StartOneCardTime()
-    //{
-    //    // 첫 번째 플레이어로 돌아올 때, 코루틴을 다시 시작
-    //    if (OneCardRoutine == null)
-    //    {
-    //        OneCardRoutine = StartCoroutine(StartCardTimer()); // 새 코루틴 시작
-    //    }
-    //}
 
     // 카운트다운 3 2 1 후 실행
     public void AfterCountdown()
@@ -105,7 +98,13 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
     IEnumerator StartTimer()
     {
-        float remainingTime = 15f;
+        // 방의 커스텀 속성에서 "timeLimit" 값을 가져오기
+        if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("timeLimit"))
+        {
+            // "timeLimit" 값을 가져와서 사용할 수 있습니다.
+            int timeLimit = (int)PhotonNetwork.CurrentRoom.CustomProperties["timeLimit"];
+            remainingTime = Convert.ToSingle(timeLimit);
+        }
 
         while (remainingTime > 0)
         {
@@ -116,7 +115,6 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
             yield return new WaitForSeconds(1f); // 1초 대기
         }
-
         OnTimerEnd();
     }
 
@@ -317,10 +315,6 @@ public class TurnManager : MonoBehaviourPunCallbacks
     {
         gameResult.EndMsg.gameObject.SetActive(false); // 게임 종료 메시지 비활성화
         gameResult.GameResultPopup.gameObject.SetActive(true); // 게임 종료 팝업 활성화
-
-        //userProfileLoad.players.Clear(); // 플레이어 클래스 초기화
-
-        //gameResult.MainCheckTime(); // 메인으로 돌아가기까지 자동 타이머 시작
     }
 
     [PunRPC]

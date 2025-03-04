@@ -4959,8 +4959,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 617193424}
-  - component: {fileID: 617193425}
   - component: {fileID: 617193426}
+  - component: {fileID: 617193425}
   m_Layer: 0
   m_Name: UserProfileLoad
   m_TagString: Untagged
@@ -4995,6 +4995,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82efdbc7f3bdddb4dbea920dfcb83238, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PV: {fileID: 617193426}
   InRoomUserList:
   - {fileID: 1545882905}
   - {fileID: 1312959752}
@@ -12076,9 +12077,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1605772705}
-  - {fileID: 1730203027}
-  - {fileID: 1284291087}
   - {fileID: 536188793}
   - {fileID: 1232462180}
   - {fileID: 1394609111}
@@ -12093,6 +12091,9 @@ RectTransform:
   - {fileID: 1410803510}
   - {fileID: 1527308450}
   - {fileID: 1602898647}
+  - {fileID: 1730203027}
+  - {fileID: 1605772705}
+  - {fileID: 1284291087}
   m_Father: {fileID: 219311435}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

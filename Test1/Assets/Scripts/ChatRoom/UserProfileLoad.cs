@@ -22,6 +22,9 @@ using TMPro;
 // UI관련 RPC
 public class UserProfileLoad : MonoBehaviourPun
 {
+    // 인스펙터에서 PhotonView를 할당
+    public PhotonView PV;
+
     public GameObject[] InRoomUserList; // 현재 방에 접속한 유저들의 리스트
     public Image[] InRoomUserImg; // 현재 방에 접속한 유저들의 프로필사진
     public TMP_Text[] InRoomUserName; // 현재 방에 접속한 유저들의 닉네임
@@ -47,12 +50,17 @@ public class UserProfileLoad : MonoBehaviourPun
         mydisplayname = PlayerPrefs.GetString(DISPLAYNAME_KEY, "Guest"); //유저이름 불러와 mydisplayname 변수에 저장
         myimgindex = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0);  //유저 이미지인덱스 불러와 myimgindex 변수에 저장
         myActNum = PhotonNetwork.LocalPlayer.ActorNumber; //액터넘버 저장
+
     }
 
-    void Start()
+    private void Start()
     {
-        // 본인의 정보 추가를 방장에게 전달
-        photonView.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, mydisplayname, myimgindex, myActNum);
+        // 현재 씬 이름이 "PlayRoom"인지 확인
+        if (SceneManager.GetActiveScene().name == "PlayRoom")
+        {
+            // 본인의 정보 추가를 방장에게 전달 - userProfileLoad 내 함수 실행
+            PV.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, mydisplayname, myimgindex, myActNum);
+        }
     }
 
     // players 리스트를 외부에서 접근할 수 있도록 메서드 제공
@@ -91,7 +99,7 @@ public class UserProfileLoad : MonoBehaviourPun
             // actnum 리스트 재정렬
             OrderedPlayers();
 
-            photonView.RPC("UpdatePlayerListNotUI", RpcTarget.AllBuffered,
+            PV.RPC("UpdatePlayerListNotUI", RpcTarget.AllBuffered,
                 players.Select(p => p.displayName).ToArray(),
                 players.Select(p => p.imgIndex).ToArray(),
                 players.Select(p => p.myActNum).ToArray(),
@@ -111,7 +119,7 @@ public class UserProfileLoad : MonoBehaviourPun
         // actnum 리스트 재정렬
         OrderedPlayers();
 
-        photonView.RPC("UpdatePlayerList", RpcTarget.AllBuffered,
+        PV.RPC("UpdatePlayerList", RpcTarget.All,
             players.Select(p => p.displayName).ToArray(),
             players.Select(p => p.imgIndex).ToArray(),
             players.Select(p => p.myActNum).ToArray(),

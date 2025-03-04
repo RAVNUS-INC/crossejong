@@ -15,6 +15,7 @@ using UnityEngine.UIElements;
 //using static UnityEditor.Progress;
 using static UnityEngine.EventSystems.PointerEventData;
 using Button = UnityEngine.UI.Button;
+using Debug = UnityEngine.Debug;
 using Image = UnityEngine.UI.Image;
 
 //방 생성 및 방 참여에 관한 코드
@@ -397,10 +398,19 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         if (!string.IsNullOrEmpty(selectedRoomName)) //방이름이 뭐라도 있으면
         {
-            PhotonNetwork.JoinRoom(selectedRoomName);
+            PhotonNetwork.JoinRoom(selectedRoomName);    
         }
         //로딩바 ui 애니메이션 보여주기
         LoadingSceneController.Instance.LoadScene("MakeRoom");
+
+    }
+
+    public override void OnJoinedRoom() // 방에 입장했을 때 자동 호출
+    {
+        Debug.Log("방 입장 성공!");
+
+        // 메시지 큐 정지
+        PhotonNetwork.IsMessageQueueRunning = false;
     }
 
     public override void OnJoinRoomFailed(short returnCode, string message) // 방 입장에 실패했을 때
