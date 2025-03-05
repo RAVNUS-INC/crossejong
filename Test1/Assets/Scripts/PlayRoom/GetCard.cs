@@ -17,6 +17,11 @@ public class GetCard : MonoBehaviourPun
     public Button getCardButton;
     public TurnChange turnChange; // 카드 개수 업데이트를 위해 사용
 
+    public void Start()
+    {
+        // 처음엔 카드 추가 버튼 비활성화 - 자신의 턴이 오면 바로 활성화
+        getCardButton.interactable = false;
+    }
     public void GetCardToUserCard()
     {
         int Mynum = PhotonNetwork.LocalPlayer.ActorNumber;

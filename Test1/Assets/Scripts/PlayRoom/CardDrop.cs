@@ -1,5 +1,8 @@
 using ExitGames.Client.Photon.StructWrapping;
+using Photon.Pun;
+using Photon.Realtime;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -7,7 +10,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 // CardDrop 클래스는 드래그 가능한 카드가 드롭될 수 있는 슬롯을 관리하는 스크립트
-public class CardDrop : MonoBehaviour, IDropHandler
+public class CardDrop : MonoBehaviourPun, IDropHandler
 {
     public CardDrag cardDrag;
     public UserCard userCard;
@@ -40,6 +43,7 @@ public class CardDrop : MonoBehaviour, IDropHandler
 
     public void OnDrop(PointerEventData eventData)
     {
+
         GameObject card = ObjectManager.instance.moveCardObejct;
 
         if (card != null && !HasCard() && IsColorWhite())
@@ -69,9 +73,26 @@ public class CardDrop : MonoBehaviour, IDropHandler
 
             ObjectManager.instance.createdWord = card.name;
 
-            fieldCard.OnOffDropAreas();
+            // 카드 놓인 그리드 위치 파악
+            for (int x = 0; x < ObjectManager.instance.gridCount; x++)
+            {
+                for (int y = 0; y < ObjectManager.instance.gridCount; y++)
+                {
+                    if (ObjectManager.instance.createdWord == ObjectManager.instance.grid[x, y].transform.name)
+                    {
+                        ObjectManager.instance.cardIndexX = x;
+                        ObjectManager.instance.cardIndexY = y;
+                    }
+                }
+            }
+
+            ObjectManager.instance.IsCardDrop = true;
+
+            fieldCard.OnOffDropAreas(); // 여기에서 다른 모두가 놓은 카드를 그리드에 실시간으로 업데이트
 
             ObjectManager.instance.dropCount += 1;
+
+            // 위 과정을 유저가 카드를 놓았을 때 모두가 수행하도록 요청하면 되지 않을까?
         }
     }
 }

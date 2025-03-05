@@ -19,13 +19,14 @@ public class TurnManager : MonoBehaviourPunCallbacks
     public GetCard getCard; // 카드 한 장 먹을 때 참조 사용
     public GameResult gameResult; // 판넬 띄울 때 사용
     public TurnChange turnChange; // 카드 개수 위해 사용
+    public UserCard userCard; // 턴이 아닐 때 카드 객체 선택 방지를 위해 사용
+    public UserCardFullPopup userCardFullPopup; // 턴이 아닐 때 카드 객체 선택 방지를 위해 사용
 
     public GameObject[] InTurnUserList; // 턴에 있는 상태의 유저 이미지 배열
     public Image[] InTurnUserImg; // 턴에 있는 유저들의 프로필사진
     public TMP_Text[] InTurnUserName, timerText; // 턴에 있는 유저들의 닉네임, 남은 시간을 보여주는 텍스트
     public Color overlayColor = new Color(0, 0, 0, 0.3f); // 검정색 그림자
     public int MyNum, NextPlayerNum, MyIndexNum; // 다음 플레이어의 액터넘버, 내 UI 인덱스 번호
-    public bool IsMyTurn = false; // 현재 턴인지 아닌지 확인
     public TMP_Text[] CardCount, InTurnCardCount; // 턴에 없을 때와 있을 때의 카드 개수 표시 텍스트 배열
     private int MyCompleteWordCount = 0; // 나의 단어 완성 횟수 변수
     private float remainingTime = 0f;
@@ -40,7 +41,20 @@ public class TurnManager : MonoBehaviourPunCallbacks
     // 카운트다운 3 2 1 후 실행
     public void AfterCountdown()
     {
-        IsMyTurn = true;
+        // 현재 내 턴
+        ObjectManager.instance.IsMyTurn = true;
+
+        // 내 카드들의 선택을 활성화
+        userCard.DeActivateCard(userCard.displayedCards);
+
+        // 내 카드들의 선택을 활성화 - 팝업
+        userCard.DeActivateCard(userCardFullPopup.fullDisplayedCards);
+
+        // 카드 추가 버튼 클릭 방지
+        getCard.getCardButton.interactable = true;
+
+        //카드 내기 완료 버튼을 활성화
+        ObjectManager.instance.CardDropBtn.interactable = true;
 
         photonView.RPC("CurrentTurnUI", RpcTarget.All, MyNum);
 
@@ -127,8 +141,6 @@ public class TurnManager : MonoBehaviourPunCallbacks
         }
         TurnRoutine = null;
 
-        IsMyTurn = false;
-
         Debug.Log("시간 초과! 턴을 넘깁니다.");
 
         // 카드 한 장 먹고 ui 업데이트
@@ -140,6 +152,21 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
     public void FindNextPlayer() // 다음 플레이어의 넘버 찾기(마지막 플레이어일 경우 0번 인덱스로 순환)
     {
+
+        ObjectManager.instance.IsMyTurn = false; // 내 턴이 아님
+
+        // 내 카드들의 선택을 비활성화
+        userCard.DeActivateCard(userCard.displayedCards);
+
+        // 내 카드들의 선택을 비활성화 - 팝업
+        userCard.DeActivateCard(userCardFullPopup.fullDisplayedCards);
+
+        // 카드 추가 버튼 클릭 방지
+        getCard.getCardButton.interactable = false;
+
+        //카드 내기 완료 버튼을 비활성화
+        ObjectManager.instance.CardDropBtn.interactable = false;
+
         // 플레이어 목록에서 현재 플레이어의 인덱스를 찾음
         MyIndexNum = Array.IndexOf(userProfileLoad.sortedPlayers, MyNum);
 
@@ -171,15 +198,13 @@ public class TurnManager : MonoBehaviourPunCallbacks
     // 낼 카드가 없어, 카드를 한 장 먹기로 결정 했을 때(카드 추가 버튼에 리스너 연결)
     public void GoToNextTurnAndAddCard()
     {
-        if (IsMyTurn) //현재 내 턴일 때
+        if (ObjectManager.instance.IsMyTurn) //현재 내 턴일 때
         {
             if (TurnRoutine != null)
             {
                 StopCoroutine(TurnRoutine); // 현재 코루틴 중지
             }
             TurnRoutine = null;
-
-            IsMyTurn = false; // 턴 상태 비활성화
 
             Debug.Log("카드를 추가하고 턴을 넘깁니다.");
 
@@ -192,15 +217,13 @@ public class TurnManager : MonoBehaviourPunCallbacks
     // 현재 카드 개수가 1장 미만인지 계속 검사 - 맞으면 모두에게 판넬 띄우기 요청
     public void TossNextTurn()
     {
-        if (IsMyTurn) //현재 내 턴일 때
+        if (ObjectManager.instance.IsMyTurn) //현재 내 턴일 때
         {
             if (TurnRoutine != null)
             {
                 StopCoroutine(TurnRoutine); // 현재 코루틴 중지
             }
             TurnRoutine = null;
-
-            IsMyTurn = false; // 턴 상태 비활성화
 
             Debug.Log("단어 완성 성공! 턴을 넘깁니다.");
 
@@ -218,7 +241,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
         {
             // 나갈때 내가 현재 턴이라면?
             // 현재 작동하던 코루틴을 멈추고 다음사람에게 턴 넘기기
-            if (IsMyTurn) //현재 내 턴일 때
+            if (ObjectManager.instance.IsMyTurn) //현재 내 턴일 때
             {
                 if (TurnRoutine != null)
                 {
@@ -264,7 +287,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
         // 만약 현재 방에 있는 플레이어가 2명 미만이라면 - 결과는 정해짐
         if (userProfileLoad.sortedPlayers.Length < 2)
         {
-            if (IsMyTurn) //현재 내 턴일 때
+            if (ObjectManager.instance.IsMyTurn) //현재 내 턴일 때
             {
                 if (TurnRoutine != null)
                 {
@@ -331,7 +354,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
     [PunRPC]
     public void StopTurnCoroutine() // 모두에게 보내되, 현재 턴인 사람이라면 코루틴 종료하기
     {
-        if (IsMyTurn) //현재 본인 턴일 때
+        if (ObjectManager.instance.IsMyTurn) //현재 본인 턴일 때
         {
             if (TurnRoutine != null)
             {
@@ -339,7 +362,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
             }
             TurnRoutine = null;
 
-            IsMyTurn = false; // 턴 상태 비활성화
+            ObjectManager.instance.IsMyTurn = false; // 턴 상태 비활성화
         }
     }
 

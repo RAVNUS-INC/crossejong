@@ -82,14 +82,12 @@ public class Countdown : MonoBehaviourPun
     [PunRPC]
     private void FirstUserCompleted()
     {
-        //Debug.Log("FirstUserCompleted 완료, 다음 진행");
         fieldCard.CreateDropAreas();
     }
 
     [PunRPC]
     private void FirstFieldCompleted()
     {
-        //Debug.Log("FirstFieldCompleted 완료, 다음 진행");
         userCard.SelectedUserCard();
     }
 

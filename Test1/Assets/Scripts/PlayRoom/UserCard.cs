@@ -32,8 +32,9 @@ public class UserCard : MonoBehaviourPun
     public CardDrag cardDrag;
     public Transform userCardContainer; // UserCardArea의 Contents
     public List<GameObject> displayedCards; // UserCardArea에서 보여지는 카드 리스트
-
     public UserProfileLoad userProfileLoad; // UserProfileLoad 참조
+    public UserCardFullPopup userCardFullPopup; // 턴이 아닐 때 카드 객체 선택 방지를 위해 사용
+
 
     //UserCardArea로 11개의 랜덤 카드 이동
     public void FirstUserCardArea()
@@ -67,16 +68,9 @@ public class UserCard : MonoBehaviourPun
         }
         List<GameObject> randomCards = cardPool.GetRandomCardsObject(RandomNames); //랜덤인덱스에 해당하는 오브젝트 추가
         cardPool.MoveCardsToTarGetArea(randomCards, userCardContainer, displayedCards);
+
+        
     }
-
-    // 정렬된 플레이어 리스트 동기화
-    //[PunRPC]
-    //void SyncSortedPlayers(int[] sortedActNums)
-    //{
-    //    userProfileLoad.sortedPlayers = sortedActNums;
-    //    Debug.Log("정렬된 플레이어 리스트 동기화 완료");
-    //}
-
 
     public void SelectedUserCard()
     {
@@ -102,5 +96,42 @@ public class UserCard : MonoBehaviourPun
 
             cardDrag.cardIndex = i;
         }
+        // 내 카드들의 선택을 비활성화
+        DeActivateCard(displayedCards);
+
+        // 내 카드들의 선택을 비활성화 - 팝업
+        DeActivateCard(userCardFullPopup.fullDisplayedCards);
     }
+
+    public void DeActivateCard(List<GameObject> fullDisplayedCards)
+    {
+        // 만약 내 턴이 아니라면
+        if (!ObjectManager.instance.IsMyTurn)
+        {
+            // 현재 팝업에 있는 카드들의 선택을 비활성화하기
+            foreach (GameObject obj in fullDisplayedCards)
+            {
+                Image image = obj.GetComponent<Image>();
+                if (image != null)
+                {
+                    image.raycastTarget = false;  // 이미지 비활성화
+                }
+            }
+
+        }
+        else
+        {
+            // 현재 팝업에 있는 카드들의 선택을 활성화하기
+            foreach (GameObject obj in fullDisplayedCards)
+            {
+                Image image = obj.GetComponent<Image>();
+                if (image != null)
+                {
+                    image.raycastTarget = true;  // 이미지 활성화
+                }
+            }
+        }
+    }
+
+
 }

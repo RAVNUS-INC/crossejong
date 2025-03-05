@@ -84,6 +84,8 @@ MonoBehaviour:
   - StopTurnCoroutine
   - UpdatePlayerInfo
   - UpdateResultData
+  - SyncDropCard
+  - SyncDropCardq
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

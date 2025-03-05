@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using DG.Tweening;
 using System.Collections.Generic;
 using Unity.Collections.LowLevel.Unsafe;
+using Unity.VisualScripting;
 
 public class UserCardFullPopup : MonoBehaviour
 {
@@ -26,6 +27,7 @@ public class UserCardFullPopup : MonoBehaviour
     public List<GameObject> fullDisplayedCards; // FullPopup에서 보여지는 카드 리스트
 
 
+
     public void MoveCardsToFullPopupArea()
     {
         cardPool.MoveCardsToTarGetArea(userCard.displayedCards, fullCardContainer, fullDisplayedCards);
@@ -35,4 +37,6 @@ public class UserCardFullPopup : MonoBehaviour
     {
         cardPool.MoveCardsToTarGetArea(fullDisplayedCards, userCard.userCardContainer, userCard.displayedCards);
     }
+
+    
 }
