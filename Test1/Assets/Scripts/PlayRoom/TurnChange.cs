@@ -99,7 +99,10 @@ public class TurnChange : MonoBehaviour
         else
         {
             Debug.Log("오류입니다");
+            RollBackAreas();
         }
+
+        
     }
 
     public void TurnEnd()
@@ -144,9 +147,9 @@ public class TurnChange : MonoBehaviour
     public void RollBackAreas()
     {
         cardPool.MoveCardsToTarGetArea(ObjectManager.instance.createdWordList, userCard.userCardContainer, userCard.displayedCards);
+        ObjectManager.instance.createdWordList.Clear();
         fieldCard.RollBackColorAreas();
         userCard.SelectedUserCard();
     }
-
 
 }
