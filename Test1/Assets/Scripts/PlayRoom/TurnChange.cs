@@ -39,7 +39,6 @@ public class TurnChange : MonoBehaviour
                 ObjectManager.instance.dropCount = 0;
                 ObjectManager.instance.inputWords = wordInput;
                 StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
-
             }
 
             for (int i = 0; i < ObjectManager.instance.createdWords.Length; i++)
@@ -64,6 +63,7 @@ public class TurnChange : MonoBehaviour
                                     isContinue = false;
                                     ObjectManager.instance.dropCount = 0;
                                     ObjectManager.instance.inputWords = wordInput;
+                                    StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
                                     break;
                                 }
                             }
@@ -82,6 +82,7 @@ public class TurnChange : MonoBehaviour
                         // wordInput (사전 API 검사 돌리기)
                         ObjectManager.instance.dropCount = 0;
                         ObjectManager.instance.inputWords = wordInput;
+                        StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
                         break;
                     }
                 }
