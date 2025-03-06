@@ -67,16 +67,21 @@ public class Main : MonoBehaviour
     // 프로필 이미지 인덱스 불러오기 함수
     private void GetProfileImageIndex()
     {
+        // playerprefs에서 인덱스 정보 불러오기
+        UserInfoManager.instance.MyImageIndex = PlayerPrefs.GetInt(UserInfoManager.IMAGEINDEX_KEY, 0);
+
         centralImage.sprite = UserInfoManager.instance.profileImages[UserInfoManager.instance.MyImageIndex]; //메인 유저 이미지 교체
         ProfileCenImg.sprite = UserInfoManager.instance.profileImages[UserInfoManager.instance.MyImageIndex]; //프로필 패널 중심 이미지 교체
 
         TestText.text = "이미지 로딩 완료";
     }
-    
 
     // DisplayName 불러오기 함수
     public void GetUserDisplayName()
     {
+        // playerprefs에서 이름 정보 불러오기
+        UserInfoManager.instance.MyName = PlayerPrefs.GetString(UserInfoManager.DISPLAYNAME_KEY, "Guest");
+
         displayNameText.text = UserInfoManager.instance.MyName; //메인 패널 이름
         inputField.text = UserInfoManager.instance.MyName; //프로필 패널 이름
 
@@ -206,11 +211,11 @@ public class Main : MonoBehaviour
         PlayFabClientAPI.GetUserData(userDataRequest, result =>
         {
             // PROFILE_IMAGE_INDEX_KEY가 존재하는지 확인
-            if (result.Data.ContainsKey(UserInfoManager.instance.PROFILE_IMAGE_INDEX_KEY))
+            if (result.Data.ContainsKey(UserInfoManager.PROFILE_IMAGE_INDEX_KEY))
             {
                 // 저장된 인덱스 값 불러오기
                 int imgindex;
-                if (int.TryParse(result.Data[UserInfoManager.instance.PROFILE_IMAGE_INDEX_KEY].Value, out imgindex))
+                if (int.TryParse(result.Data[UserInfoManager.PROFILE_IMAGE_INDEX_KEY].Value, out imgindex))
                 {
                     
                     // 인덱스 범위 체크 후 랭킹 유저 이미지 업데이트

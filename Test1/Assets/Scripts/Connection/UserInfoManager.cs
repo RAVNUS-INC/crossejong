@@ -4,20 +4,19 @@ using UnityEngine;
 
 public class UserInfoManager : MonoBehaviour
 {
-    public static UserInfoManager instance = null;
+    public static UserInfoManager instance;
 
     private void Awake()
     {
         if (instance == null)
         {
             instance = this;
+            DontDestroyOnLoad(gameObject); // 씬 변경에도 살아있게 유지
         }
-        else if (instance != this)
+        else
         {
-            Destroy(gameObject);
+            Destroy(gameObject); // 이미 instance가 존재하면 파괴
         }
-
-        DontDestroyOnLoad(transform.parent.gameObject);
     }
 
 
@@ -26,11 +25,11 @@ public class UserInfoManager : MonoBehaviour
     public int MyImageIndex; // 유저의 프로필 이미지 인덱스
     public Sprite[] profileImages; // 3가지 기본 제공 프로필 이미지
 
-    // 저장 키
-    public string PROFILE_IMAGE_INDEX_KEY = "ProfileImageIndex";
+    // playfab에 저장할 변수 이름
+    public const string PROFILE_IMAGE_INDEX_KEY = "ProfileImageIndex";
 
     //playerprefs에 저장할 내용들(Key)
-    public string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
-    public string IMAGEINDEX_KEY = "ImageIndex"; // 유저의 이미지 인덱스
+    public const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
+    public const string IMAGEINDEX_KEY = "ImageIndex"; // 유저의 이미지 인덱스
 
 }

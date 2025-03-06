@@ -17,6 +17,8 @@ using System.Linq;
 public class FieldCard : MonoBehaviourPun
 
 {
+    public UserCardFullPopup fullPopup;
+
     public Transform fieldContainer; // FieldAreaÀÇ Contents
     public CardPool cardPool; // CardPool ÂüÁ¶
     public List<GameObject> fieldDisplayedCards;

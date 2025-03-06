@@ -3,6 +3,7 @@ using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -39,8 +40,6 @@ public class ObjectManager : MonoBehaviourPun
     public int gridCount = 9;
     public GameObject[,] grid;
     public int dropCount = 0;
-    public string Displayname; //자신의 닉네임
-    public const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
     public TMP_Text StatusMsg; //카드를 놓는 중의 상태 표시 텍스트
     public List<string> cardFrontRed = new List<string> { "ㄱ", "ㅇ", "ㅎ" };
     public List<string> cardFrontBlack; //난이도에 따라 내용이 달라짐
@@ -49,7 +48,8 @@ public class ObjectManager : MonoBehaviourPun
     public bool IsFirstTurn = true; // 첫 시작을 알리는 bool 변수
     public bool IsCardDrop = false; // 카드를 드래그해서 드롭했을 때 true -> rpc함수 호출의 조건이 됨
     public bool IsMyTurn = false; // 내 턴인지 아닌지에 따라 드래그 및 버튼 활성화
-    public Button CardDropBtn; // 카드 내고나서 누르는 버튼 - 턴에 따라 비활성화 활성화
+    public int MyCompleteWordCount = 0; // 나의 단어 완성 횟수 변수
+
 
     private void Start()
     {
@@ -73,14 +73,8 @@ public class ObjectManager : MonoBehaviourPun
                 Debug.Log(string.Join(", ", cardFrontBlack));
             }
         }
-        //카드 내기 완료 버튼을 처음엔 모두 비활성화
-        CardDropBtn.interactable = false;
-
-        //자신의 이름을 변수에 저장
-        Displayname = PlayerPrefs.GetString(DISPLAYNAME_KEY);
-
         //상태메시지 비우기
-        StatusMsg.text = ""; 
+        StatusMsg.text = "";
     }
 
     public void SortAfterMove() 
@@ -97,7 +91,7 @@ public class ObjectManager : MonoBehaviourPun
     public void ShowCardSelectingMessage(bool isDragging)
     {
         // 드래그 중(카드 고르는 중)을 알리는 메시지를 모두에게 표시
-        photonView.RPC("ShowDragStatus", RpcTarget.All, isDragging, ObjectManager.instance.Displayname);
+        photonView.RPC("ShowDragStatus", RpcTarget.All, isDragging, UserInfoManager.instance.MyName);
     }
    
     [PunRPC]

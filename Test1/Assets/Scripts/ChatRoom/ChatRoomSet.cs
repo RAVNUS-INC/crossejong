@@ -296,7 +296,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
 
         //현재 접속 인원 업데이트
         PlayersUpdate();
-        UnityEngine.Debug.Log("새로운 플레이어 입장");
+        //UnityEngine.Debug.Log("새로운 플레이어 입장");
     }
     public override void OnPlayerLeftRoom(Player otherPlayer) // 플레이어가 방을 나갔을 때
     {
@@ -305,7 +305,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
 
         //현재 접속 인원 업데이트
         PlayersUpdate();
-        UnityEngine.Debug.Log("다른 플레이어 방 나감");
+        //UnityEngine.Debug.Log("다른 플레이어 방 나감");
     }
  
     public void LeaveRoom() // 방을 나갈때

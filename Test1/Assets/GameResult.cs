@@ -163,9 +163,7 @@ public class GameResult : MonoBehaviourPunCallbacks
     [PunRPC]
     public void UpdateResultData(int actorNum, int completeCount) 
     {
-        // 방장만 수행
-        //if (PhotonNetwork.IsMasterClient)
-        //{
+
             // 해당 액터넘버에 해당하는 Player 찾기
             Player targetPlayer = userProfileLoad.players.FirstOrDefault(p => p.myActNum == actorNum);
 

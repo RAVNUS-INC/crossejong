@@ -9,16 +9,17 @@ using System;
 using Photon.Pun;
 using UnityEditor;
 using Unity.VisualScripting;
+using System.Text.RegularExpressions;
 
 public class TurnChange : MonoBehaviour
 {
     public UserCard userCard;
-    public UserCardFullPopup userCardFullPopup; // ÅÏÀÌ ¾Æ´Ò ¶§ Ä«µå °´Ã¼ ¼±ÅÃ ¹æÁö¸¦ À§ÇØ »ç¿ë
     public TurnManager turnManager; // ÀÚ½ÅÀÇ ÀÎµ¦½º ¹øÈ£ ¾Ë±â À§ÇØ »ç¿ë
     public GameResult gameResult; // °á°ú ÆÇ³Ú È°¼ºÈ­¸¦ À§ÇØ »ç¿ë
 
     public int userCardCount; // º»ÀÎÀÇ Ä«µå °³¼ö
-    public TMP_InputField cardInputField;
+    public TMP_InputField cardInputField; // Ä«µå ³»°í ÀÔ·ÂÇÏ´Â ÇÊµå
+    public Button CardDropBtn; // Ä«µå ³»°í³ª¼­ ´©¸£´Â ¹öÆ° - ÅÏ¿¡ µû¶ó ºñÈ°¼ºÈ­ È°¼ºÈ­
     public string wordInput;
     public bool isContinue;
     public WordLists wordLists;
@@ -26,6 +27,23 @@ public class TurnChange : MonoBehaviour
 
     public List<char> charList = new List<char>
     {'¤¡', '¤¢', '¤¤', '¤§', '¤¨', '¤©', '¤±', '¤²', '¤³', '¤µ', '¤¶', '¤·', '¤¸', '¤¹', '¤º', '¤»', '¤¼', '¤½', '¤¾'};
+
+    
+
+    private void Start()
+    {
+        // Ä«µå¸¦ ³»°í ÀÎÇ²ÇÊµå¿¡ ÀÔ·ÂÇÒ ¶§ ÇÑ±Û¸¸ ÀÔ·Â °¡´ÉÇÏµµ·Ï ÇÔ
+        cardInputField.onValueChanged.AddListener(OnlyKoreanOK);
+
+        //Ä«µå ³»±â ¿Ï·á ¹öÆ°À» Ã³À½¿£ ºñÈ°¼ºÈ­
+        CardDropBtn.interactable = false;
+
+        CardDropBtn.onClick.AddListener(() => {
+            CardDropBtn.gameObject.SetActive(false); // CardDropBtn ºñÈ°¼ºÈ­
+            cardInputField.gameObject.SetActive(true); // cardInputField È°¼ºÈ­
+            cardInputField.text = ""; // ÀÎÇ²ÇÊµå ÀÔ·Â¶õÀ» ºñ¿ö³õÀ½
+        });
+    }
 
 
     public void IsCreateWord()
@@ -100,6 +118,18 @@ public class TurnChange : MonoBehaviour
         }
     }
 
+    public void OnlyKoreanOK(string text) // ´Ü¾î ÀÔ·ÂÇÊµå¿¡ ÇÑ±Û¸¸ ÀÛ¼ºÇÒ ¼ö ÀÖµµ·Ï ÇÔ
+    {
+        // ÇÑ±ÛÀ» Á¦¿ÜÇÑ ¸ğµç ¹®ÀÚ Á¦¿Ü
+        // ÇÑ±Û¸¸ Çã¿ëÇÏ´Â Á¤±Ô½Ä (¶ç¾î¾²±â Æ÷ÇÔ X)
+        string koreanPattern = "^[°¡-ÆR]*$";
+
+        if (!Regex.IsMatch(text, koreanPattern))
+        {
+            cardInputField.text = Regex.Replace(text, "[^°¡-ÆR]", ""); // ÇÑ±Û ÀÌ¿ÜÀÇ ¹®ÀÚ Á¦°Å
+        }
+    }
+
     public void TurnEnd()
     {
         ObjectManager.instance.dropCount = 0;
@@ -114,9 +144,6 @@ public class TurnChange : MonoBehaviour
     {
         userCardCount = count; // º¯¼ö¿¡ °³¼ö ÀúÀå
 
-        Debug.Log($"³» Ä«µå °³¼ö: {userCardCount}");
-        Debug.Log($"³» ÀÎµ¦½º: {turnManager.MyIndexNum}");
-
         // ¸ğµÎ¿¡°Ô ÀÚ½ÅÀÇ Ä«µå °³¼ö Àü´Ş ¿äÃ»ÇÏ±â - ÀÚ½ÅÀÇ Ä«µå°³¼ö, ÀÚ½ÅÀÇ ÀÎµ¦½º ¹øÈ£
         turnManager.photonView.RPC("SyncAllCardCount", RpcTarget.All, userCardCount, turnManager.MyIndexNum);
 
@@ -125,7 +152,7 @@ public class TurnChange : MonoBehaviour
             // ³îÀÌ°¡ Á¾·áµÇ¾úÀ½À» ¾Ë¸®´Â ¸Ş½ÃÁö 1ÃÊ Á¤µµ Ç¥½Ã ÈÄ °á°ú Ã¢ ¶ç¿ì±â
             gameResult.EndGameDelay();
         }
-        else if ((userCardCount > 0) && (ObjectManager.instance.IsFirstTurn)) // Ä«µå´Â ³²¾ÆÀÖ°í Áö±İÀÌ Ã¹ ÅÏ¿¡¼­ÀÇ ÇÔ¼ö È£ÃâÀÌ¶ó¸é
+        else if ((userCardCount > 0) && (ObjectManager.instance.IsFirstTurn)) // Ä«µå´Â ³²¾ÆÀÖ°í Áö±İÀÌ Ã¹ ÅÏ¿¡¼­ÀÇ ÇÔ¼ö È£ÃâÀÌ¶ó¸é(Ã¹ »óÈ²¿¡¼­ Ä«µå °³¼ö ¾÷µ¥ÀÌÆ®¸¦ À§ÇÔ)
         {
             // ÅÏ ³Ñ±â±â ¹æÁö¸¦ À§ÇÑ º¯¼ö¸¦ ÀÌÁ¦´Â false·Î º¯°æ
             ObjectManager.instance.IsFirstTurn = false;

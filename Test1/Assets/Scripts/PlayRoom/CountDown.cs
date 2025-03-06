@@ -11,24 +11,33 @@ public class Countdown : MonoBehaviourPun
     public UserCard userCard;  // UserCard 참조
     public float startDelay = 1f; // 시작 딜레이
     public Button startGameButton; //게임 시작버튼
+    public GameObject WaitingPanel; // 모두가 접속하기 전까지 보이는 패널(대기상태표시)
+    public Image fieldArea; // 보드판 활성화를 위해
+
     public FieldCard fieldCard;
     public TurnManager turnMananger;
     public TurnChange turnChange;
 
     private void Start()
     {
+        WaitingPanel.SetActive(true); // 맨 처음엔 패널 활성화
+
         // 방장만 시작버튼 활성화, 실행 가능
-        if (PhotonNetwork.IsMasterClient)
-        {
-            startGameButton.onClick.AddListener(() =>
-            photonView.RPC("StartCountDown", RpcTarget.All));
-        }
+        //if (PhotonNetwork.IsMasterClient)
+        //{
+        //    startGameButton.onClick.AddListener(() =>
+        //    photonView.RPC("StartCountDown", RpcTarget.All));
+        //}
     }
 
     [PunRPC]
     private void StartCountDown()
     {
-        StartCoroutine(CountDownRoutine(1));
+        WaitingPanel.SetActive(false); // 게임 시작했으므로 패널 비활성화
+
+        fieldArea.gameObject.SetActive(true); // 카운트다운 숫자가 보이게
+
+        StartCoroutine(CountDownRoutine(1)); // 타이머 시작
     }
 
     private IEnumerator CountDownRoutine(int count)

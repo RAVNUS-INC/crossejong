@@ -25,6 +25,7 @@ public class UserProfileLoad : MonoBehaviourPun
     // 인스펙터에서 PhotonView를 할당
     public PhotonView PV;
 
+    public Countdown countDown; // 카운트다운 실행을 위해 사용
     public GameObject[] InRoomUserList; // 현재 방에 접속한 유저들의 리스트
     public Image[] InRoomUserImg; // 현재 방에 접속한 유저들의 프로필사진
     public TMP_Text[] InRoomUserName; // 현재 방에 접속한 유저들의 닉네임
@@ -61,12 +62,29 @@ public class UserProfileLoad : MonoBehaviourPun
     {
         if (!PhotonNetwork.IsMasterClient) return; 
 
-        // 방장이 플레이어 리스트에 추가
+        // 방장이 플레이어를 리스트에 추가
         players.Add(new Player(displayName, imgIndex, myActNum));
-        Debug.Log($"플레이어 {myActNum}가 리스트에 추가됨.");
+
+        // Debug.Log($"플레이어 {myActNum}가 리스트에 추가됨.");
 
         // 모든 유저에게 동기화 요청
         SyncPlayerList();
+
+        // 현재 플레이방에 있으며, 방 속성에서 설정한 인원과 리스트 길이가 같을 때 -> 카운트다운 실행
+        if ((SceneManager.GetActiveScene().name == "PlayRoom") && (players.Count == PhotonNetwork.CurrentRoom.MaxPlayers))
+        //if ((SceneManager.GetActiveScene().name == "PlayRoom"))
+        {
+            Debug.Log("모든 플레이어 입장 완료!");
+
+            // 모두가 입장했으므로 자신을 포함한 모두에게 카운트다운 실행 요청
+            // 1초 뒤에 RPC 호출
+            Invoke("StartCountDownAll", 1f);
+        }
+
+    }
+    void StartCountDownAll()
+    {
+        countDown.photonView.RPC("StartCountDown", RpcTarget.All);
     }
 
     [PunRPC]

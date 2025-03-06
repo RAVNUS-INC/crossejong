@@ -17,6 +17,7 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
     public FieldCard fieldCard;
     public CardPool cardPool;
 
+
     void Awake()
     {
         fieldCard = FindObjectOfType<FieldCard>();
@@ -92,7 +93,6 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
 
             ObjectManager.instance.dropCount += 1;
 
-            // 위 과정을 유저가 카드를 놓았을 때 모두가 수행하도록 요청하면 되지 않을까?
         }
     }
 }

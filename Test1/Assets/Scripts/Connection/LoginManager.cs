@@ -40,6 +40,8 @@ public class LoginManager : MonoBehaviour
 
     void Awake()
     {
+       // 실제 앱 빌드 시 playerprefs정보 초기화 수행!
+
        //PlayerPrefs.DeleteAll();
        //Debug.Log("PlayerPrefs 모두 삭제함");
     }
@@ -67,7 +69,7 @@ public class LoginManager : MonoBehaviour
         AutoLoginWithDeviceID();
 
         // playerprefs에서 정보 불러오기(디버그를 위한)
-        //LoadUserInfoFromPrefs();
+        // LoadUserInfoFromPrefs();
 
         // 첫 로그인인 경우, 로그인으로 이동
         //SceneManager.LoadScene("Login");
@@ -77,8 +79,8 @@ public class LoginManager : MonoBehaviour
     private void LoadUserInfoFromPrefs() // 플레이어 정보 로컬에 저장된 값 불러오기
     {
         // GetString의 두번째 값은 기본값을 나타냄
-        UserInfoManager.instance.MyName = PlayerPrefs.GetString(UserInfoManager.instance.DISPLAYNAME_KEY, "Guest");
-        UserInfoManager.instance.MyImageIndex = PlayerPrefs.GetInt(UserInfoManager.instance.IMAGEINDEX_KEY, 0);
+        UserInfoManager.instance.MyName = PlayerPrefs.GetString(UserInfoManager.DISPLAYNAME_KEY, "Guest");
+        UserInfoManager.instance.MyImageIndex = PlayerPrefs.GetInt(UserInfoManager.IMAGEINDEX_KEY, 0);
 
         // 필요한 곳에 정보를 설정하거나 UI에 반영
        Debug.Log($"로컬 - DisplayName: {UserInfoManager.instance.MyName}, ImageIndex: {UserInfoManager.instance.MyImageIndex}");
@@ -126,7 +128,7 @@ public class LoginManager : MonoBehaviour
         PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest(), result =>
         {
             string displayName = result.AccountInfo.TitleInfo.DisplayName;
-            PlayerPrefs.SetString(UserInfoManager.instance.DISPLAYNAME_KEY, displayName);
+            PlayerPrefs.SetString(UserInfoManager.DISPLAYNAME_KEY, displayName);
             PlayerPrefs.Save();
             UserInfoManager.instance.MyName = displayName;
             Debug.Log($"[playerprefs] DisplayName 저장 완료: {UserInfoManager.instance.MyName}");
@@ -139,11 +141,11 @@ public class LoginManager : MonoBehaviour
         // 2. ImageIndex 불러오기 (User Data 방식)
         PlayFabClientAPI.GetUserData(new GetUserDataRequest(), userDataResult =>
         {
-            if (userDataResult.Data.ContainsKey(UserInfoManager.instance.PROFILE_IMAGE_INDEX_KEY))
+            if (userDataResult.Data.ContainsKey(UserInfoManager.PROFILE_IMAGE_INDEX_KEY))
             {
                 // 'ImageIndex' 키가 있으면 값을 파싱
-                int imageIndex = int.Parse(userDataResult.Data[UserInfoManager.instance.PROFILE_IMAGE_INDEX_KEY].Value);
-                PlayerPrefs.SetInt(UserInfoManager.instance.IMAGEINDEX_KEY, imageIndex);
+                int imageIndex = int.Parse(userDataResult.Data[UserInfoManager.PROFILE_IMAGE_INDEX_KEY].Value);
+                PlayerPrefs.SetInt(UserInfoManager.IMAGEINDEX_KEY, imageIndex);
                 PlayerPrefs.Save();
                 UserInfoManager.instance.MyImageIndex = imageIndex;
                 Debug.Log($"[playerprefs] ImageIndex 저장 완료: {UserInfoManager.instance.MyImageIndex}");
@@ -198,7 +200,7 @@ public class LoginManager : MonoBehaviour
         },
         error =>
         {
-            Debug.LogError("첫 로그인 감지. 자동 로그인 실패: " + error.GenerateErrorReport());
+            Debug.Log("첫 로그인 감지. 자동 로그인 실패: " + error.GenerateErrorReport());
             InitialTestText.text = "로그아웃 상태";
         });
     }

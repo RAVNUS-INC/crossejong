@@ -62,6 +62,9 @@ public class DictionaryAPI : MonoBehaviour
                         if (wordExists)
                         {
                             Debug.Log("단어 '" + word + "'가 존재하며, 명사입니다.");
+
+                            // 단어가 확인되면 턴 넘기기
+                            TurnManager.instance.TossNextTurn();
                         }
                         else
                         {
