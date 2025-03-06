@@ -22,6 +22,7 @@ public class TurnChange : MonoBehaviour
     public string wordInput;
     public bool isContinue;
     public WordLists wordLists;
+    public DictionaryAPI dictionaryAPI;
 
     public List<char> charList = new List<char>
     {'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'};
@@ -40,6 +41,8 @@ public class TurnChange : MonoBehaviour
                 Debug.Log("글자로만 이루어진 단어를 사전 API 검사를 시작합니다");
                 // wordInput (사전 API 검사 돌리기)
                 ObjectManager.instance.dropCount = 0;
+                ObjectManager.instance.inputWords = wordInput;
+                StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
             }
 
             for (int i = 0; i < ObjectManager.instance.createdWords.Length; i++)
@@ -63,6 +66,8 @@ public class TurnChange : MonoBehaviour
                                     // wordInput (사전 API 검사 돌리기)
                                     isContinue = false;
                                     ObjectManager.instance.dropCount = 0;
+                                    ObjectManager.instance.inputWords = wordInput;
+                                    StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
                                     break;
                                 }
                             }
@@ -80,6 +85,8 @@ public class TurnChange : MonoBehaviour
                         Debug.Log("특수 카드로 이루어진 단어를 사전 API 검사를 시작합니다");
                         // wordInput (사전 API 검사 돌리기)
                         ObjectManager.instance.dropCount = 0;
+                        ObjectManager.instance.inputWords = wordInput;
+                        StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
                         break;
                     }
                 }
