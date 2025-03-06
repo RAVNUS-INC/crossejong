@@ -35,6 +35,7 @@ public class ObjectManager : MonoBehaviourPun
     public int cardIndexY;
     public string createdWord;
     public string createdWords;
+    public string inputWords;
     public int gridCount = 9;
     public GameObject[,] grid;
     public int dropCount = 0;
