@@ -35,10 +35,12 @@ public class ObjectManager : MonoBehaviourPun
     public int cardIndexY;
     public string createdWord;
     public string createdWords;
+    public List<GameObject> createdWordList;
     public string inputWords;
     public int gridCount = 9;
     public GameObject[,] grid;
     public int dropCount = 0;
+
     public string Displayname; //자신의 닉네임
     public const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
     public TMP_Text StatusMsg; //카드를 놓는 중의 상태 표시 텍스트

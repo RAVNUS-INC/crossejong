@@ -13,6 +13,8 @@ using Unity.VisualScripting;
 public class TurnChange : MonoBehaviour
 {
     public UserCard userCard;
+    public FieldCard fieldCard;
+    public CardPool cardPool;
     public UserCardFullPopup userCardFullPopup; // 턴이 아닐 때 카드 객체 선택 방지를 위해 사용
     public TurnManager turnManager; // 자신의 인덱스 번호 알기 위해 사용
     public GameResult gameResult; // 결과 판넬 활성화를 위해 사용
@@ -137,6 +139,13 @@ public class TurnChange : MonoBehaviour
             turnManager.FindNextPlayer();
         }
 
+    }
+
+    public void RollBackAreas()
+    {
+        cardPool.MoveCardsToTarGetArea(ObjectManager.instance.createdWordList, userCard.userCardContainer, userCard.displayedCards);
+        fieldCard.RollBackColorAreas();
+        userCard.SelectedUserCard();
     }
 
 
