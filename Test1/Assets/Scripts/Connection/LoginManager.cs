@@ -35,12 +35,8 @@ public class LoginManager : MonoBehaviour
     // 로그인 시 팝업창에 표시할 알림 내용
     public TMP_Text popupText;
 
-    //playerprefs에 저장할 내용들
-    private const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
-    private const string IMAGEINDEX_KEY = "ImageIndex"; // 유저의 이미지 인덱스
-    private const string PROFILE_IMAGE_INDEX_KEY = "ProfileImageIndex";  // 저장 키
-
-    public Text TestText, InitialTestText; //알림창 테스트 메시지, 처음 접속 테스트 메시지 배치
+    //알림창 테스트 메시지, 처음 접속 테스트 메시지 배치
+    public Text TestText, InitialTestText; 
 
     void Awake()
     {
@@ -48,11 +44,10 @@ public class LoginManager : MonoBehaviour
        //Debug.Log("PlayerPrefs 모두 삭제함");
     }
 
-    void Start() // 초기 상태 설정
+    void Start() 
     {
         // 로그인 상태 확인 및 첫 로그인 체크
         CheckLoginStatus();
-
 
         ResetPasswordToggle(); //토글 비활성화
         ResetWarningTexts(); //경고메시지 비활성화
@@ -82,11 +77,11 @@ public class LoginManager : MonoBehaviour
     private void LoadUserInfoFromPrefs() // 플레이어 정보 로컬에 저장된 값 불러오기
     {
         // GetString의 두번째 값은 기본값을 나타냄
-        string displayName = PlayerPrefs.GetString(DISPLAYNAME_KEY, "Guest");
-        int imageIndex = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0);
+        UserInfoManager.instance.MyName = PlayerPrefs.GetString(UserInfoManager.instance.DISPLAYNAME_KEY, "Guest");
+        UserInfoManager.instance.MyImageIndex = PlayerPrefs.GetInt(UserInfoManager.instance.IMAGEINDEX_KEY, 0);
 
         // 필요한 곳에 정보를 설정하거나 UI에 반영
-       Debug.Log($"로컬 - DisplayName: {displayName}, ImageIndex: {imageIndex}");
+       Debug.Log($"로컬 - DisplayName: {UserInfoManager.instance.MyName}, ImageIndex: {UserInfoManager.instance.MyImageIndex}");
     }
 
     // 로그인 버튼 클릭 시
@@ -131,9 +126,10 @@ public class LoginManager : MonoBehaviour
         PlayFabClientAPI.GetAccountInfo(new GetAccountInfoRequest(), result =>
         {
             string displayName = result.AccountInfo.TitleInfo.DisplayName;
-            PlayerPrefs.SetString(DISPLAYNAME_KEY, displayName);
+            PlayerPrefs.SetString(UserInfoManager.instance.DISPLAYNAME_KEY, displayName);
             PlayerPrefs.Save();
-            Debug.Log($"[playerprefs] DisplayName 저장 완료: {displayName}");
+            UserInfoManager.instance.MyName = displayName;
+            Debug.Log($"[playerprefs] DisplayName 저장 완료: {UserInfoManager.instance.MyName}");
             TestText.text = "DisplayName 저장";
         }, error =>
         {
@@ -143,13 +139,14 @@ public class LoginManager : MonoBehaviour
         // 2. ImageIndex 불러오기 (User Data 방식)
         PlayFabClientAPI.GetUserData(new GetUserDataRequest(), userDataResult =>
         {
-            if (userDataResult.Data.ContainsKey(PROFILE_IMAGE_INDEX_KEY))
+            if (userDataResult.Data.ContainsKey(UserInfoManager.instance.PROFILE_IMAGE_INDEX_KEY))
             {
                 // 'ImageIndex' 키가 있으면 값을 파싱
-                int imageIndex = int.Parse(userDataResult.Data[PROFILE_IMAGE_INDEX_KEY].Value);
-                PlayerPrefs.SetInt(IMAGEINDEX_KEY, imageIndex);
+                int imageIndex = int.Parse(userDataResult.Data[UserInfoManager.instance.PROFILE_IMAGE_INDEX_KEY].Value);
+                PlayerPrefs.SetInt(UserInfoManager.instance.IMAGEINDEX_KEY, imageIndex);
                 PlayerPrefs.Save();
-                Debug.Log($"[playerprefs] ImageIndex 저장 완료: {imageIndex}");
+                UserInfoManager.instance.MyImageIndex = imageIndex;
+                Debug.Log($"[playerprefs] ImageIndex 저장 완료: {UserInfoManager.instance.MyImageIndex}");
                 TestText.text = "ImageIndex 저장";
             }
             else

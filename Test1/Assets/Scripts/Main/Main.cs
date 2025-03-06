@@ -13,11 +13,9 @@ using System.Collections;
 // 메인에 존재하는 기능에 관한 스크립트
 public class Main : MonoBehaviour
 {
-
     //usersetmanager에서 가져온 변수들    
     private TMP_InputField inputField; //프로필 패널 안의 이름입력필드
     private TMP_Text SaveText; //프로필 패널 안의 저장메시지
-    private Sprite[] ProfileImg; //프로필 이미지 배열
     private Image ProfileCenImg; //프로필 패널 중심 이미지
     private Button SaveBtn; //프로필 패널 정보 변경 후 저장 버튼
 
@@ -33,9 +31,6 @@ public class Main : MonoBehaviour
     public TMP_Text[] wordcount; //단어완성횟수
 
     public Text TestText, LogTestText; //빌드 테스트 텍스트 상태, 로그아웃 텍스트 상태
-    private const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
-    private const string IMAGEINDEX_KEY = "ImageIndex"; // 유저의 이미지 인덱스
-    private const string PROFILE_IMAGE_INDEX_KEY = "ProfileImageIndex";  // 저장 키
 
     private void Awake()
     {
@@ -45,7 +40,6 @@ public class Main : MonoBehaviour
         // UserSetManager에서 InputField를 가져옴
         inputField = userSetManager.inputText;
         SaveText = userSetManager.saveText;
-        ProfileImg = userSetManager.profileImages; //프로필 이미지 배열
         ProfileCenImg = userSetManager.centralImage; //프로필 패널 중심사진
         SaveBtn = userSetManager.confirmButton; //프로필 패널 저장버튼
     }
@@ -73,9 +67,8 @@ public class Main : MonoBehaviour
     // 프로필 이미지 인덱스 불러오기 함수
     private void GetProfileImageIndex()
     {
-        int imageIndex = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0);
-        centralImage.sprite = ProfileImg[imageIndex]; //메인 유저 이미지 교체
-        ProfileCenImg.sprite = ProfileImg[imageIndex]; //프로필 패널 중심 이미지 교체
+        centralImage.sprite = UserInfoManager.instance.profileImages[UserInfoManager.instance.MyImageIndex]; //메인 유저 이미지 교체
+        ProfileCenImg.sprite = UserInfoManager.instance.profileImages[UserInfoManager.instance.MyImageIndex]; //프로필 패널 중심 이미지 교체
 
         TestText.text = "이미지 로딩 완료";
     }
@@ -84,9 +77,8 @@ public class Main : MonoBehaviour
     // DisplayName 불러오기 함수
     public void GetUserDisplayName()
     {
-        string displayName = PlayerPrefs.GetString(DISPLAYNAME_KEY, "Guest");
-        displayNameText.text = displayName; //메인 패널 이름
-        inputField.text = displayName; //프로필 패널 이름
+        displayNameText.text = UserInfoManager.instance.MyName; //메인 패널 이름
+        inputField.text = UserInfoManager.instance.MyName; //프로필 패널 이름
 
         TestText.text = "DisplayName 로딩 완료";
     }
@@ -189,7 +181,7 @@ public class Main : MonoBehaviour
                 {
                     int actualRank = curBoard.Position + 1; // 0위는 1위로 변환
                     myRankText.text = $"현재 {actualRank}위";
-                    Debug.Log($"현재 몇위: {curBoard.Position}");
+                    Debug.Log($"현재 {curBoard.Position + 1}위:");
                 }
                 //유저수, 순위에 따른 오브젝트 활성화
                 ranklist[i].SetActive(true);
@@ -214,17 +206,17 @@ public class Main : MonoBehaviour
         PlayFabClientAPI.GetUserData(userDataRequest, result =>
         {
             // PROFILE_IMAGE_INDEX_KEY가 존재하는지 확인
-            if (result.Data.ContainsKey(PROFILE_IMAGE_INDEX_KEY))
+            if (result.Data.ContainsKey(UserInfoManager.instance.PROFILE_IMAGE_INDEX_KEY))
             {
                 // 저장된 인덱스 값 불러오기
                 int imgindex;
-                if (int.TryParse(result.Data[PROFILE_IMAGE_INDEX_KEY].Value, out imgindex))
+                if (int.TryParse(result.Data[UserInfoManager.instance.PROFILE_IMAGE_INDEX_KEY].Value, out imgindex))
                 {
                     
                     // 인덱스 범위 체크 후 랭킹 유저 이미지 업데이트
-                    if (imgindex >= 0 && imgindex < ProfileImg.Length)
+                    if (imgindex >= 0 && imgindex < UserInfoManager.instance.profileImages.Length)
                     {
-                        userimage[index].sprite = ProfileImg[imgindex];
+                        userimage[index].sprite = UserInfoManager.instance.profileImages[imgindex];
                     }
                     else
                     {

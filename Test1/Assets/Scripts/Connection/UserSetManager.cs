@@ -26,18 +26,12 @@ public class UserSetManager : MonoBehaviourPunCallbacks
     private const int MaxLength = 8; // 최대 입력 길이(변동가능)
 
     public Image centralImage; // 중앙에 표시되는 프로필이미지
-    public Sprite[] profileImages; // 3가지 기본 제공 이미지
-
     private int currentIndex = 0; // 현재 선택된 이미지 인덱스
-    private const string PROFILE_IMAGE_INDEX_KEY = "ProfileImageIndex";  // 저장 키
-    private string displayName; //디스플레이 이름(임시저장을 위한 변수)
 
     public GameObject profilePanel; //프로필 설정 패널(메인패널에서 미리 준비해야 작동)
     public GameObject usersetPanel; //유저 초기 설정 패널
 
-    //playerprefs에 저장할 내용들(Key)
-    private const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
-    private const string IMAGEINDEX_KEY = "ImageIndex"; // 유저의 이미지 인덱스
+    
 
     void Start()
     {
@@ -63,13 +57,13 @@ public class UserSetManager : MonoBehaviourPunCallbacks
     
     private void LoadDefaultDisplayName() // 저장된 DisplayName 로드 및 저장 함수(존재하면 해당 값을, 존재하지 않으면 Guest)
     {
-        if (PlayerPrefs.HasKey(DISPLAYNAME_KEY))
+        if (PlayerPrefs.HasKey(UserInfoManager.instance.DISPLAYNAME_KEY))
         {
             // 키가 존재하면 저장된 값을 가져온다
-            string displayName = PlayerPrefs.GetString(DISPLAYNAME_KEY, "Guest");
+            UserInfoManager.instance.MyName = PlayerPrefs.GetString(UserInfoManager.instance.DISPLAYNAME_KEY, "Guest");
 
             // 불러온 이름을 인풋란에 보여주기
-            inputText.text = displayName;
+            inputText.text = UserInfoManager.instance.MyName;
 
             //프로필 이름 초기 비활성화
             inputText.interactable = false;
@@ -80,19 +74,19 @@ public class UserSetManager : MonoBehaviourPunCallbacks
             inputText.text = "";
 
             // 기본값을 playerprefs에도 바로 저장
-            PlayerPrefs.SetString(DISPLAYNAME_KEY, "Guest"); PlayerPrefs.Save();
+            PlayerPrefs.SetString(UserInfoManager.instance.DISPLAYNAME_KEY, "Guest"); PlayerPrefs.Save();
         }
     }
 
     private void LoadDefaultImageIndex() // 저장된 이미지 인덱스를 불러오기(존재하면 해당 값을, 존재하지 않으면 기본값 0)
     {
-        if (PlayerPrefs.HasKey(IMAGEINDEX_KEY))
+        if (PlayerPrefs.HasKey(UserInfoManager.instance.IMAGEINDEX_KEY))
         {
             // 키가 존재하면 저장된 값을 가져온다
-            int Index = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0);
+            UserInfoManager.instance.MyImageIndex = PlayerPrefs.GetInt(UserInfoManager.instance.IMAGEINDEX_KEY, 0);
 
             //currentIndex 인덱스 변수에 값 저장
-            currentIndex = Index;
+            currentIndex = UserInfoManager.instance.MyImageIndex;
         }
         else
         {
@@ -100,18 +94,18 @@ public class UserSetManager : MonoBehaviourPunCallbacks
             currentIndex = 0;
 
             // 기본값을 playerprefs에도 바로 저장
-            PlayerPrefs.SetInt(IMAGEINDEX_KEY, currentIndex); PlayerPrefs.Save();
+            PlayerPrefs.SetInt(UserInfoManager.instance.IMAGEINDEX_KEY, currentIndex); PlayerPrefs.Save();
         }
-        centralImage.sprite = profileImages[currentIndex];  // 이미지 업데이트
+        centralImage.sprite = UserInfoManager.instance.profileImages[currentIndex];  // 이미지 업데이트
     }
 
     public void SaveDisplayName() //DisplayName을 playfab과 playerprefs에 저장
     { 
-        string displayName = inputText.text.Trim();
+        UserInfoManager.instance.MyName = inputText.text.Trim();
 
         var request = new UpdateUserTitleDisplayNameRequest
         {
-            DisplayName = displayName
+            DisplayName = UserInfoManager.instance.MyName
         };
 
         //playfab에 저장
@@ -126,8 +120,8 @@ public class UserSetManager : MonoBehaviourPunCallbacks
             });
 
         //변경된 이미지 인덱스를 playerprefs에 저장(기존 유저의 경우 덮어쓰기, 신규 유저는 새로 추가하는 상황)
-        UpdateDisplayName(displayName);
-        Debug.Log($"[playerprefs] Displayname: {displayName}을 저장했습니다");
+        UpdateDisplayName(UserInfoManager.instance.MyName);
+        Debug.Log($"[playerprefs] Displayname: {UserInfoManager.instance.MyName}을 저장했습니다");
 
         if (usersetPanel.activeSelf)
         {
@@ -143,18 +137,20 @@ public class UserSetManager : MonoBehaviourPunCallbacks
 
     private void SaveSelectedImageIndex() // 선택된 이미지 인덱스를 저장해 playfab에 전송, playerprefs 업뎃
     {
-        string ImageIndex = currentIndex.ToString(); //int형 -> 문자열로 변환
+        UserInfoManager.instance.MyImageIndex = currentIndex; // int형
+
+        string ImageIndex = UserInfoManager.instance.MyImageIndex.ToString(); // 문자열로 변환
 
         var request = new UpdateUserDataRequest
         {
             Data = new Dictionary<string, string>
         {
-            { PROFILE_IMAGE_INDEX_KEY, ImageIndex}
+            { UserInfoManager.instance.PROFILE_IMAGE_INDEX_KEY, ImageIndex}
         },
             Permission = UserDataPermission.Public // 데이터를 공개 상태로 저장
         };
 
-        //playfab에 저장
+        // playfab에 저장
         PlayFabClientAPI.UpdateUserData(request,
             result =>
             {
@@ -165,34 +161,30 @@ public class UserSetManager : MonoBehaviourPunCallbacks
                 Debug.LogError($"[Playfab] 유저 데이터 저장 실패: {error.GenerateErrorReport()}");
             });
 
-        //문자열 -> int형으로 변환
-        int RImageIndex = int.Parse(ImageIndex); 
-
-        //변경된 이미지 인덱스를 playerprefs에 저장(기존 유저의 경우 덮어쓰기, 신규 유저는 새로 추가하는 상황)
-        UpdateImageIndex(RImageIndex); 
-        Debug.Log($"[playerprefs] Imageindex: {currentIndex}을 저장했습니다");
+        // 변경된 이미지 인덱스를 playerprefs에 저장(기존 유저의 경우 덮어쓰기, 신규 유저는 새로 추가하는 상황)
+        UpdateImageIndex(UserInfoManager.instance.MyImageIndex); 
+        Debug.Log($"[playerprefs] Imageindex: {UserInfoManager.instance.MyImageIndex}을 저장했습니다");
     }
 
     void UpdateDisplayName(string name) //새로운 이름 저장
     {
-        PlayerPrefs.SetString(DISPLAYNAME_KEY, name); // 새로운 값 저장
+        PlayerPrefs.SetString(UserInfoManager.instance.DISPLAYNAME_KEY, name); // 새로운 값 저장
         PlayerPrefs.Save(); // 저장 유지
     }
 
     void UpdateImageIndex(int newIndex) //새로운 인덱스 저장
     {
-        PlayerPrefs.SetInt(IMAGEINDEX_KEY, newIndex); // 새로운 값 저장
+        PlayerPrefs.SetInt(UserInfoManager.instance.IMAGEINDEX_KEY, newIndex); // 새로운 값 저장
         PlayerPrefs.Save(); // 저장 유지
     }
     
     public void OnLeftButtonClicked() // 왼쪽 버튼 클릭 시 호출
     {
         currentIndex--;
-        if (currentIndex < 0) currentIndex = profileImages.Length - 1;  // 순환 (맨 처음으로 돌아감)
-        centralImage.sprite = profileImages[currentIndex];  // 인덱스에 해당하는 이미지로 업데이트
+        if (currentIndex < 0) currentIndex = UserInfoManager.instance.profileImages.Length - 1;  // 순환 (맨 처음으로 돌아감)
+        centralImage.sprite = UserInfoManager.instance.profileImages[currentIndex];  // 인덱스에 해당하는 이미지로 업데이트
 
-        int Index = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0);
-        if (Index == currentIndex) //만약 현재 인덱스 이미지와 기존 이미지 인덱스가 같다면
+        if (UserInfoManager.instance.MyImageIndex == currentIndex) //만약 현재 인덱스 이미지와 기존 이미지 인덱스가 같다면
         {
             confirmButton.interactable = false; //저장버튼 비활성화
         }
@@ -204,11 +196,10 @@ public class UserSetManager : MonoBehaviourPunCallbacks
 
     public void OnRightButtonClicked() // 오른쪽 버튼 클릭 시 호출
     {
-        currentIndex = (currentIndex + 1) % profileImages.Length;
-        centralImage.sprite = profileImages[currentIndex];  // 인덱스에 해당하는 이미지로 업데이트
+        currentIndex = (currentIndex + 1) % UserInfoManager.instance.profileImages.Length;
+        centralImage.sprite = UserInfoManager.instance.profileImages[currentIndex];  // 인덱스에 해당하는 이미지로 업데이트
 
-        int Index = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0);
-        if (Index == currentIndex) //만약 현재 인덱스 이미지와 기존 이미지 인덱스가 같다면
+        if (UserInfoManager.instance.MyImageIndex == currentIndex) //만약 현재 인덱스 이미지와 기존 이미지 인덱스가 같다면
         {
             confirmButton.interactable = false; //저장버튼 비활성화
         }
@@ -254,7 +245,7 @@ public class UserSetManager : MonoBehaviourPunCallbacks
             warningText.text = "닉네임을 입력해주세요.";
             confirmButton.interactable = false; 
         }
-        else if (displayName == inputname && (inputText.isActiveAndEnabled)) //입력란이 기존 닉네임과 같으면서 활성화되어있는 경우
+        else if (UserInfoManager.instance.MyName == inputname && (inputText.isActiveAndEnabled)) //입력란이 기존 닉네임과 같으면서 활성화되어있는 경우
         {
             warningText.text = "기존 닉네임과 달라야 합니다.";
             confirmButton.interactable = false;
@@ -291,7 +282,6 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         }
         return count;
     }
-
 
     public override void OnConnectedToMaster() //마스터 서버 접속 되면
     {

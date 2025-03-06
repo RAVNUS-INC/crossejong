@@ -30,14 +30,6 @@ public class UserProfileLoad : MonoBehaviourPun
     public TMP_Text[] InRoomUserName; // 현재 방에 접속한 유저들의 닉네임
     public Sprite[] profileImages; // 3가지 기본 제공 이미지
 
-    private string mydisplayname; //현재 유저 이름 저장 변수
-    private int myimgindex; //현재 유저 이미지 저장 변수
-    private int myActNum; //현재 유저 액터넘버
-
-    //playerprefs 내용들(Key)
-    private const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
-    private const string IMAGEINDEX_KEY = "ImageIndex"; // 유저의 이미지 인덱스
-
     public List<Player> players = new List<Player>(); // 플레이어 리스트
     public string[] userNameList; // 유저 닉네임 리스트(디스플레이네임)
     public int[] userImageList; // 유저 이미지 리스트(프로필사진)
@@ -46,11 +38,6 @@ public class UserProfileLoad : MonoBehaviourPun
     void Awake() 
     {
         SetActive(); // 리스트 표시 비활성화
-
-        mydisplayname = PlayerPrefs.GetString(DISPLAYNAME_KEY, "Guest"); //유저이름 불러와 mydisplayname 변수에 저장
-        myimgindex = PlayerPrefs.GetInt(IMAGEINDEX_KEY, 0);  //유저 이미지인덱스 불러와 myimgindex 변수에 저장
-        myActNum = PhotonNetwork.LocalPlayer.ActorNumber; //액터넘버 저장
-
     }
 
     private void Start()
@@ -59,7 +46,7 @@ public class UserProfileLoad : MonoBehaviourPun
         if (SceneManager.GetActiveScene().name == "PlayRoom")
         {
             // 본인의 정보 추가를 방장에게 전달 - userProfileLoad 내 함수 실행
-            PV.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, mydisplayname, myimgindex, myActNum);
+            PV.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, UserInfoManager.instance.MyName, UserInfoManager.instance.MyImageIndex, UserInfoManager.instance.MyActNum);
         }
     }
 
