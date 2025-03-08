@@ -2158,7 +2158,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -879.99976}
+  m_AnchoredPosition: {x: 0, y: -879.9997}
   m_SizeDelta: {x: 0, y: -1760}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &259437066
@@ -14600,6 +14600,7 @@ MonoBehaviour:
   - {fileID: 601581382}
   - {fileID: 818295130}
   - {fileID: 200072124}
+  endFullPopupButton: {fileID: 301406325}
 --- !u!1 &1922321675
 GameObject:
   m_ObjectHideFlags: 0
@@ -14707,6 +14708,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardPool: {fileID: 1342198615}
   userCard: {fileID: 11155626}
+  userCardFullPopup: {fileID: 0}
   cardDrag: {fileID: 0}
   getCardButton: {fileID: 536188794}
   turnChange: {fileID: 542433695}
