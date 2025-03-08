@@ -144,6 +144,8 @@ public class TurnChange : MonoBehaviour
         turnManager.FindMyIndex();
 
         CountUserCard(userCard.displayedCards.Count);
+
+        ObjectManager.instance.createdWordList.Clear();
     }
 
     public void CountUserCard(int count)  //자신의 카드 개수 업데이트
@@ -175,7 +177,6 @@ public class TurnChange : MonoBehaviour
     public void RollBackAreas()
     {
         cardPool.MoveCardsToTarGetArea(ObjectManager.instance.createdWordList, userCard.userCardContainer, userCard.displayedCards);
-        ObjectManager.instance.createdWordList.Clear();
         fieldCard.RollBackColorAreas();
         userCard.SelectedUserCard();
     }
