@@ -6,6 +6,8 @@ using System.Xml;  // XML 파싱을 위한 네임스페이스
 
 public class DictionaryAPI : MonoBehaviour
 {
+    public TurnChange turnChange;
+
     private string apiUrl = "https://krdict.korean.go.kr/api/search";  // API 엔드포인트
     private string apiKey = "BD6ACB6A46D2336CBFB3EF7283A0279C";  // 네가 설정한 인증키
 
@@ -69,11 +71,13 @@ public class DictionaryAPI : MonoBehaviour
                         else
                         {
                             Debug.Log("단어 '" + word + "'가 존재하지 않거나, 명사가 아닙니다.");
+                            turnChange.RollBackAreas();
                         }
                     }
                     else
                     {
                         Debug.Log("단어 '" + word + "'가 존재하지 않습니다.");
+                        turnChange.RollBackAreas();
                     }
                 }
                 catch (Exception e)
@@ -86,6 +90,7 @@ public class DictionaryAPI : MonoBehaviour
             {
                 // 요청 실패 시 에러 로그 출력
                 Debug.LogError("API 요청 실패: " + request.error + "\nResponse: " + request.downloadHandler.text);
+                turnChange.RollBackAreas();
             }
         }
     }

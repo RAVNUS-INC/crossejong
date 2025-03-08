@@ -14,34 +14,37 @@ using System.Text.RegularExpressions;
 public class TurnChange : MonoBehaviour
 {
     public UserCard userCard;
-    public TurnManager turnManager; // ÀÚ½ÅÀÇ ÀÎµ¦½º ¹øÈ£ ¾Ë±â À§ÇØ »ç¿ë
-    public GameResult gameResult; // °á°ú ÆÇ³Ú È°¼ºÈ­¸¦ À§ÇØ »ç¿ë
+    public FieldCard fieldCard;
+    public CardPool cardPool;
+    public UserCardFullPopup userCardFullPopup; // ï¿½ï¿½ï¿½ï¿½ ï¿½Æ´ï¿½ ï¿½ï¿½ Ä«ï¿½ï¿½ ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+    public TurnManager turnManager; // ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½ ï¿½ï¿½È£ ï¿½Ë±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+    public GameResult gameResult; // ï¿½ï¿½ï¿½ ï¿½Ç³ï¿½ È°ï¿½ï¿½È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 
-    public int userCardCount; // º»ÀÎÀÇ Ä«µå °³¼ö
-    public TMP_InputField cardInputField; // Ä«µå ³»°í ÀÔ·ÂÇÏ´Â ÇÊµå
-    public Button CardDropBtn; // Ä«µå ³»°í³ª¼­ ´©¸£´Â ¹öÆ° - ÅÏ¿¡ µû¶ó ºñÈ°¼ºÈ­ È°¼ºÈ­
+    public int userCardCount; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ä«ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    public TMP_InputField cardInputField; // Ä«ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô·ï¿½ï¿½Ï´ï¿½ ï¿½Êµï¿½
+    public Button CardDropBtn; // Ä«ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ° - ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È°ï¿½ï¿½È­ È°ï¿½ï¿½È­
     public string wordInput;
     public bool isContinue;
     public WordLists wordLists;
     public DictionaryAPI dictionaryAPI;
 
     public List<char> charList = new List<char>
-    {'¤¡', '¤¢', '¤¤', '¤§', '¤¨', '¤©', '¤±', '¤²', '¤³', '¤µ', '¤¶', '¤·', '¤¸', '¤¹', '¤º', '¤»', '¤¼', '¤½', '¤¾'};
+    {'ï¿½ï¿½', 'ï¿½ï¿½', 'ï¿½ï¿½', 'ï¿½ï¿½', 'ï¿½ï¿½', 'ï¿½ï¿½', 'ï¿½ï¿½', 'ï¿½ï¿½', 'ï¿½ï¿½', 'ï¿½ï¿½', 'ï¿½ï¿½', 'ï¿½ï¿½', 'ï¿½ï¿½', 'ï¿½ï¿½', 'ï¿½ï¿½', 'ï¿½ï¿½', 'ï¿½ï¿½', 'ï¿½ï¿½', 'ï¿½ï¿½'};
 
     
 
     private void Start()
     {
-        // Ä«µå¸¦ ³»°í ÀÎÇ²ÇÊµå¿¡ ÀÔ·ÂÇÒ ¶§ ÇÑ±Û¸¸ ÀÔ·Â °¡´ÉÇÏµµ·Ï ÇÔ
+        // Ä«ï¿½å¸¦ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç²ï¿½Êµå¿¡ ï¿½Ô·ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ñ±Û¸ï¿½ ï¿½Ô·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ ï¿½ï¿½
         cardInputField.onValueChanged.AddListener(OnlyKoreanOK);
 
-        //Ä«µå ³»±â ¿Ï·á ¹öÆ°À» Ã³À½¿£ ºñÈ°¼ºÈ­
+        //Ä«ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ï·ï¿½ ï¿½ï¿½Æ°ï¿½ï¿½ Ã³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È°ï¿½ï¿½È­
         CardDropBtn.interactable = false;
 
         CardDropBtn.onClick.AddListener(() => {
-            CardDropBtn.gameObject.SetActive(false); // CardDropBtn ºñÈ°¼ºÈ­
-            cardInputField.gameObject.SetActive(true); // cardInputField È°¼ºÈ­
-            cardInputField.text = ""; // ÀÎÇ²ÇÊµå ÀÔ·Â¶õÀ» ºñ¿ö³õÀ½
+            CardDropBtn.gameObject.SetActive(false); // CardDropBtn ï¿½ï¿½È°ï¿½ï¿½È­
+            cardInputField.gameObject.SetActive(true); // cardInputField È°ï¿½ï¿½È­
+            cardInputField.text = ""; // ï¿½ï¿½Ç²ï¿½Êµï¿½ ï¿½Ô·Â¶ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         });
     }
 
@@ -54,10 +57,10 @@ public class TurnChange : MonoBehaviour
 
         if (wordInput.Length > ObjectManager.instance.dropCount)
         {
-            if (ObjectManager.instance.createdWords.Contains(wordInput))  // ±ÛÀÚ·Î ÀÌ·ç¾îÁø ´Ü¾îÀÏ °æ¿ì
+            if (ObjectManager.instance.createdWords.Contains(wordInput))  // ï¿½ï¿½ï¿½Ú·ï¿½ ï¿½Ì·ï¿½ï¿½ï¿½ï¿½ ï¿½Ü¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
             {
-                Debug.Log("±ÛÀÚ·Î¸¸ ÀÌ·ç¾îÁø ´Ü¾î¸¦ »çÀü API °Ë»ç¸¦ ½ÃÀÛÇÕ´Ï´Ù");
-                // wordInput (»çÀü API °Ë»ç µ¹¸®±â)
+                Debug.Log("ï¿½ï¿½ï¿½Ú·Î¸ï¿½ ï¿½Ì·ï¿½ï¿½ï¿½ï¿½ ï¿½Ü¾î¸¦ ï¿½ï¿½ï¿½ï¿½ API ï¿½Ë»ç¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½");
+                // wordInput (ï¿½ï¿½ï¿½ï¿½ API ï¿½Ë»ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
                 ObjectManager.instance.dropCount = 0;
                 ObjectManager.instance.inputWords = wordInput;
                 StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
@@ -73,15 +76,15 @@ public class TurnChange : MonoBehaviour
                 {
                     for (int j = 0; j < 19; j++)
                     {
-                        if (ObjectManager.instance.createdWords[i] == charList[j])  // ÀÚÀ½Ä«µå°¡ Æ÷ÇÔµÈ °æ¿ì
+                        if (ObjectManager.instance.createdWords[i] == charList[j])  // ï¿½ï¿½ï¿½ï¿½Ä«ï¿½å°¡ ï¿½ï¿½ï¿½Ôµï¿½ ï¿½ï¿½ï¿½
                         {
                             List<char> words = wordLists.choDictionary[charList[j]];
                             for (int k = 0; k < 588; k++)
                             {
                                 if (wordInput[i] == words[k])
                                 {
-                                    Debug.Log("ÀÚÀ½ Ä«µå·Î ÀÌ·ç¾îÁø ´Ü¾î¸¦ »çÀü API °Ë»ç¸¦ ½ÃÀÛÇÕ´Ï´Ù");
-                                    // wordInput (»çÀü API °Ë»ç µ¹¸®±â)
+                                    Debug.Log("ï¿½ï¿½ï¿½ï¿½ Ä«ï¿½ï¿½ï¿½ ï¿½Ì·ï¿½ï¿½ï¿½ï¿½ ï¿½Ü¾î¸¦ ï¿½ï¿½ï¿½ï¿½ API ï¿½Ë»ç¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½");
+                                    // wordInput (ï¿½ï¿½ï¿½ï¿½ API ï¿½Ë»ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
                                     isContinue = false;
                                     ObjectManager.instance.dropCount = 0;
                                     ObjectManager.instance.inputWords = wordInput;
@@ -96,12 +99,12 @@ public class TurnChange : MonoBehaviour
 
             for (int i = 0; i < ObjectManager.instance.createdWords.Length; i++)
             {
-                if (ObjectManager.instance.createdWords[i] == 'C' || ObjectManager.instance.createdWords[i] == 'B')  // Æ¯¼öÄ«µå°¡ Æ÷ÇÔµÈ °æ¿ì
+                if (ObjectManager.instance.createdWords[i] == 'C' || ObjectManager.instance.createdWords[i] == 'B')  // Æ¯ï¿½ï¿½Ä«ï¿½å°¡ ï¿½ï¿½ï¿½Ôµï¿½ ï¿½ï¿½ï¿½
                 {
                     if (44032 <= wordInput[i] && wordInput[i] <= 54616)
                     {
-                        Debug.Log("Æ¯¼ö Ä«µå·Î ÀÌ·ç¾îÁø ´Ü¾î¸¦ »çÀü API °Ë»ç¸¦ ½ÃÀÛÇÕ´Ï´Ù");
-                        // wordInput (»çÀü API °Ë»ç µ¹¸®±â)
+                        Debug.Log("Æ¯ï¿½ï¿½ Ä«ï¿½ï¿½ï¿½ ï¿½Ì·ï¿½ï¿½ï¿½ï¿½ ï¿½Ü¾î¸¦ ï¿½ï¿½ï¿½ï¿½ API ï¿½Ë»ç¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½");
+                        // wordInput (ï¿½ï¿½ï¿½ï¿½ API ï¿½Ë»ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
                         ObjectManager.instance.dropCount = 0;
                         ObjectManager.instance.inputWords = wordInput;
                         StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
@@ -114,19 +117,22 @@ public class TurnChange : MonoBehaviour
         }
         else
         {
-            Debug.Log("¿À·ùÀÔ´Ï´Ù");
+            Debug.Log("ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½");
+            RollBackAreas();
         }
+
+        
     }
 
-    public void OnlyKoreanOK(string text) // ´Ü¾î ÀÔ·ÂÇÊµå¿¡ ÇÑ±Û¸¸ ÀÛ¼ºÇÒ ¼ö ÀÖµµ·Ï ÇÔ
+    public void OnlyKoreanOK(string text) // ï¿½Ü¾ï¿½ ï¿½Ô·ï¿½ï¿½Êµå¿¡ ï¿½Ñ±Û¸ï¿½ ï¿½Û¼ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Öµï¿½ï¿½ï¿½ ï¿½ï¿½
     {
-        // ÇÑ±ÛÀ» Á¦¿ÜÇÑ ¸ðµç ¹®ÀÚ Á¦¿Ü
-        // ÇÑ±Û¸¸ Çã¿ëÇÏ´Â Á¤±Ô½Ä (¶ç¾î¾²±â Æ÷ÇÔ X)
-        string koreanPattern = "^[°¡-ÆR]*$";
+        // ï¿½Ñ±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        // ï¿½Ñ±Û¸ï¿½ ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½Ô½ï¿½ (ï¿½ï¿½î¾²ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ X)
+        string koreanPattern = "^[ï¿½ï¿½-ï¿½R]*$";
 
         if (!Regex.IsMatch(text, koreanPattern))
         {
-            cardInputField.text = Regex.Replace(text, "[^°¡-ÆR]", ""); // ÇÑ±Û ÀÌ¿ÜÀÇ ¹®ÀÚ Á¦°Å
+            cardInputField.text = Regex.Replace(text, "[^ï¿½ï¿½-ï¿½R]", ""); // ï¿½Ñ±ï¿½ ï¿½Ì¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         }
     }
 
@@ -134,37 +140,44 @@ public class TurnChange : MonoBehaviour
     {
         ObjectManager.instance.dropCount = 0;
 
-        // ÀÚ½ÅÀÇ UI ÀÎµ¦½º È®ÀÎ ¹× ¾÷µ¥ÀÌÆ®
+        // ï¿½Ú½ï¿½ï¿½ï¿½ UI ï¿½Îµï¿½ï¿½ï¿½ È®ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
         turnManager.FindMyIndex();
 
         CountUserCard(userCard.displayedCards.Count);
     }
 
-    public void CountUserCard(int count) //ÀÚ½ÅÀÇ Ä«µå °³¼ö ¾÷µ¥ÀÌÆ®
+    public void CountUserCard(int count) //ï¿½Ú½ï¿½ï¿½ï¿½ Ä«ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
     {
-        userCardCount = count; // º¯¼ö¿¡ °³¼ö ÀúÀå
+        userCardCount = count; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-        // ¸ðµÎ¿¡°Ô ÀÚ½ÅÀÇ Ä«µå °³¼ö Àü´Þ ¿äÃ»ÇÏ±â - ÀÚ½ÅÀÇ Ä«µå°³¼ö, ÀÚ½ÅÀÇ ÀÎµ¦½º ¹øÈ£
+        // ï¿½ï¿½Î¿ï¿½ï¿½ï¿½ ï¿½Ú½ï¿½ï¿½ï¿½ Ä«ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã»ï¿½Ï±ï¿½ - ï¿½Ú½ï¿½ï¿½ï¿½ Ä«ï¿½å°³ï¿½ï¿½, ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½ ï¿½ï¿½È£
         turnManager.photonView.RPC("SyncAllCardCount", RpcTarget.All, userCardCount, turnManager.MyIndexNum);
 
-        if (userCardCount == 0) // Ä«µå¸¦ ´Ù ¼ÒÁøÇßÀ» ¶§ - Ä«µå °³¼ö°¡ ÇöÀç 0°³ÀÌ¸é
+        if (userCardCount == 0) // Ä«ï¿½å¸¦ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ - Ä«ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ 0ï¿½ï¿½ï¿½Ì¸ï¿½
         {
-            // ³îÀÌ°¡ Á¾·áµÇ¾úÀ½À» ¾Ë¸®´Â ¸Þ½ÃÁö 1ÃÊ Á¤µµ Ç¥½Ã ÈÄ °á°ú Ã¢ ¶ç¿ì±â
+            // ï¿½ï¿½ï¿½Ì°ï¿½ ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ë¸ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ 1ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ Ã¢ ï¿½ï¿½ï¿½ï¿½
             gameResult.EndGameDelay();
         }
-        else if ((userCardCount > 0) && (ObjectManager.instance.IsFirstTurn)) // Ä«µå´Â ³²¾ÆÀÖ°í Áö±ÝÀÌ Ã¹ ÅÏ¿¡¼­ÀÇ ÇÔ¼ö È£ÃâÀÌ¶ó¸é(Ã¹ »óÈ²¿¡¼­ Ä«µå °³¼ö ¾÷µ¥ÀÌÆ®¸¦ À§ÇÔ)
+        else if ((userCardCount > 0) && (ObjectManager.instance.IsFirstTurn)) // Ä«ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ö°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã¹ ï¿½Ï¿ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ È£ï¿½ï¿½ï¿½Ì¶ï¿½ï¿½(Ã¹ ï¿½ï¿½È²ï¿½ï¿½ï¿½ï¿½ Ä«ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
         {
-            // ÅÏ ³Ñ±â±â ¹æÁö¸¦ À§ÇÑ º¯¼ö¸¦ ÀÌÁ¦´Â false·Î º¯°æ
+            // ï¿½ï¿½ ï¿½Ñ±ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ falseï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             ObjectManager.instance.IsFirstTurn = false;
 
-            return; // ÅÏÀ» ³Ñ±âÁö ¾ÊÀ½
+            return; // ï¿½ï¿½ï¿½ï¿½ ï¿½Ñ±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         }
-        else // Ã¹ ÅÏÀÌ ¾Æ´Ñ ÀçÈ£ÃâÀÌ¶ó¸é ÅÏÀ» ³Ñ±è
+        else // Ã¹ ï¿½ï¿½ï¿½ï¿½ ï¿½Æ´ï¿½ ï¿½ï¿½È£ï¿½ï¿½ï¿½Ì¶ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ñ±ï¿½
         {
             turnManager.FindNextPlayer();
         }
 
     }
 
+    public void RollBackAreas()
+    {
+        cardPool.MoveCardsToTarGetArea(ObjectManager.instance.createdWordList, userCard.userCardContainer, userCard.displayedCards);
+        ObjectManager.instance.createdWordList.Clear();
+        fieldCard.RollBackColorAreas();
+        userCard.SelectedUserCard();
+    }
 
 }

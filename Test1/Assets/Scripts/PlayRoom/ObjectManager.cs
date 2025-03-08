@@ -36,44 +36,47 @@ public class ObjectManager : MonoBehaviourPun
     public int cardIndexY;
     public string createdWord;
     public string createdWords;
+    public List<GameObject> createdWordList;
     public string inputWords;
     public int gridCount = 9;
     public GameObject[,] grid;
     public int dropCount = 0;
-    public TMP_Text StatusMsg; //Ä«µå¸¦ ³õ´Â ÁßÀÇ »óÅÂ Ç¥½Ã ÅØ½ºÆ®
-    public List<string> cardFrontRed = new List<string> { "¤¡", "¤·", "¤¾" };
-    public List<string> cardFrontBlack; //³­ÀÌµµ¿¡ µû¶ó ³»¿ëÀÌ ´Þ¶óÁü
+    public string Displayname; //ï¿½Ú½ï¿½ï¿½ï¿½ ï¿½Ð³ï¿½ï¿½ï¿½
+    public const string DISPLAYNAME_KEY = "DisplayName"; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ DisplayName
+    public TMP_Text StatusMsg; //Ä«ï¿½å¸¦ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½ ï¿½Ø½ï¿½Æ®
+    public List<string> cardFrontRed = new List<string> { "ï¿½ï¿½", "ï¿½ï¿½", "ï¿½ï¿½" };
+    public List<string> cardFrontBlack; //ï¿½ï¿½ï¿½Ìµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Þ¶ï¿½ï¿½ï¿½
     public List<string> cardFrontSpecial = new List<string> { "C", "B" };
     public List<string> usedIndices = new List<string>();
-    public bool IsFirstTurn = true; // Ã¹ ½ÃÀÛÀ» ¾Ë¸®´Â bool º¯¼ö
-    public bool IsCardDrop = false; // Ä«µå¸¦ µå·¡±×ÇØ¼­ µå·ÓÇßÀ» ¶§ true -> rpcÇÔ¼ö È£ÃâÀÇ Á¶°ÇÀÌ µÊ
-    public bool IsMyTurn = false; // ³» ÅÏÀÎÁö ¾Æ´ÑÁö¿¡ µû¶ó µå·¡±× ¹× ¹öÆ° È°¼ºÈ­
-    public int MyCompleteWordCount = 0; // ³ªÀÇ ´Ü¾î ¿Ï¼º È½¼ö º¯¼ö
+    public bool IsFirstTurn = true; // Ã¹ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ë¸ï¿½ï¿½ï¿½ bool ï¿½ï¿½ï¿½ï¿½
+    public bool IsCardDrop = false; // Ä«ï¿½å¸¦ ï¿½å·¡ï¿½ï¿½ï¿½Ø¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ true -> rpcï¿½Ô¼ï¿½ È£ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+    public bool IsMyTurn = false; // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Æ´ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½å·¡ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½Æ° È°ï¿½ï¿½È­
+    public int MyCompleteWordCount = 0; // ï¿½ï¿½ï¿½ï¿½ ï¿½Ü¾ï¿½ ï¿½Ï¼ï¿½ È½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 
     private void Start()
     {
-        // ¹æÀÇ ³­ÀÌµµ ºÒ·¯¿À±â
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ìµï¿½ ï¿½Ò·ï¿½ï¿½ï¿½ï¿½ï¿½
         if (PhotonNetwork.InRoom)
         {
             Room room = PhotonNetwork.CurrentRoom;
 
-            // 'DifficultyContents' Å°¿¡ ÀúÀåµÈ °ªÀ» °¡Á®¿Í¼­ ¹Ù·Î List<string>À¸·Î º¯È¯
+            // 'DifficultyContents' Å°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ ï¿½Ù·ï¿½ List<string>ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯
             if (room.CustomProperties.ContainsKey("DifficultyContents"))
             {
                 string[] difficultyContentsArray = (string[])room.CustomProperties["DifficultyContents"];
 
-                // string[]À» List<string>À¸·Î º¯È¯
+                // string[]ï¿½ï¿½ List<string>ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯
                 List<string> difficultyContentsList = new List<string>(difficultyContentsArray);
 
-                // ³­ÀÌµµ ³»¿ëÀ» º¯¼ö¿¡ Àü´Þ
+                // ï¿½ï¿½ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                 cardFrontBlack = difficultyContentsList;
 
-                // ÀÌÁ¦ List<string>À¸·Î »ç¿ë °¡´É
+                // ï¿½ï¿½ï¿½ï¿½ List<string>ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                 Debug.Log(string.Join(", ", cardFrontBlack));
             }
         }
-        //»óÅÂ¸Þ½ÃÁö ºñ¿ì±â
+        //ï¿½ï¿½ï¿½Â¸Þ½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         StatusMsg.text = "";
     }
 
@@ -90,7 +93,7 @@ public class ObjectManager : MonoBehaviourPun
     }
     public void ShowCardSelectingMessage(bool isDragging)
     {
-        // µå·¡±× Áß(Ä«µå °í¸£´Â Áß)À» ¾Ë¸®´Â ¸Þ½ÃÁö¸¦ ¸ðµÎ¿¡°Ô Ç¥½Ã
+        // ï¿½å·¡ï¿½ï¿½ ï¿½ï¿½(Ä«ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½)ï¿½ï¿½ ï¿½Ë¸ï¿½ï¿½ï¿½ ï¿½Þ½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Î¿ï¿½ï¿½ï¿½ Ç¥ï¿½ï¿½
         photonView.RPC("ShowDragStatus", RpcTarget.All, isDragging, UserInfoManager.instance.MyName);
     }
    
@@ -99,11 +102,11 @@ public class ObjectManager : MonoBehaviourPun
     {
         if (isDragging)
         {
-            ObjectManager.instance.StatusMsg.text = $"{name}´ÔÀÌ Ä«µå¸¦ °í¸£´Â Áß..";
+            ObjectManager.instance.StatusMsg.text = $"{name}ï¿½ï¿½ï¿½ï¿½ Ä«ï¿½å¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½..";
         }
         else
         {
-            ObjectManager.instance.StatusMsg.text = $"{name}´ÔÀÌ ´Ü¾î¸¦ ÀÔ·Â Áß..";
+            ObjectManager.instance.StatusMsg.text = $"{name}ï¿½ï¿½ï¿½ï¿½ ï¿½Ü¾î¸¦ ï¿½Ô·ï¿½ ï¿½ï¿½..";
         }  
     }
 

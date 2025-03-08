@@ -74,6 +74,8 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
 
             ObjectManager.instance.createdWord = card.name;
 
+            ObjectManager.instance.createdWordList.Add(card);
+
             // 카드 놓인 그리드 위치 파악
             for (int x = 0; x < ObjectManager.instance.gridCount; x++)
             {

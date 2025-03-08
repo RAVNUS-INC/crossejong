@@ -61,6 +61,23 @@ public class FieldCard : MonoBehaviourPun
         }
     }
 
+    public void RollBackColorAreas()
+    {
+        for (int x = 0; x < 7; x++)
+        {
+            for (int y = 0; y < 7; y++)
+            {
+                Image image = ObjectManager.instance.grid[x, y].GetComponent<Image>();
+                image.color = Color.clear;
+                if (ObjectManager.instance.grid[x, y].transform.childCount == 1)
+                {
+                    image.color = Color.white;
+                }
+            }
+            OnOffDropAreas();
+        }
+    }
+
     public void OnOffDropAreas()
     {
         for (int x = 0; x < 7; x++)
