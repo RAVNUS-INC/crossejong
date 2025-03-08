@@ -274,21 +274,23 @@ public class TurnManager : MonoBehaviourPunCallbacks
         Debug.Log($"나간 유저의 액터넘버: {leftNum}");
 
         // 만약 현재 방에 있는 플레이어가 2명 미만이라면 - 결과는 정해짐
-        if (userProfileLoad.sortedPlayers.Length < 2)
-        {
-            if (ObjectManager.instance.IsMyTurn) //현재 내 턴일 때
-            {
-                if (TurnRoutine != null)
-                {
-                    StopCoroutine(TurnRoutine); // 현재 코루틴 중지
-                }
-                TurnRoutine = null;
-            }
-            Debug.Log($"현재 플레이어가 2명 미만으로 게임이 종료됩니다.");
+        // 멀티 테스트 시 주석 해제
 
-            // 놀이가 종료되었음을 알리는 메시지 1초 정도 표시 후 결과 창 띄우기
-            gameResult.EndGameDelay();
-        }
+        //if (userProfileLoad.sortedPlayers.Length < 2)
+        //{
+        //    if (ObjectManager.instance.IsMyTurn) //현재 내 턴일 때
+        //    {
+        //        if (TurnRoutine != null)
+        //        {
+        //            StopCoroutine(TurnRoutine); // 현재 코루틴 중지
+        //        }
+        //        TurnRoutine = null;
+        //    }
+        //    Debug.Log($"현재 플레이어가 2명 미만으로 게임이 종료됩니다.");
+
+        //    // 놀이가 종료되었음을 알리는 메시지 1초 정도 표시 후 결과 창 띄우기
+        //    gameResult.EndGameDelay();
+        //}
     }
 
     [PunRPC]
