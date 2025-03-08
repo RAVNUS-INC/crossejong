@@ -71,13 +71,13 @@ public class DictionaryAPI : MonoBehaviour
                         else
                         {
                             Debug.Log("단어 '" + word + "'가 존재하지 않거나, 명사가 아닙니다.");
-                            turnChange.RollBackAreas();
+                            turnChange.RollBackAreas(); // API검사에 통과하지 못했으므로 카드를 다시 돌려놓기
                         }
                     }
                     else
                     {
                         Debug.Log("단어 '" + word + "'가 존재하지 않습니다.");
-                        turnChange.RollBackAreas();
+                        turnChange.RollBackAreas(); // API검사에 통과하지 못했으므로 카드를 다시 돌려놓기
                     }
                 }
                 catch (Exception e)
@@ -90,7 +90,7 @@ public class DictionaryAPI : MonoBehaviour
             {
                 // 요청 실패 시 에러 로그 출력
                 Debug.LogError("API 요청 실패: " + request.error + "\nResponse: " + request.downloadHandler.text);
-                turnChange.RollBackAreas();
+                turnChange.RollBackAreas(); // API 요청 실패로 카드를 다시 돌려놓기
             }
         }
     }

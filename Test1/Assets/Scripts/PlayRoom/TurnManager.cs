@@ -138,7 +138,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
         Debug.Log("시간 초과! 턴을 넘깁니다.");
 
-        // 카드 한 장 먹고 ui 업데이트
+        // 카드 한 장 먹고 ui 업데이트, 롤백도 수행
         getCard.GetCardToUserCard();
 
         // 다음 턴의 플레이어 찾기 
@@ -197,7 +197,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
             Debug.Log("카드를 추가하고 턴을 넘깁니다.");
 
-            // 카드 한 장 먹고 ui 업데이트
+            // 카드 한 장 먹고 ui 업데이트, 롤백 수행
             getCard.GetCardToUserCard();
         }
     }
@@ -219,7 +219,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
             // 단어완성횟수 +1 증가시키기
             ObjectManager.instance.MyCompleteWordCount++;
 
-            // 나의 카드 개수 ui업데이트 요청
+            // 나의 카드 개수 ui업데이트 요청, 턴 넘기기 수행
             turnChange.TurnEnd();
         }
     }

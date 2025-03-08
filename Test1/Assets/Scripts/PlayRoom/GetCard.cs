@@ -66,6 +66,9 @@ public class GetCard : MonoBehaviourPun
             getCardButton.interactable = false;
         }
 
+        // 보드판에 있던 카드를 다시 슬롯으로 되돌려놓기
+        turnChange.RollBackAreas();
+
         // 카드 개수 UI 업데이트 요청
         turnChange.TurnEnd();
     }

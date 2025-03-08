@@ -71,8 +71,8 @@ public class UserProfileLoad : MonoBehaviourPun
         SyncPlayerList();
 
         // 현재 플레이방에 있으며, 방 속성에서 설정한 인원과 리스트 길이가 같을 때 -> 카운트다운 실행
-        if ((SceneManager.GetActiveScene().name == "PlayRoom") && (players.Count == PhotonNetwork.CurrentRoom.MaxPlayers))
-        //if ((SceneManager.GetActiveScene().name == "PlayRoom"))
+        //if ((SceneManager.GetActiveScene().name == "PlayRoom") && (players.Count == PhotonNetwork.CurrentRoom.MaxPlayers))
+        if ((SceneManager.GetActiveScene().name == "PlayRoom"))
         {
             Debug.Log("모든 플레이어 입장 완료!");
 

@@ -41,42 +41,40 @@ public class ObjectManager : MonoBehaviourPun
     public int gridCount = 9;
     public GameObject[,] grid;
     public int dropCount = 0;
-    public string Displayname; //�ڽ��� �г���
-    public const string DISPLAYNAME_KEY = "DisplayName"; // ������ DisplayName
-    public TMP_Text StatusMsg; //ī�带 ���� ���� ���� ǥ�� �ؽ�Ʈ
-    public List<string> cardFrontRed = new List<string> { "��", "��", "��" };
-    public List<string> cardFrontBlack; //���̵��� ���� ������ �޶���
+    public TMP_Text StatusMsg; //카드를 놓는 중의 상태 표시 텍스트
+    public List<string> cardFrontRed = new List<string> { "ㄱ", "ㅇ", "ㅎ" };
+    public List<string> cardFrontBlack; //난이도에 따라 내용이 달라짐
     public List<string> cardFrontSpecial = new List<string> { "C", "B" };
     public List<string> usedIndices = new List<string>();
-    public bool IsFirstTurn = true; // ù ������ �˸��� bool ����
-    public bool IsCardDrop = false; // ī�带 �巡���ؼ� ������� �� true -> rpc�Լ� ȣ���� ������ ��
-    public bool IsMyTurn = false; // �� ������ �ƴ����� ���� �巡�� �� ��ư Ȱ��ȭ
-    public int MyCompleteWordCount = 0; // ���� �ܾ� �ϼ� Ƚ�� ����
+    public bool IsFirstTurn = true; // 첫 시작을 알리는 bool 변수
+    public bool IsCardDrop = false;  // 카드를 드래그해서 드롭했을 때 true -> rpc함수 호출의 조건이 됨
+    public bool IsMyTurn = false;  // 내 턴인지 아닌지에 따라 드래그 및 버튼 활성화
+    public int MyCompleteWordCount = 0; // 나의 단어 완성 횟수 변수
 
 
     private void Start()
     {
-        // ���� ���̵� �ҷ�����
+        // 방의 난이도 불러오기
         if (PhotonNetwork.InRoom)
         {
             Room room = PhotonNetwork.CurrentRoom;
 
-            // 'DifficultyContents' Ű�� ����� ���� �����ͼ� �ٷ� List<string>���� ��ȯ
+            // 'DifficultyContents' 키에 저장된 값을 가져와서 바로 List<string>으로 변환
             if (room.CustomProperties.ContainsKey("DifficultyContents"))
             {
                 string[] difficultyContentsArray = (string[])room.CustomProperties["DifficultyContents"];
 
-                // string[]�� List<string>���� ��ȯ
+                /// string[]을 List<string>으로 변환
                 List<string> difficultyContentsList = new List<string>(difficultyContentsArray);
 
-                // ���̵� ������ ������ ����
+                // 난이도 내용을 변수에 전달
                 cardFrontBlack = difficultyContentsList;
 
-                // ���� List<string>���� ��� ����
+                // 이제 List<string>으로 사용 가능
                 Debug.Log(string.Join(", ", cardFrontBlack));
             }
         }
-        //���¸޽��� ����
+        //상태메시지 비우기
         StatusMsg.text = "";
     }
 
@@ -93,7 +91,7 @@ public class ObjectManager : MonoBehaviourPun
     }
     public void ShowCardSelectingMessage(bool isDragging)
     {
-        // �巡�� ��(ī�� ������ ��)�� �˸��� �޽����� ��ο��� ǥ��
+        // 드래그 중(카드 고르는 중)을 알리는 메시지를 모두에게 표시
         photonView.RPC("ShowDragStatus", RpcTarget.All, isDragging, UserInfoManager.instance.MyName);
     }
    
@@ -102,12 +100,12 @@ public class ObjectManager : MonoBehaviourPun
     {
         if (isDragging)
         {
-            ObjectManager.instance.StatusMsg.text = $"{name}���� ī�带 ������ ��..";
+            ObjectManager.instance.StatusMsg.text = $"{name}님이 카드를 고르는 중..";
         }
         else
         {
-            ObjectManager.instance.StatusMsg.text = $"{name}���� �ܾ �Է� ��..";
-        }  
+            ObjectManager.instance.StatusMsg.text = $"{name}님이 단어를 입력 중..";
+        }
     }
 
 

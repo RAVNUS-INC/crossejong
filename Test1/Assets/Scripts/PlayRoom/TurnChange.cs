@@ -16,35 +16,35 @@ public class TurnChange : MonoBehaviour
     public UserCard userCard;
     public FieldCard fieldCard;
     public CardPool cardPool;
-    public UserCardFullPopup userCardFullPopup; // ���� �ƴ� �� ī�� ��ü ���� ������ ���� ���
-    public TurnManager turnManager; // �ڽ��� �ε��� ��ȣ �˱� ���� ���
-    public GameResult gameResult; // ��� �ǳ� Ȱ��ȭ�� ���� ���
+    public UserCardFullPopup userCardFullPopup; // 턴이 아닐 때 카드 객체 선택 방지를 위해 사용
+    public TurnManager turnManager; // 자신의 인덱스 번호 알기 위해 사용
+    public GameResult gameResult; // 결과 판넬 활성화를 위해 사용
 
-    public int userCardCount; // ������ ī�� ����
-    public TMP_InputField cardInputField; // ī�� ���� �Է��ϴ� �ʵ�
-    public Button CardDropBtn; // ī�� �������� ������ ��ư - �Ͽ� ���� ��Ȱ��ȭ Ȱ��ȭ
+    public int userCardCount; // 본인의 카드 개수
+    public TMP_InputField cardInputField; // 카드 내고 입력하는 필드
+    public Button CardDropBtn; // 카드 내고나서 누르는 버튼 - 턴에 따라 비활성화 활성화
     public string wordInput;
     public bool isContinue;
     public WordLists wordLists;
     public DictionaryAPI dictionaryAPI;
 
     public List<char> charList = new List<char>
-    {'��', '��', '��', '��', '��', '��', '��', '��', '��', '��', '��', '��', '��', '��', '��', '��', '��', '��', '��'};
+     {'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'};
 
-    
+
 
     private void Start()
     {
-        // ī�带 ���� ��ǲ�ʵ忡 �Է��� �� �ѱ۸� �Է� �����ϵ��� ��
+        // 카드를 내고 인풋필드에 입력할 때 한글만 입력 가능하도록 함
         cardInputField.onValueChanged.AddListener(OnlyKoreanOK);
 
-        //ī�� ���� �Ϸ� ��ư�� ó���� ��Ȱ��ȭ
+        //카드 내기 완료 버튼을 처음엔 비활성화
         CardDropBtn.interactable = false;
 
         CardDropBtn.onClick.AddListener(() => {
-            CardDropBtn.gameObject.SetActive(false); // CardDropBtn ��Ȱ��ȭ
-            cardInputField.gameObject.SetActive(true); // cardInputField Ȱ��ȭ
-            cardInputField.text = ""; // ��ǲ�ʵ� �Է¶��� �������
+            CardDropBtn.gameObject.SetActive(false); // CardDropBtn 비활성화
+            cardInputField.gameObject.SetActive(true); // cardInputField 활성화
+            cardInputField.text = ""; // 인풋필드 입력란을 비워놓음
         });
     }
 
@@ -57,10 +57,10 @@ public class TurnChange : MonoBehaviour
 
         if (wordInput.Length > ObjectManager.instance.dropCount)
         {
-            if (ObjectManager.instance.createdWords.Contains(wordInput))  // ���ڷ� �̷���� �ܾ��� ���
+            if (ObjectManager.instance.createdWords.Contains(wordInput))  // 글자로 이루어진 단어일 경우
             {
-                Debug.Log("���ڷθ� �̷���� �ܾ ���� API �˻縦 �����մϴ�");
-                // wordInput (���� API �˻� ������)
+                Debug.Log("글자로만 이루어진 단어를 사전 API 검사를 시작합니다");
+                // wordInput  (사전 API 검사 돌리기)
                 ObjectManager.instance.dropCount = 0;
                 ObjectManager.instance.inputWords = wordInput;
                 StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
@@ -76,15 +76,15 @@ public class TurnChange : MonoBehaviour
                 {
                     for (int j = 0; j < 19; j++)
                     {
-                        if (ObjectManager.instance.createdWords[i] == charList[j])  // ����ī�尡 ���Ե� ���
+                        if (ObjectManager.instance.createdWords[i] == charList[j])  // 자음카드가 포함된 경우
                         {
                             List<char> words = wordLists.choDictionary[charList[j]];
                             for (int k = 0; k < 588; k++)
                             {
                                 if (wordInput[i] == words[k])
                                 {
-                                    Debug.Log("���� ī��� �̷���� �ܾ ���� API �˻縦 �����մϴ�");
-                                    // wordInput (���� API �˻� ������)
+                                    Debug.Log("자음 카드로 이루어진 단어를 사전 API 검사를 시작합니다");
+                                    // wordInput (사전 API 검사 돌리기)
                                     isContinue = false;
                                     ObjectManager.instance.dropCount = 0;
                                     ObjectManager.instance.inputWords = wordInput;
@@ -99,12 +99,12 @@ public class TurnChange : MonoBehaviour
 
             for (int i = 0; i < ObjectManager.instance.createdWords.Length; i++)
             {
-                if (ObjectManager.instance.createdWords[i] == 'C' || ObjectManager.instance.createdWords[i] == 'B')  // Ư��ī�尡 ���Ե� ���
+                if (ObjectManager.instance.createdWords[i] == 'C' || ObjectManager.instance.createdWords[i] == 'B')  // 특수카드가 포함된 경우
                 {
                     if (44032 <= wordInput[i] && wordInput[i] <= 54616)
                     {
-                        Debug.Log("Ư�� ī��� �̷���� �ܾ ���� API �˻縦 �����մϴ�");
-                        // wordInput (���� API �˻� ������)
+                        Debug.Log("특수 카드로 이루어진 단어를 사전 API 검사를 시작합니다");
+                        // wordInput (사전 API 검사 돌리기)
                         ObjectManager.instance.dropCount = 0;
                         ObjectManager.instance.inputWords = wordInput;
                         StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
@@ -117,22 +117,22 @@ public class TurnChange : MonoBehaviour
         }
         else
         {
-            Debug.Log("�����Դϴ�");
+            Debug.Log("오류입니다");
             RollBackAreas();
         }
 
         
     }
 
-    public void OnlyKoreanOK(string text) // �ܾ� �Է��ʵ忡 �ѱ۸� �ۼ��� �� �ֵ��� ��
+    public void OnlyKoreanOK(string text) // 단어 입력필드에 한글만 작성할 수 있도록 함
     {
-        // �ѱ��� ������ ��� ���� ����
-        // �ѱ۸� ����ϴ� ���Խ� (���� ���� X)
-        string koreanPattern = "^[��-�R]*$";
+        // 한글을 제외한 모든 문자 제외
+        // 한글만 허용하는 정규식 (띄어쓰기 포함 X)
+        string koreanPattern = "^[가-힣]*$";
 
         if (!Regex.IsMatch(text, koreanPattern))
         {
-            cardInputField.text = Regex.Replace(text, "[^��-�R]", ""); // �ѱ� �̿��� ���� ����
+            cardInputField.text = Regex.Replace(text, "[^가-힣]", ""); // 한글 이외의 문자 제거
         }
     }
 
@@ -140,32 +140,32 @@ public class TurnChange : MonoBehaviour
     {
         ObjectManager.instance.dropCount = 0;
 
-        // �ڽ��� UI �ε��� Ȯ�� �� ������Ʈ
+        // 자신의 UI 인덱스 확인 및 업데이트
         turnManager.FindMyIndex();
 
         CountUserCard(userCard.displayedCards.Count);
     }
 
-    public void CountUserCard(int count) //�ڽ��� ī�� ���� ������Ʈ
+    public void CountUserCard(int count)  //자신의 카드 개수 업데이트
     {
-        userCardCount = count; // ������ ���� ����
+        userCardCount = count; // 변수에 개수 저장
 
-        // ��ο��� �ڽ��� ī�� ���� ���� ��û�ϱ� - �ڽ��� ī�尳��, �ڽ��� �ε��� ��ȣ
+        // 모두에게 자신의 카드 개수 전달 요청하기 - 자신의 카드개수, 자신의 인덱스 번호
         turnManager.photonView.RPC("SyncAllCardCount", RpcTarget.All, userCardCount, turnManager.MyIndexNum);
 
-        if (userCardCount == 0) // ī�带 �� �������� �� - ī�� ������ ���� 0���̸�
+        if (userCardCount == 0) // 카드를 다 소진했을 때 - 카드 개수가 현재 0개이면
         {
-            // ���̰� ����Ǿ����� �˸��� �޽��� 1�� ���� ǥ�� �� ��� â ����
+            // 놀이가 종료되었음을 알리는 메시지 1초 정도 표시 후 결과 창 띄우기
             gameResult.EndGameDelay();
         }
-        else if ((userCardCount > 0) && (ObjectManager.instance.IsFirstTurn)) // ī��� �����ְ� ������ ù �Ͽ����� �Լ� ȣ���̶��(ù ��Ȳ���� ī�� ���� ������Ʈ�� ����)
+        else if ((userCardCount > 0) && (ObjectManager.instance.IsFirstTurn)) // 카드는 남아있고 지금이 첫 턴에서의 함수 호출이라면
         {
-            // �� �ѱ�� ������ ���� ������ ������ false�� ����
+            // 턴 넘기기 방지를 위한 변수를 이제는 false로 변경
             ObjectManager.instance.IsFirstTurn = false;
 
-            return; // ���� �ѱ��� ����
+            return; // 턴을 넘기지 않음
         }
-        else // ù ���� �ƴ� ��ȣ���̶�� ���� �ѱ�
+        else // 첫 턴이 아닌 재호출이라면 턴을 넘김
         {
             turnManager.FindNextPlayer();
         }
