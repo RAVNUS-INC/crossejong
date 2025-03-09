@@ -31,6 +31,8 @@ public class TurnManager : MonoBehaviourPunCallbacks
     public int NextPlayerNum, MyIndexNum; // 다음 플레이어의 액터넘버, 내 UI 인덱스 번호
     public TMP_Text[] CardCount, InTurnCardCount; // 턴에 없을 때와 있을 때의 카드 개수 표시 텍스트 배열
 
+    public UnityEngine.UI.Button endFullPopupButton; //UserCardFullPopup 닫기 버튼
+
     private float remainingTime = 0f;
     Coroutine TurnRoutine;
 
@@ -137,6 +139,8 @@ public class TurnManager : MonoBehaviourPunCallbacks
         TurnRoutine = null;
 
         Debug.Log("시간 초과! 턴을 넘깁니다.");
+
+        endFullPopupButton.onClick.Invoke(); // UserCardFullPopup 창 닫기
 
         // 카드 한 장 먹고 ui 업데이트, 롤백도 수행
         getCard.GetCardToUserCard();

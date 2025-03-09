@@ -13,6 +13,7 @@ public class GetCard : MonoBehaviourPun
 {
     public CardPool cardPool;
     public UserCard userCard;
+    public UserCardFullPopup userCardFullPopup;
     public CardDrag cardDrag;
     public Button getCardButton;
     public TurnChange turnChange; // 카드 개수 업데이트를 위해 사용
@@ -52,7 +53,9 @@ public class GetCard : MonoBehaviourPun
 
         if (cardPool.cards.Count > 0)
         {
+
             cardPool.GetCardsToTarGetArea(randomCards, userCard.userCardContainer, userCard.displayedCards);
+            
 
             cardDrag = randomCards[0].GetComponent<CardDrag>();
             if (cardDrag == null)
