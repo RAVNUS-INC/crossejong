@@ -72,10 +72,10 @@ public class UserCard : MonoBehaviourPun
         
     }
 
-    public void SelectedUserCard()
+    public void SelectedUserCard(List<GameObject> userLists)
     {
-        for (int i = 0; i < displayedCards.Count; i++) { 
-            GameObject card = displayedCards[i];
+        for (int i = 0; i < userLists.Count; i++) { 
+            GameObject card = userLists[i];
 
             Button cardButton = card.GetComponent<Button>();
             if (cardButton == null)
