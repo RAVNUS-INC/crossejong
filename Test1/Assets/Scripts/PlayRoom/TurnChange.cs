@@ -11,7 +11,7 @@ using UnityEditor;
 using Unity.VisualScripting;
 using System.Text.RegularExpressions;
 
-public class TurnChange : MonoBehaviour
+public class TurnChange : MonoBehaviourPun
 {
     public UserCard userCard;
     public FieldCard fieldCard;
@@ -177,11 +177,25 @@ public class TurnChange : MonoBehaviour
 
     }
 
+    // 롤백 버튼을 누르면 수행되는 함수
     public void RollBackAreas()
     {
         cardPool.GetCardsToTarGetArea(ObjectManager.instance.createdWordList, userCard.userCardContainer, userCard.displayedCards);
         fieldCard.RollBackColorAreas();
         userCard.SelectedUserCard(userCard.displayedCards);
+
+        // 다른 유저에게 내가 롤백했음을 알려 카드를 다시 되돌리도록 요청
+        // ObjectManager.instance.rollBackList.ToArray() 리스트를 배열로 전환해 받아서 이것을 사용
+        //  - 보드판에 해당 문자가 있는지 돌면서 검사 - 있으면 해당 위치 파악, 해당 위치 빈 객체로 초기화
+        if (ObjectManager.instance.rollBackList.Count > 0) // 롤백할 무언가가 있으면
+        {
+            // 다른 유저들에게 삭제해줄 것을 요청
+            userCard.photonView.RPC("RemoveRollCard", RpcTarget.Others, string.Join(",",ObjectManager.instance.rollBackList));
+
+            // 롤백리스트 다시 초기화
+            ObjectManager.instance.rollBackList.Clear();
+            ObjectManager.instance.createdWordList.Clear();
+        }
     }
 
 }

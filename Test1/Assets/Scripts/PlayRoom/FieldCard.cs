@@ -73,6 +73,7 @@ public class FieldCard : MonoBehaviourPun
                 if (ObjectManager.instance.grid[x, y].transform.childCount == 1)
                 {
                     image.color = Color.white;
+                    Debug.Log($"{x}, {y}위치에 자식 존재");
                 }
             }
             OnOffDropAreas();
@@ -230,14 +231,15 @@ public class FieldCard : MonoBehaviourPun
             targetCard.SetActive(true);
             targetCard.transform.SetParent(targetGridObject.transform, false);
             ObjectManager.instance.grid[cardIndexX, cardIndexY] = targetCard; // 그리드에 카드 정보 업데이트
-
-            // 그리드에 카드를 배치한 후, 드롭 영역 업데이트
-            OnOffDropAreas();
         }
         else
         {
             Debug.LogError("카드를 찾을 수 없거나, 잘못된 그리드 위치입니다.");
         }
+
+        // 그리드에 카드를 배치한 후, 드롭 영역 업데이트
+        // 드롭영역 업데이트
+        RollBackColorAreas();
     }
 
     public void FirstFieldCard()

@@ -74,6 +74,8 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
 
             ObjectManager.instance.createdWord = card.name;
 
+            ObjectManager.instance.rollBackList.Add(card.name); // 롤백 할지도 모르니 놓은 카드 리스트들을 저장
+
             ObjectManager.instance.createdWordList.Add(card);
 
             // 카드 놓인 그리드 위치 파악
@@ -94,6 +96,8 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
             fieldCard.OnOffDropAreas(); // 여기에서 다른 모두가 놓은 카드를 그리드에 실시간으로 업데이트
 
             ObjectManager.instance.dropCount += 1;
+
+            ObjectManager.instance.createdWord = ""; // 드롭한 카드 목록 비우기
 
         }
     }
