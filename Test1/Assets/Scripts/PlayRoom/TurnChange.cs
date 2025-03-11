@@ -160,12 +160,15 @@ public class TurnChange : MonoBehaviour
             // 놀이가 종료되었음을 알리는 메시지 1초 정도 표시 후 결과 창 띄우기
             gameResult.EndGameDelay();
         }
-        else if ((userCardCount > 0) && (ObjectManager.instance.IsFirstTurn)) // 카드는 남아있고 지금이 첫 턴에서의 함수 호출이라면
+        else if (userCardCount > 0) // 처음 카드개수 셀 때만 이 함수를 거침. 카드는 남아있고 지금이 첫 턴에서의 함수 호출일 때 수행
         {
-            // 턴 넘기기 방지를 위한 변수를 이제는 false로 변경
-            ObjectManager.instance.IsFirstTurn = false;
+            if (ObjectManager.instance.IsFirstTurn == true)
+            {
+                // 턴 넘기기 방지를 위한 변수를 이제는 false로 변경
+                ObjectManager.instance.IsFirstTurn = false;
 
-            return; // 턴을 넘기지 않음
+                return; // 턴을 넘기지 않음
+            }
         }
         else // 첫 턴이 아닌 재호출이라면 턴을 넘김
         {

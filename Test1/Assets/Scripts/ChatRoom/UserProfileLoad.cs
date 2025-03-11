@@ -65,13 +65,12 @@ public class UserProfileLoad : MonoBehaviourPun
         // 방장이 플레이어를 리스트에 추가
         players.Add(new Player(displayName, imgIndex, myActNum));
 
-        // Debug.Log($"플레이어 {myActNum}가 리스트에 추가됨.");
-
         // 모든 유저에게 동기화 요청
         SyncPlayerList();
 
         // 현재 플레이방에 있으며, 방 속성에서 설정한 인원과 리스트 길이가 같을 때 -> 카운트다운 실행
         //if ((SceneManager.GetActiveScene().name == "PlayRoom") && (players.Count == PhotonNetwork.CurrentRoom.MaxPlayers))
+
         if ((SceneManager.GetActiveScene().name == "PlayRoom"))
         {
             Debug.Log("모든 플레이어 입장 완료!");
@@ -104,7 +103,7 @@ public class UserProfileLoad : MonoBehaviourPun
             // actnum 리스트 재정렬
             OrderedPlayers();
 
-            PV.RPC("UpdatePlayerListNotUI", RpcTarget.AllBuffered,
+            PV.RPC("UpdatePlayerListNotUI", RpcTarget.All,
                 players.Select(p => p.displayName).ToArray(),
                 players.Select(p => p.imgIndex).ToArray(),
                 players.Select(p => p.myActNum).ToArray(),
@@ -146,7 +145,7 @@ public class UserProfileLoad : MonoBehaviourPun
         // 유저들 사진 리스트를 모두가 갱신받음
         userImageList = imgIndexes;
 
-        Debug.Log($"플레이어 리스트 동기화됨.");
+        Debug.Log($"플레이어 수에 따른 리스트 동기화 완료");
 
         UpdatePlayerViewUI();
     }

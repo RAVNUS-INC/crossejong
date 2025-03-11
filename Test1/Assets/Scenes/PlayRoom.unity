@@ -249,6 +249,7 @@ MonoBehaviour:
   displayedCards: []
   userProfileLoad: {fileID: 617193425}
   userCardFullPopup: {fileID: 1768101437}
+  countDown: {fileID: 0}
 --- !u!114 &11155627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6956,6 +6957,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fullPopup: {fileID: 1768101437}
+  userCard: {fileID: 11155626}
   fieldContainer: {fileID: 534768504}
   cardPool: {fileID: 1342198615}
   fieldDisplayedCards: []
@@ -9168,7 +9170,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 98.725, y: -166.255}
+  m_AnchoredPosition: {x: 98.725006, y: -166.255}
   m_SizeDelta: {x: 197.45, y: 266.83}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1200990911

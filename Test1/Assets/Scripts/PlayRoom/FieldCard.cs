@@ -18,6 +18,7 @@ public class FieldCard : MonoBehaviourPun
 
 {
     public UserCardFullPopup fullPopup;
+    public UserCard userCard; // 카드 드래그 상태 설정 위해
 
     public Transform fieldContainer; // FieldArea의 Contents
     public CardPool cardPool; // CardPool 참조
@@ -267,6 +268,11 @@ public class FieldCard : MonoBehaviourPun
         ObjectManager.instance.grid[4, 4] = firstCards;
 
         OnOffDropAreas();
+
+        // 카드 드래그 상태 각자 설정하기
+        userCard.SelectedUserCard(userCard.displayedCards);
     }
+
+    
 
 }

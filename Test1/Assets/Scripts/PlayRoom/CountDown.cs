@@ -13,6 +13,7 @@ public class Countdown : MonoBehaviourPun
     public Button startGameButton; //게임 시작버튼
     public GameObject WaitingPanel; // 모두가 접속하기 전까지 보이는 패널(대기상태표시)
     public Image fieldArea; // 보드판 활성화를 위해
+    private bool isCountingDown = false;
 
     public FieldCard fieldCard;
     public TurnManager turnMananger;
@@ -37,6 +38,9 @@ public class Countdown : MonoBehaviourPun
 
         fieldArea.gameObject.SetActive(true); // 카운트다운 숫자가 보이게
 
+        if (isCountingDown) return; // 이미 실행 중이면 중복 실행 방지
+        isCountingDown = true;
+
         StartCoroutine(CountDownRoutine(1)); // 타이머 시작
     }
 
@@ -55,50 +59,28 @@ public class Countdown : MonoBehaviourPun
         yield return new WaitForSeconds(startDelay);
 
         countDownText.gameObject.SetActive(false); // 카운트다운 텍스트 숨김
-        StartGame();
-
-    }
-
-    private void StartGame()
-    {
-        //방장만 먼저 첫번째 카드를 고른다
-        if (PhotonNetwork.IsMasterClient)
-        {
-            userCard.FirstUserCardArea();
-            // 방장이 완료되었음을 알림 (RPC 호출)
-            photonView.RPC("FirstUserCompleted", RpcTarget.All);
-        }
 
         if (PhotonNetwork.IsMasterClient)
         {
-            fieldCard.FirstFieldCard();
-            // 방장이 완료되었음을 알림 (RPC 호출)
-            photonView.RPC("FirstFieldCompleted", RpcTarget.All);
+            StartGame(); // 방장이라면 이 함수 수행
         }
 
-        // 첫사람(방장)부터 타이머 시작
-        if (PhotonNetwork.IsMasterClient)
-        {
-            // 각자 모두 현재 카드 개수 세기 요청
-            photonView.RPC("LetsCardCount", RpcTarget.All);
-
-            // 방장부터 첫 카운트 다운 시작
-            turnMananger.AfterCountdown();
-        }
-
+        isCountingDown = false; // 타이머 종료 후, 다시 호출 가능하도록 설정
     }
 
-    [PunRPC]
-    private void FirstUserCompleted()
+    private void StartGame() // 방장만 수행
     {
-        fieldCard.CreateDropAreas();
+        userCard.FirstUserCardArea(); // 방장이 카드를 몇장씩 뽑아 플레이어들에게 나눠줌
+
+        fieldCard.FirstFieldCard(); // 방장이 첫 카드 뽑아 모두에게 수행 추가 요청
+
+        // 각자 모두 현재 카드 개수 세기 요청
+        photonView.RPC("LetsCardCount", RpcTarget.All);
+
+        // 방장부터 첫 카운트 다운 시작
+        turnMananger.AfterCountdown();
     }
 
-    [PunRPC]
-    private void FirstFieldCompleted()
-    {
-        userCard.SelectedUserCard(userCard.displayedCards);
-    }
 
     [PunRPC]
     private void LetsCardCount() // 자신의 카드 개수 업데이트

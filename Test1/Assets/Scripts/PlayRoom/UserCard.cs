@@ -34,14 +34,12 @@ public class UserCard : MonoBehaviourPun
     public List<GameObject> displayedCards; // UserCardArea에서 보여지는 카드 리스트
     public UserProfileLoad userProfileLoad; // UserProfileLoad 참조
     public UserCardFullPopup userCardFullPopup; // 턴이 아닐 때 카드 객체 선택 방지를 위해 사용
+    public Countdown countDown; // 11장 배분 뒤 모두에게 요청 위해
 
 
     //UserCardArea로 11개의 랜덤 카드 이동
     public void FirstUserCardArea()
     {
-        // 정렬된 플레이어 리스트와 함께 모든 유저에게 전달
-        //photonView.RPC("SyncSortedPlayers", RpcTarget.All, userProfileLoad.sortedPlayers);
-
         for (int i = 0; i < userProfileLoad.sortedPlayers.Length; i++) //players수만큼 반복
         {
             // 방장만 랜덤으로 11장의 카드 인덱스를 뽑음
@@ -50,6 +48,7 @@ public class UserCard : MonoBehaviourPun
 
             // 방장이 자신을 포함한 모든 유저에게 11장의 카드를 추가, 배치하도록 요청
             photonView.RPC("AddCardObjectToAll", RpcTarget.All, randomnames, i);
+
         }
     }
 
@@ -57,19 +56,24 @@ public class UserCard : MonoBehaviourPun
     [PunRPC]
     void AddCardObjectToAll(string[] RandomNames, int count)
     {
-        Debug.Log("카드 추가를 수행하는 중");
-
+        Debug.Log("나는 방장인지 검사 중");
         // 정렬된 리스트를 반복문으로 순차적으로 처리
-        if (userProfileLoad.sortedPlayers[count] != PhotonNetwork.LocalPlayer.ActorNumber) return; //해당 인덱스 플레이어의 actnum이 나와 같다면 다음 수행
-        Debug.Log($"현재 {count}번째 유저: 액터넘버 {userProfileLoad.sortedPlayers[count]}");
-        foreach (string name in RandomNames) //뽑은 리스트들 기존 변수에 저장
+        if (userProfileLoad.sortedPlayers[count] == UserInfoManager.instance.MyActNum)
         {
-            Debug.Log($"{name}");
-        }
-        List<GameObject> randomCards = cardPool.GetRandomCardsObject(RandomNames); //랜덤인덱스에 해당하는 오브젝트 추가
-        cardPool.MoveCardsToTarGetArea(randomCards, userCardContainer, displayedCards);
+            Debug.Log("내가 카드를 배분받을 차례");
+            Debug.Log($"나는 현재 {count}번째 유저: Num {userProfileLoad.sortedPlayers[count]}");
 
-        
+            List<GameObject> randomCards = cardPool.GetRandomCardsObject(RandomNames); //랜덤인덱스에 해당하는 오브젝트 추가
+            cardPool.MoveCardsToTarGetArea(randomCards, userCardContainer, displayedCards);
+
+            // 카드를 배분받은 뒤, 드롭 영역 생성 수행
+            fieldCard.CreateDropAreas();
+        }
+        else // 자신의 차례가 아니면 끝내기
+        {
+            return;
+        }
+ 
     }
 
     public void SelectedUserCard(List<GameObject> userLists)
