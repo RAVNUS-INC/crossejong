@@ -236,7 +236,16 @@ public class CardPool : MonoBehaviour
         {
             MoveCardToParent(card, targetArea); // 각 카드를 TargetArea로 이동
             card.SetActive(true); // 카드가 보이도록 활성화
-            targetList.Add(card); // 보여지는 리스트에 추가
+
+            if (targetList.Contains(card))
+            {
+                Debug.Log("중복 카드를 추가하지 않습니다.");
+            }
+            else
+            {
+                targetList.Add(card); // 보여지는 리스트에 추가
+            }
+
 
             for (int i = 0; i < cards.Count; i++)
             {

@@ -178,8 +178,7 @@ public class TurnChange : MonoBehaviour
     {
         cardPool.GetCardsToTarGetArea(ObjectManager.instance.createdWordList, userCard.userCardContainer, userCard.displayedCards);
         fieldCard.RollBackColorAreas();
-        userCard.SelectedUserCard();
-        ObjectManager.instance.dropCount = 0; // 롤백하면 드롭카운트 0으로 초기화
+        userCard.SelectedUserCard(userCard.displayedCards);
     }
 
 }

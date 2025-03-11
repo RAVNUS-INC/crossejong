@@ -97,7 +97,7 @@ public class Countdown : MonoBehaviourPun
     [PunRPC]
     private void FirstFieldCompleted()
     {
-        userCard.SelectedUserCard();
+        userCard.SelectedUserCard(userCard.displayedCards);
     }
 
     [PunRPC]
