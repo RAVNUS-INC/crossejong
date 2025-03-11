@@ -25,9 +25,10 @@ public class GetCard : MonoBehaviourPun
     }
     public void GetCardToUserCard()
     {
-        int Mynum = PhotonNetwork.LocalPlayer.ActorNumber;
-        photonView.RPC("RequestRandomCards", RpcTarget.MasterClient, 1, Mynum);
-        Debug.Log("카드를 한 장 추가합니다.");
+        //방장만이 카드 한장 추가 수행
+        photonView.RPC("RequestRandomCards", RpcTarget.MasterClient, 1, UserInfoManager.instance.MyActNum);
+
+        //Debug.Log("카드를 한 장 추가합니다.");
     }
 
     [PunRPC]
@@ -53,9 +54,7 @@ public class GetCard : MonoBehaviourPun
 
         if (cardPool.cards.Count > 0)
         {
-
             cardPool.GetCardsToTarGetArea(randomCards, userCard.userCardContainer, userCard.displayedCards);
-            
 
             cardDrag = randomCards[0].GetComponent<CardDrag>();
             if (cardDrag == null)

@@ -48,7 +48,6 @@ public class TurnChange : MonoBehaviourPun
         });
     }
 
-
     public void IsCreateWord()
     {
         Debug.Log(ObjectManager.instance.dropCount);
@@ -169,10 +168,14 @@ public class TurnChange : MonoBehaviourPun
 
                 return; // 턴을 넘기지 않음
             }
+            else // 첫 턴이 아닌 재호출이라면 턴을 넘김
+            {
+                turnManager.FindNextPlayer();
+            }
         }
-        else // 첫 턴이 아닌 재호출이라면 턴을 넘김
+        else 
         {
-            turnManager.FindNextPlayer();
+            return;
         }
 
     }

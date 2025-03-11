@@ -93,7 +93,7 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
 
             ObjectManager.instance.IsCardDrop = true;
 
-            fieldCard.OnOffDropAreas(); // 여기에서 다른 모두가 놓은 카드를 그리드에 실시간으로 업데이트
+            fieldCard.RollBackColorAreas(); // 여기에서 다른 모두가 놓은 카드를 그리드에 실시간으로 업데이트
 
             ObjectManager.instance.dropCount += 1;
 

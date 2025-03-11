@@ -41,30 +41,6 @@ public class CardPool : MonoBehaviour
 
     public RectTransform rectTransform; // 카드의 RectTransform
 
-    void Start()
-    {
-        ObjectManager.instance.cardFrontRed = new List<string>
-       {"ㄱ", "ㅇ", "ㅎ" };
-
-        ObjectManager.instance.cardFrontBlack = new List<string>
-       {"가", "거", "고", "구", "그", "금", "기",
-        "나",
-        "다", "대", "도", "동", "드",
-        "라", "로", "리",
-        "마",
-        "보", "부", "비",
-        "사", "상", "생", "소", "수", "스", "시", "식",
-        "아", "안", "어", "오", "요", "우", "음", "이", "인", "일",
-        "자", "장", "전", "정", "제", "주", "지", "진",
-        "하", "한", "해" };
-
-        ObjectManager.instance.cardFrontSpecial = new List<string>
-       {"C", "B"};
-
-        // 카드 생성
-        CreateCard();
-    }
-
     public void CreateCards(List<string> cardList, Color color)
     {
         for (int i = 0; i < cardList.Count; i++)
@@ -159,7 +135,7 @@ public class CardPool : MonoBehaviour
         }
     }
 
-    private void CreateCard()
+    public void CreateCard()
     {
         CreateCards(ObjectManager.instance.cardFrontRed, Color.red);
         CreateCards(ObjectManager.instance.cardFrontBlack, Color.black);

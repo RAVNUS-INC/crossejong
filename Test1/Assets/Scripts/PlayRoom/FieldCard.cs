@@ -73,7 +73,7 @@ public class FieldCard : MonoBehaviourPun
                 if (ObjectManager.instance.grid[x, y].transform.childCount == 1)
                 {
                     image.color = Color.white;
-                    Debug.Log($"{x}, {y}위치에 자식 존재");
+                    //Debug.Log($"{x}, {y}위치에 자식 존재");
                 }
             }
             OnOffDropAreas();
@@ -239,7 +239,7 @@ public class FieldCard : MonoBehaviourPun
 
         // 그리드에 카드를 배치한 후, 드롭 영역 업데이트
         // 드롭영역 업데이트
-        RollBackColorAreas();
+        OnOffDropAreas();
     }
 
     public void FirstFieldCard()

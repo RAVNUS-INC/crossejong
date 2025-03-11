@@ -142,11 +142,8 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
         endFullPopupButton.onClick.Invoke(); // UserCardFullPopup 창 닫기
 
-        // 카드 한 장 먹고 ui 업데이트, 롤백도 수행
+        // 카드 한 장 먹고 ui 업데이트, 롤백 수행, 턴 넘기기
         getCard.GetCardToUserCard();
-
-        // 다음 턴의 플레이어 찾기 
-        FindNextPlayer();
     }
 
     public void FindNextPlayer() // 다음 플레이어의 넘버 찾기(마지막 플레이어일 경우 0번 인덱스로 순환)
@@ -201,7 +198,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
             Debug.Log("카드를 추가하고 턴을 넘깁니다.");
 
-            // 카드 한 장 먹고 ui 업데이트, 롤백 수행
+            // 카드 한 장 먹고 ui 업데이트, 롤백 수행, 턴 넘기기
             getCard.GetCardToUserCard();
         }
     }

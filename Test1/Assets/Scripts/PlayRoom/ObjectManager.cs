@@ -9,6 +9,7 @@ using UnityEngine.UI;
 
 public class ObjectManager : MonoBehaviourPun
 {
+    public CardPool cardPool; //카드 생성을 위해 연결
     public static ObjectManager instance = null;
 
     private void Awake()
@@ -73,6 +74,9 @@ public class ObjectManager : MonoBehaviourPun
 
                 // 이제 List<string>으로 사용 가능
                 Debug.Log(string.Join(", ", cardFrontBlack));
+
+                // 난이도 반영된 카드로 생성
+                cardPool.CreateCard();
             }
         }
         //상태메시지 비우기
