@@ -65,7 +65,7 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
                 fieldCard.fieldDisplayedCards.Add(card);
             }
 
-            if (fieldCard.fieldDisplayedCards.Contains(card))
+            if (userCard.displayedCards.Contains(card))
             {
                 Debug.Log("보유카드에 해당 카드가 이미 존재하지 않습니다");
             }
@@ -74,7 +74,7 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
                 userCard.displayedCards.Remove(card);
             }
 
-            if (fieldCard.fieldDisplayedCards.Contains(card))
+            if (userCardFullPopup.fullDisplayedCards.Contains(card))
             {
                 Debug.Log("전페보유카드에 해당 카드가 이미 존재하지 않습니다");
             }
