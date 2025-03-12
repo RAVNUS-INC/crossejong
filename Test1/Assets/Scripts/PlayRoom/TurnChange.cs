@@ -183,6 +183,11 @@ public class TurnChange : MonoBehaviourPun
     // 롤백 버튼을 누르면 수행되는 함수
     public void RollBackAreas()
     {
+        for (int i = 0; i < ObjectManager.instance.createdWordList.Count; i++)
+        {
+            ObjectManager.instance.createdWordList[i].transform.parent.name = "";
+        }
+
         cardPool.GetCardsToTarGetArea(ObjectManager.instance.createdWordList, userCard.userCardContainer, userCard.displayedCards);
         fieldCard.RollBackColorAreas();
         userCard.SelectedUserCard(userCard.displayedCards);

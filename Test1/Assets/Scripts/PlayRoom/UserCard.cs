@@ -84,7 +84,6 @@ public class UserCard : MonoBehaviourPun
             {
                 cardButton = card.AddComponent<Button>();
             }
-            //Button cardButton = card.AddComponent<Button>();
 
             cardDrag = card.GetComponent<CardDrag>();
             if (cardDrag == null)

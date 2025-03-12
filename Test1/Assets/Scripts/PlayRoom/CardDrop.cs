@@ -16,12 +16,14 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
     public UserCard userCard;
     public FieldCard fieldCard;
     public CardPool cardPool;
+    public UserCardFullPopup userCardFullPopup;
 
 
     void Awake()
     {
         fieldCard = FindObjectOfType<FieldCard>();
         userCard = FindObjectOfType<UserCard>();
+        userCardFullPopup = FindObjectOfType<UserCardFullPopup>();
     }
 
 
@@ -54,8 +56,32 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
             card.transform.SetParent(transform);
             card.transform.parent.name = card.transform.name;
 
-            fieldCard.fieldDisplayedCards.Add(card);
-            userCard.displayedCards.Remove(card);
+            if (fieldCard.fieldDisplayedCards.Contains(card))
+            {
+                Debug.Log("필드카드에 해당 카드가 이미 존재합니다");
+            }
+            else
+            {
+                fieldCard.fieldDisplayedCards.Add(card);
+            }
+
+            if (userCard.displayedCards.Contains(card))
+            {
+                userCard.displayedCards.Remove(card);
+            }
+            else
+            {
+                Debug.Log("보유카드에 해당 카드가 이미 존재하지 않습니다");
+            }
+
+            if (userCardFullPopup.fullDisplayedCards.Contains(card))
+            {
+                userCardFullPopup.fullDisplayedCards.Remove(card);
+            }
+            else
+            {
+                Debug.Log("전체보유카드에 해당 카드가 이미 존재하지 않습니다");
+            }
 
 
             // RectTransform 설정

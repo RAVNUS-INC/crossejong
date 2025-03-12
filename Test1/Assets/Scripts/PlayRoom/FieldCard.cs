@@ -269,6 +269,8 @@ public class FieldCard : MonoBehaviourPun
         firstCards.transform.SetParent(middleObejcts.transform, false);
         ObjectManager.instance.grid[4, 4] = firstCards;
 
+        firstCards.transform.parent.name = firstCards.transform.name;
+
         OnOffDropAreas();
 
         // 카드 드래그 상태 각자 설정하기
