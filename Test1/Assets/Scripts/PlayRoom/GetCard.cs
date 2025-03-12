@@ -23,12 +23,13 @@ public class GetCard : MonoBehaviourPun
         // 처음엔 카드 추가 버튼 비활성화 - 자신의 턴이 오면 바로 활성화
         getCardButton.interactable = false;
     }
-    public void GetCardToUserCard()
+    public void GetCardToUserCard() // 카드 얻기
     {
+        // 보드판에 있던 카드를 다시 슬롯으로 되돌려놓기
+        turnChange.RollBackAreas();
+
         //방장만이 카드 한장 추가 수행
         photonView.RPC("RequestRandomCards", RpcTarget.MasterClient, 1, UserInfoManager.instance.MyActNum);
-
-        //Debug.Log("카드를 한 장 추가합니다.");
     }
 
     [PunRPC]
@@ -54,7 +55,7 @@ public class GetCard : MonoBehaviourPun
 
         if (cardPool.cards.Count > 0)
         {
-            cardPool.GetCardsToTarGetArea(randomCards, userCard.userCardContainer, userCard.displayedCards);
+            cardPool.GetCardsToTarGetArea(randomCards, userCard.userCardContainer, userCard.displayedCards); // 디스플레이 카드 상태 업데이트
 
             cardDrag = randomCards[0].GetComponent<CardDrag>();
             if (cardDrag == null)
@@ -67,9 +68,6 @@ public class GetCard : MonoBehaviourPun
         {
             getCardButton.interactable = false;
         }
-
-        // 보드판에 있던 카드를 다시 슬롯으로 되돌려놓기
-        turnChange.RollBackAreas();
 
         // 카드 개수 UI 업데이트 요청
         turnChange.TurnEnd();

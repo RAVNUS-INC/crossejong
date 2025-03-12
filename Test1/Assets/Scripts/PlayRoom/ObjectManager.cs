@@ -47,7 +47,7 @@ public class ObjectManager : MonoBehaviourPun
     public List<string> cardFrontRed = new List<string> { "ㄱ", "ㅇ", "ㅎ" };
     public List<string> cardFrontBlack; //난이도에 따라 내용이 달라짐
     public List<string> cardFrontSpecial = new List<string> { "C", "B" };
-    public List<string> usedIndices = new List<string>();
+    public List<string> usedIndices = new List<string>(); // 롤백 시에는 해당 문자를 리스트에서 제거해야함
     public bool IsFirstTurn = true; // 첫 시작을 알리는 bool 변수
     public bool IsCardDrop = false;  // 카드를 드래그해서 드롭했을 때 true -> rpc함수 호출의 조건이 됨
     public bool IsMyTurn = false;  // 내 턴인지 아닌지에 따라 드래그 및 버튼 활성화

@@ -217,6 +217,10 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
             Debug.Log("단어 완성 성공! 턴을 넘깁니다.");
 
+            // 만든 단어, 리스트 모두 비우기
+            ObjectManager.instance.rollBackList.Clear();
+            ObjectManager.instance.createdWords = "";
+
             // 단어완성횟수 +1 증가시키기
             ObjectManager.instance.MyCompleteWordCount++;
 
@@ -229,15 +233,9 @@ public class TurnManager : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.InRoom)
         {
-            // 나갈때 내가 현재 턴이라면?
-            // 현재 작동하던 코루틴을 멈추고 다음사람에게 턴 넘기기
             if (ObjectManager.instance.IsMyTurn) //현재 내 턴일 때
             {
-                if (TurnRoutine != null)
-                {
-                    StopCoroutine(TurnRoutine); // 현재 코루틴 중지
-                }
-                TurnRoutine = null;
+                StopAllCoroutines(); // 실행되고 있는 모든 코루틴 중단
 
                 FindNextPlayer(); // 다음 턴을 탐색
 
@@ -254,17 +252,57 @@ public class TurnManager : MonoBehaviourPunCallbacks
             // 액터넘버 번호 삭제 요청하기, 기존의 ui 변화 주의
             userProfileLoad.photonView.RPC("RequestRemoveUserInfo", RpcTarget.MasterClient, UserInfoManager.instance.MyActNum);
 
+            // 네트워크 및 로컬 객체 삭제
+            DestroyPlayRoomAndAllChildren();
+
             //나가기
             PhotonNetwork.LeaveRoom();
         }
+        //로딩바 ui 애니메이션 보여주기
+        LoadingSceneController.Instance.LoadScene("Main");
     }
+
+    void DestroyPlayRoomAndAllChildren()
+    {
+        // PlayRoom 객체 찾기
+        GameObject playRoom = GameObject.Find("PlayRoom");
+
+        if (playRoom != null)
+        {
+            // PlayRoom 객체 하위의 모든 자식 객체들을 순차적으로 삭제
+            foreach (Transform child in playRoom.transform)
+            {
+                PhotonView photonView = child.GetComponent<PhotonView>();
+
+                if (photonView != null && photonView.IsMine)
+                {
+                    // PhotonView가 있는 객체는 네트워크에서도 삭제
+                    PhotonNetwork.Destroy(child.gameObject);  // 네트워크에서 객체 삭제
+                }
+                else
+                {
+                    // PhotonView가 없는 일반 객체는 로컬에서 삭제
+                    Destroy(child.gameObject);  // 로컬 씬에서 객체 삭제
+                }
+
+                Debug.Log("삭제된 객체: " + child.gameObject.name);
+            }
+
+            // 이제 PlayRoom 객체 자체도 삭제
+            Destroy(playRoom);
+            Debug.Log("PlayRoom 객체와 하위 객체들 삭제 완료!");
+        }
+        else
+        {
+            Debug.LogWarning("PlayRoom 객체를 찾을 수 없습니다.");
+        }
+    }
+
 
     public override void OnLeftRoom() // 방을 성공적으로 나갔을 때 호출되는 콜백
     {
         Debug.Log("놀이를 성공적으로 종료했습니다.");
 
-        //로딩바 ui 애니메이션 보여주기
-        LoadingSceneController.Instance.LoadScene("Main");
     }
 
     // 모두가 수행하는 작업 ui관련

@@ -187,11 +187,15 @@ public class TurnChange : MonoBehaviourPun
         {
             ObjectManager.instance.createdWordList[i].transform.parent.name = "";
         }
-
-        cardPool.GetCardsToTarGetArea(ObjectManager.instance.createdWordList, userCard.userCardContainer, userCard.displayedCards);
-        fieldCard.RollBackColorAreas();
-        userCard.SelectedUserCard(userCard.displayedCards);
-
+        
+        if (ObjectManager.instance.createdWordList.Count > 0)
+        {
+            cardPool.GetCardsToTarGetArea(ObjectManager.instance.createdWordList, userCard.userCardContainer, userCard.displayedCards); //디스플레이에 카드 되돌리기
+            //cardPool.GetCardsToTarGetArea(ObjectManager.instance.createdWordList, userCardFullPopup.fullCardContainer, userCard.displayedCards); //팝업에 카드 되돌리기
+            fieldCard.RollBackColorAreas();
+            userCard.SelectedUserCard(userCard.displayedCards);
+        }
+        
         // 다른 유저에게 내가 롤백했음을 알려 카드를 다시 되돌리도록 요청
         // ObjectManager.instance.rollBackList.ToArray() 리스트를 배열로 전환해 받아서 이것을 사용
         //  - 보드판에 해당 문자가 있는지 돌면서 검사 - 있으면 해당 위치 파악, 해당 위치 빈 객체로 초기화
@@ -200,9 +204,10 @@ public class TurnChange : MonoBehaviourPun
             // 다른 유저들에게 삭제해줄 것을 요청
             userCard.photonView.RPC("RemoveRollCard", RpcTarget.Others, string.Join(",",ObjectManager.instance.rollBackList));
 
-            // 롤백리스트 다시 초기화
-            ObjectManager.instance.rollBackList.Clear();
-            ObjectManager.instance.createdWordList.Clear();
+            // 롤백리스트, 드롭카운트 초기화
+            ObjectManager.instance.rollBackList.Clear(); //문자열 리스트 삭제
+            ObjectManager.instance.createdWordList.Clear(); //객체 삭제
+            ObjectManager.instance.dropCount = 0; //카운트 0
         }
     }
 

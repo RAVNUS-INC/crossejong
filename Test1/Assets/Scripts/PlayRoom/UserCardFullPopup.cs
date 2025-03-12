@@ -28,7 +28,7 @@ public class UserCardFullPopup : MonoBehaviour
 
 
 
-    public void MoveCardsToFullPopupArea()
+    public void MoveCardsToFullPopupArea() 
     {
         cardPool.MoveCardsToTarGetArea(userCard.displayedCards, fullCardContainer, fullDisplayedCards);
     }

@@ -63,7 +63,7 @@ public class UserCard : MonoBehaviourPun
             Debug.Log($"나는 현재 {count}번째 유저: Num {userProfileLoad.sortedPlayers[count]}");
 
             List<GameObject> randomCards = cardPool.GetRandomCardsObject(RandomNames); //랜덤인덱스에 해당하는 오브젝트 추가
-            cardPool.MoveCardsToTarGetArea(randomCards, userCardContainer, displayedCards);
+            cardPool.GetCardsToTarGetArea(randomCards, userCardContainer, displayedCards); // 디스플레이 카드 상태 업데이트
 
             // 카드를 배분받은 뒤, 드롭 영역 생성 수행
             fieldCard.CreateDropAreas();

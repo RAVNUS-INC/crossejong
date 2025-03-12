@@ -262,7 +262,8 @@ public class FieldCard : MonoBehaviourPun
         }
         List<GameObject> randomCards = cardPool.GetRandomCardsObject(usedNames);
 
-        cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
+        cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards); //디스플레이 카드 상태 업데이트
+
         GameObject middleObejcts = ObjectManager.instance.grid[4, 4];
         GameObject firstCards = randomCards[0];
         ObjectManager.instance.grid[4, 4].SetActive(true);
