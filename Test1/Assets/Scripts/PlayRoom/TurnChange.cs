@@ -176,6 +176,11 @@ public class TurnChange : MonoBehaviour
 
     public void RollBackAreas()
     {
+        for (int i = 0; i < ObjectManager.instance.createdWordList.Count; i++)
+        {
+            ObjectManager.instance.createdWordList[i].transform.parent.name = "";
+        }
+
         cardPool.GetCardsToTarGetArea(ObjectManager.instance.createdWordList, userCard.userCardContainer, userCard.displayedCards);
         fieldCard.RollBackColorAreas();
         userCard.SelectedUserCard(userCard.displayedCards);

@@ -266,6 +266,8 @@ public class FieldCard : MonoBehaviourPun
         firstCards.transform.SetParent(middleObejcts.transform, false);
         ObjectManager.instance.grid[4, 4] = firstCards;
 
+        firstCards.transform.parent.name = firstCards.transform.name;
+
         OnOffDropAreas();
     }
 
