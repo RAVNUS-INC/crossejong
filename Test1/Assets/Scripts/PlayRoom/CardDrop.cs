@@ -67,20 +67,20 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
 
             if (userCard.displayedCards.Contains(card))
             {
-                Debug.Log("보유카드에 해당 카드가 이미 존재하지 않습니다");
+                userCard.displayedCards.Remove(card);
             }
             else
             {
-                userCard.displayedCards.Remove(card);
+                Debug.Log("보유카드에 해당 카드가 이미 존재하지 않습니다");
             }
 
             if (userCardFullPopup.fullDisplayedCards.Contains(card))
             {
-                Debug.Log("전페보유카드에 해당 카드가 이미 존재하지 않습니다");
+                userCardFullPopup.fullDisplayedCards.Remove(card);
             }
             else
             {
-                userCardFullPopup.fullDisplayedCards.Remove(card);
+                Debug.Log("전체보유카드에 해당 카드가 이미 존재하지 않습니다");
             }
 
 
