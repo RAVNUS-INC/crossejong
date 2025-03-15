@@ -139,40 +139,35 @@ public class UserCard : MonoBehaviourPun
         }
     }
 
-    [PunRPC]
-    void RemoveRollCard(string cardNames) // 롤백리스트를 받아 해당 위치 찾고 빈 객체로 만들기
-    {
-        // 받은 string을 다시 List<string>으로 변환
-        List<string> rollbackList = new List<string>(cardNames.Split(','));
+    //[PunRPC]
+    //void RemoveRollCard(string cardNames) // 롤백리스트를 받아 해당 위치 찾고 빈 객체로 만들기
+    //{
+    //    // 받은 string을 다시 List<string>으로 변환
+    //    List<string> rollbackList = new List<string>(cardNames.Split(','));
 
-        foreach (string cardName in rollbackList) // 카드 이름 배열을 순회
-        {
-            for (int x = 0; x < 7; x++) // 보드의 X축 순회
-            {
-                for (int y = 0; y < 7; y++) // 보드의 Y축 순회
-                {
-                    if (ObjectManager.instance.grid[x, y].transform.childCount == 1)
-                    {
-                        GameObject card = ObjectManager.instance.grid[x, y].transform.gameObject; // 자식(카드) 가져오기
+    //    foreach (string cardName in rollbackList) // 카드 이름 배열을 순회
+    //    {
+    //        for (int x = 0; x < ObjectManager.instance.gridCount; x++) // 보드의 X축 순회
+    //        {
+    //            for (int y = 0; y < ObjectManager.instance.gridCount; y++) // 보드의 Y축 순회
+    //            {
+    //                if (ObjectManager.instance.grid[x, y].transform.childCount == 1)
+    //                {
+    //                    GameObject card = ObjectManager.instance.grid[x, y].transform.gameObject; // 자식(카드) 가져오기
 
-                        //Debug.Log($"카드 {card.name} 발견");
+    //                    if (card.name == cardName) // 카드 이름이 일치하면
+    //                    {
+    //                        Transform parent = ObjectManager.instance.grid[x, y].transform.parent;
+    //                        parent.name = "";
+    //                        parent.DetachChildren();    
 
-                        if (card.name == cardName) // 카드 이름이 일치하면
-                        {
-                            // 최상위 부모 객체에서 현재 자식들을 모두 분리
-                            ObjectManager.instance.grid[x, y].transform.DetachChildren();
-
-                            // 최상위 부모 객체에서 현재 자식들을 모두 분리
-                            ObjectManager.instance.grid[x, y].transform.parent.DetachChildren();
-
-                            Debug.Log($"보드에서 카드 {cardName} 제거 완료");
-                            Debug.Log(ObjectManager.instance.grid[x, y].transform.childCount);
-                        }  
-                    }
-                }
-            }
-        }
-        // 드롭영역 업데이트
-        fieldCard.RollBackColorAreas();
-    }
+    //                        Debug.Log($"보드에서 카드 {cardName} 제거 완료");
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //    // 드롭영역 업데이트
+    //    fieldCard.RollBackColorAreas();
+    //}
 }

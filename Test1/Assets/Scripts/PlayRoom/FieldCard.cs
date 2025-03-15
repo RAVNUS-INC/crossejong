@@ -93,14 +93,6 @@ public class FieldCard : MonoBehaviourPun
                 }
             }
         }
-
-        if (ObjectManager.instance.IsCardDrop)
-        {
-            //다른 모든 유저들에게 카드 드롭 이미지 업데이트 요청
-            photonView.RPC("SyncDropCard", RpcTarget.Others, ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY, ObjectManager.instance.createdWord);
-
-            ObjectManager.instance.IsCardDrop = false;
-        }
     }
         
 
@@ -133,7 +125,6 @@ public class FieldCard : MonoBehaviourPun
         else
             isTop = false;
     }
-
     public void IsPosition()
     {
         IsLeft();
@@ -203,41 +194,83 @@ public class FieldCard : MonoBehaviourPun
         ObjectManager.instance.ShowCardSelectingMessage(false);
     }
 
-    [PunRPC] //카드를 놓은 사람을 제외한 나머지는 모두 카드의 좌표, 이름을 전달받아 그리드에 추가 수행
-    public void SyncDropCard(int cardIndexX, int cardIndexY, string cardName) //카드의 x,y좌표와 이름을 전달
+    //[PunRPC] //카드를 놓은 사람을 제외한 나머지는 모두 카드의 좌표, 이름을 전달받아 그리드에 추가 수행
+    //public void SyncDropCard(int cardIndexX, int cardIndexY, string cardName) //카드의 x,y좌표와 이름을 전달
+    //{
+    //    Debug.Log($"상대방 카드 '{cardName}'");
+
+    //    // 그리드 내에서 x, y 좌표에 해당하는 오브젝트 찾기
+    //    GameObject targetGridObject = ObjectManager.instance.grid[cardIndexX, cardIndexY];
+
+    //    // 입력받은 카드 이름에 해당하는 오브젝트 찾기
+    //    GameObject targetCard = null;
+
+    //    foreach (GameObject card in cardPool.cards) // cardPool.cards는 카드들이 저장된 리스트로 가정
+    //    {
+    //        if (card.name == cardName) // 카드 이름이 일치하는지 확인
+    //        {
+    //            targetCard = card; // 일치하는 카드 찾음
+    //            break; // 일치하는 카드 찾으면 종료
+    //        }
+    //    }
+
+    //    if (targetCard != null && targetGridObject != null)
+    //    {
+    //        // 해당 카드의 오브젝트를 targetGridObject 위치로 이동시키기
+    //        targetCard.transform.SetParent(targetGridObject.transform, false);
+    //        ObjectManager.instance.grid[cardIndexX, cardIndexY] = targetCard; // 그리드에 카드 정보 업데이트
+    //        targetGridObject.transform.name = cardName; // 부모 객체에 카드이름 설정
+
+    //        // 그리드에 카드를 배치한 후, 드롭 영역 업데이트
+    //        RollBackColorAreas();
+    //    }
+    //    else
+    //    {
+    //        Debug.LogError("카드를 찾을 수 없거나, 잘못된 그리드 위치입니다.");
+    //    }
+    //}
+
+    [PunRPC] // 최종적인 카드 추가(변동x) - 카드를 놓은 사람을 제외한 나머지는 모두 카드의 좌표, 이름을 전달받아 그리드에 추가 수행
+    public void SyncDropCard(int[] cardIndexX, int[] cardIndexY, string[] cardNames) //카드의 x,y좌표와 이름을 전달
     {
-        Debug.Log("상대방 카드 전달받음");
-
-        // 그리드 내에서 x, y 좌표에 해당하는 오브젝트 찾기
-        GameObject targetGridObject = ObjectManager.instance.grid[cardIndexX, cardIndexY];
-
-        // 입력받은 카드 이름에 해당하는 오브젝트 찾기
-        GameObject targetCard = null;
-
-        foreach (GameObject card in cardPool.cards) // cardPool.cards는 카드들이 저장된 리스트로 가정
+        for (int i=0; i < cardNames.Length; i++)
         {
-            if (card.name == cardName) // 카드 이름이 일치하는지 확인
+            string cardName = cardNames[i];
+            int x = cardIndexX[i];
+            int y = cardIndexY[i];
+
+            // 그리드 내에서 x, y 좌표에 해당하는 오브젝트 찾기
+            GameObject targetGridObject = ObjectManager.instance.grid[x, y];
+
+            // 입력받은 카드 이름에 해당하는 오브젝트 찾기
+            GameObject targetCard = null;
+            foreach (GameObject card in cardPool.cards) // cardPool.cards는 카드들이 저장된 리스트로 가정
             {
-                targetCard = card;
-                break; // 일치하는 카드 찾으면 종료
+                if (card.name == cardName) // 카드 이름이 일치하는지 확인
+                {
+                    targetCard = card; // 일치하는 카드 찾음
+                    break; // 일치하는 카드 찾으면 종료
+                }
             }
-        }
+            if (targetCard != null && targetGridObject != null)
+            {
+                // 해당 카드의 오브젝트를 targetGridObject 위치로 이동시키기
+                targetCard.transform.SetParent(targetGridObject.transform, false);
+                ObjectManager.instance.grid[x, y] = targetCard; // 그리드에 카드 정보 업데이트
+                targetGridObject.transform.name = cardName; // 부모 객체에 카드이름 설정
 
-        if (targetCard != null && targetGridObject != null)
-        {
-            // 해당 카드의 오브젝트를 targetGridObject 위치로 이동시키기
-            targetCard.SetActive(true);
-            targetCard.transform.SetParent(targetGridObject.transform, false);
-            ObjectManager.instance.grid[cardIndexX, cardIndexY] = targetCard; // 그리드에 카드 정보 업데이트
-
-            // 그리드에 카드를 배치한 후, 드롭 영역 업데이트
-            OnOffDropAreas();
+                
+            }
+            else
+            {
+                Debug.LogError("카드를 찾을 수 없거나, 잘못된 그리드 위치입니다.");
+            }
+            Debug.Log($"그리드에 추가함: '{cardNames[i]}'");
         }
-        else
-        {
-            Debug.LogError("카드를 찾을 수 없거나, 잘못된 그리드 위치입니다.");
-        }
+        // 그리드에 카드를 배치한 후, 드롭 영역 업데이트
+        RollBackColorAreas();
     }
+
 
     public void FirstFieldCard()
     {

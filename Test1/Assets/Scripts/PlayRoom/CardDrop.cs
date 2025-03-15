@@ -112,7 +112,10 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
                     if (ObjectManager.instance.createdWord == ObjectManager.instance.grid[x, y].transform.name)
                     {
                         ObjectManager.instance.cardIndexX = x;
+                        ObjectManager.instance.FinIndexX.Add(x); // 전달할 리스트 배열에 저장
+
                         ObjectManager.instance.cardIndexY = y;
+                        ObjectManager.instance.FinIndexY.Add(y); // 전달할 리스트 배열에 저장
                     }
                 }
             }

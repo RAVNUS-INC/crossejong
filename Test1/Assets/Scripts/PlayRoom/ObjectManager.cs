@@ -37,7 +37,9 @@ public class ObjectManager : MonoBehaviourPun
     public int cardIndexY;
     public string createdWord;
     public string createdWords;
-    public List<string> rollBackList; // 롤백하면 삭제하기 위해 담아둔 문자열 리스트
+    public List<string> rollBackList; // 최종 전달할 문자열 리스트
+    public List<int> FinIndexX; //최종 전달할 카드들의 x좌표 배열들
+    public List<int> FinIndexY; //최종 전달할 카드들의 y좌표 배열들
     public List<GameObject> createdWordList;
     public string inputWords;
     public int gridCount = 9;

@@ -23,9 +23,10 @@ public class TurnManager : MonoBehaviourPunCallbacks
     public TurnChange turnChange; // 카드 개수 위해 사용
     public UserCard userCard; // 턴이 아닐 때 카드 객체 선택 방지를 위해 사용
     public UserCardFullPopup userCardFullPopup; // 턴이 아닐 때 카드 객체 선택 방지를 위해 사용
+    public FieldCard fieldCard; //단어완성 성공 시 다른 유저들 보드판에 실제 업데이트
 
     public GameObject[] InTurnUserList; // 턴에 있는 상태의 유저 이미지 배열
-    public Image[] InTurnUserImg; // 턴에 있는 유저들의 프로필사진
+    public Image[] InTurnUserImg, timerImages; // 턴에 있는 유저들의 프로필사진, 남은 타이머 UI 이미지
     public TMP_Text[] InTurnUserName, timerText; // 턴에 있는 유저들의 닉네임, 남은 시간을 보여주는 텍스트
     public Color overlayColor = new Color(0, 0, 0, 0.3f); // 검정색 그림자
     public int NextPlayerNum, MyIndexNum; // 다음 플레이어의 액터넘버, 내 UI 인덱스 번호
@@ -33,12 +34,23 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
     public UnityEngine.UI.Button endFullPopupButton; //UserCardFullPopup 닫기 버튼
 
-    private float remainingTime = 0f;
+    private float TimeLimit = 0f; //방에서 설정된 제한시간
+    private float remainingTime = 0f; //타이머에서 남은 시간
     Coroutine TurnRoutine;
 
     private void Awake()
     {
         instance = this;
+    }
+
+    private void Start()
+    {
+        // 방의 커스텀 속성에서 "timeLimit" 값을 가져오기
+        if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("timeLimit"))
+        {
+            // "timeLimit" 값을 가져와서 사용할 수 있습니다.
+            TimeLimit = (int)PhotonNetwork.CurrentRoom.CustomProperties["timeLimit"];
+        }
     }
 
     // 카운트다운 3 2 1 후 실행
@@ -103,19 +115,15 @@ public class TurnManager : MonoBehaviourPunCallbacks
             if (nextnum == userProfileLoad.sortedPlayers[i])
             {
                 timerText[i].text = Mathf.CeilToInt(time).ToString(); // 남은 시간을 정수로 표시
+                timerImages[i].fillAmount = time / TimeLimit; //남은 시간에 맞게 타이머이미지 업데이트
             }
         }
     }
 
     IEnumerator StartTimer()
     {
-        // 방의 커스텀 속성에서 "timeLimit" 값을 가져오기
-        if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("timeLimit"))
-        {
-            // "timeLimit" 값을 가져와서 사용할 수 있습니다.
-            int timeLimit = (int)PhotonNetwork.CurrentRoom.CustomProperties["timeLimit"];
-            remainingTime = Convert.ToSingle(timeLimit);
-        }
+
+        remainingTime = Convert.ToSingle(TimeLimit);
 
         while (remainingTime > 0)
         {
@@ -217,9 +225,17 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
             Debug.Log("단어 완성 성공! 턴을 넘깁니다.");
 
+            //다른 유저들 모두가 카드를 실제 보드판에 업데이트하도록 요청---------------------------------------------------x배열,y배열,문자열배열
+            fieldCard.photonView.RPC("SyncDropCard", RpcTarget.Others, ObjectManager.instance.FinIndexX.ToArray(), ObjectManager.instance.FinIndexY.ToArray(), ObjectManager.instance.rollBackList.ToArray());
+
+            ObjectManager.instance.IsCardDrop = false;
+
             // 만든 단어, 리스트 모두 비우기
             ObjectManager.instance.rollBackList.Clear();
-            ObjectManager.instance.createdWords = "";
+            ObjectManager.instance.FinIndexX.Clear(); // x좌표 정보 삭제
+            ObjectManager.instance.FinIndexY.Clear(); // y좌표 정보 삭제
+            ObjectManager.instance.createdWordList.Clear(); //객체 삭제
+            ObjectManager.instance.dropCount = 0; //카운트 0
 
             // 단어완성횟수 +1 증가시키기
             ObjectManager.instance.MyCompleteWordCount++;
