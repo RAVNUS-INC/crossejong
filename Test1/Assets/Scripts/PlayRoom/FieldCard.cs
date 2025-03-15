@@ -18,7 +18,6 @@ public class FieldCard : MonoBehaviourPun
 
 {
     public UserCardFullPopup fullPopup;
-    public UserCard userCard; // 카드 드래그 상태 설정 위해
 
     public Transform fieldContainer; // FieldArea의 Contents
     public CardPool cardPool; // CardPool 참조
@@ -64,27 +63,26 @@ public class FieldCard : MonoBehaviourPun
 
     public void RollBackColorAreas()
     {
-        for (int x = 0; x < 7; x++)
+        for (int x = 0; x < ObjectManager.instance.gridCount; x++)
         {
-            for (int y = 0; y < 7; y++)
+            for (int y = 0; y < ObjectManager.instance.gridCount; y++)
             {
                 Image image = ObjectManager.instance.grid[x, y].GetComponent<Image>();
                 image.color = Color.clear;
                 if (ObjectManager.instance.grid[x, y].transform.childCount == 1)
                 {
                     image.color = Color.white;
-                    //Debug.Log($"{x}, {y}위치에 자식 존재");
                 }
             }
-            OnOffDropAreas();
         }
+        OnOffDropAreas();
     }
 
     public void OnOffDropAreas()
     {
-        for (int x = 0; x < 7; x++)
+        for (int x = 0; x < ObjectManager.instance.gridCount; x++)
         {
-            for (int y = 0; y < 7; y++)
+            for (int y = 0; y < ObjectManager.instance.gridCount; y++)
             {
                 if (ObjectManager.instance.grid[x, y].transform.childCount == 1)
                 {
@@ -231,15 +229,14 @@ public class FieldCard : MonoBehaviourPun
             targetCard.SetActive(true);
             targetCard.transform.SetParent(targetGridObject.transform, false);
             ObjectManager.instance.grid[cardIndexX, cardIndexY] = targetCard; // 그리드에 카드 정보 업데이트
+
+            // 그리드에 카드를 배치한 후, 드롭 영역 업데이트
+            OnOffDropAreas();
         }
         else
         {
             Debug.LogError("카드를 찾을 수 없거나, 잘못된 그리드 위치입니다.");
         }
-
-        // 그리드에 카드를 배치한 후, 드롭 영역 업데이트
-        // 드롭영역 업데이트
-        OnOffDropAreas();
     }
 
     public void FirstFieldCard()
@@ -262,22 +259,16 @@ public class FieldCard : MonoBehaviourPun
         }
         List<GameObject> randomCards = cardPool.GetRandomCardsObject(usedNames);
 
-        cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards); //디스플레이 카드 상태 업데이트
-
-        GameObject middleObejcts = ObjectManager.instance.grid[4, 4];
+        cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
+        GameObject middleObejcts = ObjectManager.instance.grid[ObjectManager.instance.gridCount/2, ObjectManager.instance.gridCount / 2];
         GameObject firstCards = randomCards[0];
-        ObjectManager.instance.grid[4, 4].SetActive(true);
+        ObjectManager.instance.grid[ObjectManager.instance.gridCount / 2, ObjectManager.instance.gridCount / 2].SetActive(true);
         firstCards.transform.SetParent(middleObejcts.transform, false);
-        ObjectManager.instance.grid[4, 4] = firstCards;
+        ObjectManager.instance.grid[ObjectManager.instance.gridCount / 2, ObjectManager.instance.gridCount / 2] = firstCards;
 
         firstCards.transform.parent.name = firstCards.transform.name;
 
         OnOffDropAreas();
-
-        // 카드 드래그 상태 각자 설정하기
-        userCard.SelectedUserCard(userCard.displayedCards);
     }
-
-    
 
 }
