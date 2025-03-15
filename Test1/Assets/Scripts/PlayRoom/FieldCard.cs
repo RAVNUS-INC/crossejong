@@ -63,9 +63,9 @@ public class FieldCard : MonoBehaviourPun
 
     public void RollBackColorAreas()
     {
-        for (int x = 0; x < 7; x++)
+        for (int x = 0; x < ObjectManager.instance.gridCount; x++)
         {
-            for (int y = 0; y < 7; y++)
+            for (int y = 0; y < ObjectManager.instance.gridCount; y++)
             {
                 Image image = ObjectManager.instance.grid[x, y].GetComponent<Image>();
                 image.color = Color.clear;
@@ -74,15 +74,15 @@ public class FieldCard : MonoBehaviourPun
                     image.color = Color.white;
                 }
             }
-            OnOffDropAreas();
         }
+        OnOffDropAreas();
     }
 
     public void OnOffDropAreas()
     {
-        for (int x = 0; x < 7; x++)
+        for (int x = 0; x < ObjectManager.instance.gridCount; x++)
         {
-            for (int y = 0; y < 7; y++)
+            for (int y = 0; y < ObjectManager.instance.gridCount; y++)
             {
                 if (ObjectManager.instance.grid[x, y].transform.childCount == 1)
                 {
@@ -260,11 +260,11 @@ public class FieldCard : MonoBehaviourPun
         List<GameObject> randomCards = cardPool.GetRandomCardsObject(usedNames);
 
         cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
-        GameObject middleObejcts = ObjectManager.instance.grid[4, 4];
+        GameObject middleObejcts = ObjectManager.instance.grid[ObjectManager.instance.gridCount/2, ObjectManager.instance.gridCount / 2];
         GameObject firstCards = randomCards[0];
-        ObjectManager.instance.grid[4, 4].SetActive(true);
+        ObjectManager.instance.grid[ObjectManager.instance.gridCount / 2, ObjectManager.instance.gridCount / 2].SetActive(true);
         firstCards.transform.SetParent(middleObejcts.transform, false);
-        ObjectManager.instance.grid[4, 4] = firstCards;
+        ObjectManager.instance.grid[ObjectManager.instance.gridCount / 2, ObjectManager.instance.gridCount / 2] = firstCards;
 
         firstCards.transform.parent.name = firstCards.transform.name;
 
