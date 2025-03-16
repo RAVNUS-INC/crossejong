@@ -225,11 +225,6 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
             Debug.Log("단어 완성 성공! 턴을 넘깁니다.");
 
-            //다른 유저들 모두가 카드를 실제 보드판에 업데이트하도록 요청---------------------------------------------------x배열,y배열,문자열배열
-            fieldCard.photonView.RPC("SyncDropCard", RpcTarget.Others, ObjectManager.instance.FinIndexX.ToArray(), ObjectManager.instance.FinIndexY.ToArray(), ObjectManager.instance.rollBackList.ToArray());
-
-            ObjectManager.instance.IsCardDrop = false;
-
             // 만든 단어, 리스트 모두 비우기
             ObjectManager.instance.rollBackList.Clear();
             ObjectManager.instance.FinIndexX.Clear(); // x좌표 정보 삭제
@@ -300,8 +295,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
                     // PhotonView가 없는 일반 객체는 로컬에서 삭제
                     Destroy(child.gameObject);  // 로컬 씬에서 객체 삭제
                 }
-
-                Debug.Log("삭제된 객체: " + child.gameObject.name);
+                //Debug.Log("삭제된 객체: " + child.gameObject.name);
             }
 
             // 이제 PlayRoom 객체 자체도 삭제

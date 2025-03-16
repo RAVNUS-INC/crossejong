@@ -200,6 +200,14 @@ public class TurnChange : MonoBehaviourPun
         //  - 보드판에 해당 문자가 있는지 돌면서 검사 - 있으면 해당 위치 파악, 해당 위치 빈 객체로 초기화
         if (ObjectManager.instance.rollBackList.Count > 0) // 롤백할 무언가가 있으면
         {
+            //다른 유저들에게 보드판의 카드 롤백을 요청함
+            fieldCard.photonView.RPC(
+                "SyncRollCard", RpcTarget.Others, 
+                ObjectManager.instance.FinIndexX.ToArray(), 
+                ObjectManager.instance.FinIndexY.ToArray(), 
+                ObjectManager.instance.rollBackList.ToArray()
+                );
+
             // 롤백리스트, 드롭카운트 초기화
             ObjectManager.instance.rollBackList.Clear(); //문자열 정보 삭제
             ObjectManager.instance.FinIndexX.Clear(); // x좌표 정보 삭제
