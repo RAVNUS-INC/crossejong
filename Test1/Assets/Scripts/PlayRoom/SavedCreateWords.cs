@@ -8,34 +8,78 @@ using UnityEditor.ShaderKeywordFilter;
 
 public class SavedCreateWords : MonoBehaviour
 {
-    public string csvFileName = "우왕좌왕세종대왕";  // 읽어 올 파일 이름
-    public Dictionary<string, int> playerCreateWords = new Dictionary<string, int>();  // 플레이어가 만든 단어와 횟수
     public string _playerCreateWord;
     public int _playerCreateWordNum;
-    public string path = "우왕좌왕세종대왕.csv";  //파일 이름.확장자
+    public Dictionary<string, int> playerCreateWords = new Dictionary<string, int>();  // 플레이어가 만든 단어와 횟수
+    public string csvFileName = "우왕좌왕세종대왕";  // 읽어 올 파일 이름
+    public string filePath;
     public bool isFinish = false;  // 마지막 줄을 판별하기 위한 bool 타입 변수
+
     private void Start()
     {
         ReadCSV();
     }
     private void ReadCSV()
     {
-        StreamReader reader = new StreamReader(Application.dataPath + "/" + path);  // UTF-8 인코딩을 위한 StreamReader
+        filePath = Path.Combine(Application.persistentDataPath, "PlayerWords.csv");
+        LoadCSVData(); // 실행 시 CSV 데이터 불러오기
+    }
 
-        while(isFinish == false)
+    private void LoadCSVData()
+    {
+        if (!File.Exists(filePath))
         {
-            // 한 줄씩 읽어서 string으로 반환하는 메서드
-            string data = reader.ReadLine();  // 한 줄 읽기
+            Debug.Log("CSV 파일이 존재하지 않아 새로 생성합니다.");
+            return;
+        }
 
-            // data 변수가 비었는지 확인
-            if(data == null)
-            {
-                // 만약 비었다면, 마지막 줄은 데이터가 없음
-                isFinish = true;
-                break;
-            }
-            
+        string[] lines = File.ReadAllLines(filePath); // 모든 줄 읽기
+        for (int i = 1; i < lines.Length; i++) // 첫 번째 줄(타이틀) 제외
+        {
+            string[] rowData = lines[i].Split(','); // 쉼표로 구분
+            if (rowData.Length < 2) continue;
+
+            string word = rowData[0].Trim(); // 단어
+            int count = int.Parse(rowData[1].Trim()); // 횟수
+
+            playerCreateWords[word] = count; // 딕셔너리에 저장
         }
     }
+
+    public void AddWordToCSV(string newWord)
+    {
+        if (playerCreateWords.ContainsKey(newWord))
+        {
+            playerCreateWords[newWord] += 1; // 기존 단어면 +1
+        }
+        else
+        {
+            playerCreateWords[newWord] = 1; // 새로운 단어면 1로 설정
+        }
+
+        SaveCSVData(); // 변경된 데이터 저장
+    }
+
+    private void SaveCSVData()
+    {
+        List<string> lines = new List<string>
+    {
+        "_playerCreateWord,_playerCreateWordNum" // CSV 제목
+    };
+
+        foreach (var entry in playerCreateWords)
+        {
+            lines.Add($"{entry.Key},{entry.Value}"); // 단어, 횟수 추가
+        }
+
+        File.WriteAllLines(filePath, lines); // 파일로 저장
+        Debug.Log("CSV 데이터 저장 완료!");
+    }
+
+    public void OnUserCreatesWord(string newWord)
+    {
+        AddWordToCSV(newWord);
+    }
+
 
 }
