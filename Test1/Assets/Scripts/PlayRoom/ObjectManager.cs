@@ -54,6 +54,7 @@ public class ObjectManager : MonoBehaviourPun
     public bool IsCardDrop = false;  // 카드를 드래그해서 드롭했을 때 true -> rpc함수 호출의 조건이 됨
     public bool IsMyTurn = false;  // 내 턴인지 아닌지에 따라 드래그 및 버튼 활성화
     public int MyCompleteWordCount = 0; // 나의 단어 완성 횟수 변수
+    public Button RollBackBtn; //롤백버튼은 놓은 게 있으면 활성화
 
 
     private void Start()
@@ -83,6 +84,8 @@ public class ObjectManager : MonoBehaviourPun
         }
         //상태메시지 비우기
         StatusMsg.text = "";
+
+        RollBackBtn.gameObject.SetActive(false); //롤백버튼 비활
     }
 
     public void SortAfterMove() 

@@ -17,6 +17,7 @@ using System.Linq;
 public class FieldCard : MonoBehaviourPun
 
 {
+    public TurnChange turnChange;
     public UserCardFullPopup fullPopup;
 
     public Transform fieldContainer; // FieldArea의 Contents
@@ -67,6 +68,10 @@ public class FieldCard : MonoBehaviourPun
         {
             // 나를 제외한 모든 유저들이 드롭한 카드를 보드판에 보이도록 요청함
             photonView.RPC("SyncDropCard", RpcTarget.Others, ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY, ObjectManager.instance.createdWord);
+
+            turnChange.CardDropBtn.interactable = true; //카드 내기 버튼 활성화
+            ObjectManager.instance.RollBackBtn.gameObject.SetActive(true); // 드롭한게 있으면 롤백버튼 보여주기
+
             ObjectManager.instance.IsCardDrop = false;
         }
 

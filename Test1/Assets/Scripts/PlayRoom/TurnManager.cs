@@ -77,6 +77,9 @@ public class TurnManager : MonoBehaviourPunCallbacks
     [PunRPC]
     public void CurrentTurnUI(int nextnum)  // 현재 턴 UI 모두에게 같은 모습으로 표시
     {
+        // 게임 시작 후, 카드 추가 버튼은 항상 활성화
+        getCard.getCardButton.interactable = true;
+
 
         for (int i = 0; i < userProfileLoad.sortedPlayers.Length; i++)
         {
@@ -178,6 +181,9 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
         // 특정 유저가 다음 함수를 실행하도록 요청하기
         photonView.RPC("RequestNextPlayer", RpcTarget.All, NextPlayerNum);
+
+        // 카드 전부 원위치
+        turnChange.RollBackAreas();
     }
 
     [PunRPC]
@@ -409,19 +415,14 @@ public class TurnManager : MonoBehaviourPunCallbacks
     
     public void SetActiveBtns() // 턴이 끝난 사람, 이제 턴인 사람에게 버튼의 활성화 여부를 정해줌
     {
-        bool IsMyTurn = ObjectManager.instance.IsMyTurn;
-
-        // 카드 추가 버튼 
-        getCard.getCardButton.interactable = IsMyTurn;
-
         //카드 내기 완료 버튼
-        turnChange.CardDropBtn.interactable = IsMyTurn;
+        turnChange.CardDropBtn.interactable = false;
 
-        // 카드 내기 완료 버튼이 가장 먼저 보이고
-        turnChange.CardDropBtn.gameObject.SetActive(true);
+        // 롤백버튼은 항상 처음 비활성화
+        ObjectManager.instance.RollBackBtn.gameObject.SetActive(false);
 
-        // 인풋필드는 기본적으로 안보이게
-        turnChange.cardInputField.gameObject.SetActive(false);
+        // 상태메시지도 초기화
+        ObjectManager.instance.StatusMsg.text = "";
     }
 
     public void SetActiveCards()

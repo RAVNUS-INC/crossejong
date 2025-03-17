@@ -214,6 +214,13 @@ public class TurnChange : MonoBehaviourPun
             ObjectManager.instance.FinIndexY.Clear(); // y좌표 정보 삭제
             ObjectManager.instance.createdWordList.Clear(); //객체 삭제
             ObjectManager.instance.dropCount = 0; //카운트 0
+
+            // UI 상태 초기화
+            ObjectManager.instance.RollBackBtn.gameObject.SetActive(false);
+            CardDropBtn.gameObject.SetActive(true);
+            CardDropBtn.interactable = false;
+            cardInputField.gameObject.SetActive(false);
+            ObjectManager.instance.inputWords = "";
         }
     }
 
