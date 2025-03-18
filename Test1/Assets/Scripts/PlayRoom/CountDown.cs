@@ -22,13 +22,6 @@ public class Countdown : MonoBehaviourPun
     private void Start()
     {
         WaitingPanel.SetActive(true); // 맨 처음엔 패널 활성화
-
-        // 방장만 시작버튼 활성화, 실행 가능
-        //if (PhotonNetwork.IsMasterClient)
-        //{
-        //    startGameButton.onClick.AddListener(() =>
-        //    photonView.RPC("StartCountDown", RpcTarget.All));
-        //}
     }
 
     [PunRPC]
@@ -70,6 +63,8 @@ public class Countdown : MonoBehaviourPun
 
     private void StartGame() // 방장만 수행
     {
+        ObjectManager.instance.IsMyTurn = true;
+
         userCard.FirstUserCardArea(); // 방장이 카드를 몇장씩 뽑아 플레이어들에게 나눠줌
 
         fieldCard.FirstFieldCard(); // 방장이 첫 카드 뽑아 모두에게 수행 추가 요청
@@ -85,6 +80,6 @@ public class Countdown : MonoBehaviourPun
     [PunRPC]
     private void LetsCardCount() // 자신의 카드 개수 업데이트
     {
-        turnChange.TurnEnd(); 
+        turnChange.TurnEnd();
     }
 }

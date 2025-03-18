@@ -94,11 +94,7 @@ public class GameResult : MonoBehaviourPunCallbacks
 
         Debug.Log("15초가 지나 메인으로 돌아갑니다.");
 
-        // 메인으로 돌아가기
-        LoadingSceneController.Instance.LoadScene("Main");
-
-        // 방 나가기
-        PhotonNetwork.LeaveRoom();
+        TurnManager.instance.LeaveRoom(); // 게임 도중 방을 나갈 때와 같은 원리
     }
 
     // 게임 종료 대기 메시지가 끝났을 때 - 결과창 보여주기
@@ -115,6 +111,8 @@ public class GameResult : MonoBehaviourPunCallbacks
 
         // 모두에게 코루틴을 멈출 것을 요청함
         turnManager.photonView.RPC("StopTurnCoroutine", RpcTarget.All);
+
+        MainCheckTime(); // 메인 되돌아가는 타이머 시작
     }
 
     public void OnConfirmButton() // 게임 결과 확인 버튼을 눌렀을 때 -> 메인 이동

@@ -30,6 +30,9 @@ public class GetCard : MonoBehaviourPun
 
         //방장만이 카드 한장 추가 수행
         photonView.RPC("RequestRandomCards", RpcTarget.MasterClient, 1, UserInfoManager.instance.MyActNum);
+
+        // 내 인덱스 번호를 넘겨주며 모두에게 카드 추가 애니메이션 수행 요청
+        CardAnimation.instance.photonView.RPC("AddCardAnimation", RpcTarget.All, ObjectManager.instance.MyIndexNum);
     }
 
     [PunRPC]
@@ -64,11 +67,6 @@ public class GetCard : MonoBehaviourPun
                 cardDrag.onDragParent = ObjectManager.instance.moveItemPanel;
             }
         }
-        else
-        {
-            getCardButton.interactable = false;
-        }
-
         // 카드 개수 UI 업데이트 요청
         turnChange.TurnEnd();
     }

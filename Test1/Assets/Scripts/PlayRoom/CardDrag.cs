@@ -19,6 +19,8 @@ public class CardDrag : MonoBehaviourPun, IDragHandler, IBeginDragHandler, IEndD
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        ObjectManager.instance.AlaramMsg.gameObject.SetActive(false);
+
         if (eventData == null) return;
         if (eventData.pointerId >= 0) return;
 

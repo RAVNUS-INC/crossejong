@@ -64,6 +64,12 @@ public class TurnChange : MonoBehaviourPun
                 ObjectManager.instance.inputWords = wordInput;
                 StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
             }
+            else
+            {
+                RollBackAreas();
+                ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
+                ObjectManager.instance.AlaramMsg.text = "단어를 올바르게 입력해주세요.";
+            }
 
             for (int i = 0; i < ObjectManager.instance.createdWords.Length; i++)
             {
@@ -118,9 +124,9 @@ public class TurnChange : MonoBehaviourPun
         {
             Debug.Log("오류입니다");
             RollBackAreas();
+            ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
+            ObjectManager.instance.AlaramMsg.text = "만든 단어와 입력한 단어가 일치하지 않습니다.";
         }
-
-        
     }
 
     public void OnlyKoreanOK(string text) // 단어 입력필드에 한글만 작성할 수 있도록 함
@@ -152,7 +158,7 @@ public class TurnChange : MonoBehaviourPun
         userCardCount = count; // 변수에 개수 저장
 
         // 모두에게 자신의 카드 개수 전달 요청하기 - 자신의 카드개수, 자신의 인덱스 번호
-        turnManager.photonView.RPC("SyncAllCardCount", RpcTarget.All, userCardCount, turnManager.MyIndexNum);
+        turnManager.photonView.RPC("SyncAllCardCount", RpcTarget.All, userCardCount, ObjectManager.instance.MyIndexNum);
 
         if (userCardCount == 0) // 카드를 다 소진했을 때 - 카드 개수가 현재 0개이면
         {
@@ -165,6 +171,19 @@ public class TurnChange : MonoBehaviourPun
             {
                 // 턴 넘기기 방지를 위한 변수를 이제는 false로 변경
                 ObjectManager.instance.IsFirstTurn = false;
+
+                if (ObjectManager.instance.IsMyTurn == true)
+                {
+                    // 카드 드래그 가능하게
+                    userCard.SelectedUserCard(userCard.displayedCards);
+                    userCard.SelectedUserCard(userCardFullPopup.fullDisplayedCards);
+                }
+                else
+                {
+                    // 카드 드래그 불가능하게
+                    userCard.DeActivateCard(userCard.displayedCards, false);
+                    userCard.DeActivateCard(userCardFullPopup.fullDisplayedCards, false);
+                }
 
                 return; // 턴을 넘기지 않음
             }
@@ -208,12 +227,18 @@ public class TurnChange : MonoBehaviourPun
                 ObjectManager.instance.rollBackList.ToArray()
                 );
 
+            //다른 유저들에게 보드판의 카드 롤백 애니메이션을 요청함
+            CardAnimation.instance.photonView.RPC(
+                "RollBackCardAnimation", RpcTarget.All,
+                ObjectManager.instance.MyIndexNum
+                );
+
             // 롤백리스트, 드롭카운트 초기화
             ObjectManager.instance.rollBackList.Clear(); //문자열 정보 삭제
             ObjectManager.instance.FinIndexX.Clear(); // x좌표 정보 삭제
             ObjectManager.instance.FinIndexY.Clear(); // y좌표 정보 삭제
             ObjectManager.instance.createdWordList.Clear(); //객체 삭제
-            ObjectManager.instance.dropCount = 0; //카운트 0
+            ObjectManager.instance.dropCount = 0; // 드롭카운트 초기화
 
             // UI 상태 초기화
             ObjectManager.instance.RollBackBtn.gameObject.SetActive(false);
