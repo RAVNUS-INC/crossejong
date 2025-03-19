@@ -76,12 +76,16 @@ public class DictionaryAPI : MonoBehaviour
                         {
                             Debug.Log("단어 '" + word + "'가 존재하지 않거나, 명사가 아닙니다.");
                             turnChange.RollBackAreas(); // API검사에 통과하지 못했으므로 카드를 다시 돌려놓기
+                            ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
+                            ObjectManager.instance.AlaramMsg.text = "해당 단어는 존재하지 않거나, 명사가 아닙니다.";
                         }
                     }
                     else
                     {
                         Debug.Log("단어 '" + word + "'가 존재하지 않습니다.");
                         turnChange.RollBackAreas(); // API검사에 통과하지 못했으므로 카드를 다시 돌려놓기
+                        ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
+                        ObjectManager.instance.AlaramMsg.text = "존재하지 않는 단어입니다.";
                     }
                 }
                 catch (Exception e)

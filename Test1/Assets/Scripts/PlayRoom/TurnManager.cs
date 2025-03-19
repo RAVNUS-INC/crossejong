@@ -23,22 +23,34 @@ public class TurnManager : MonoBehaviourPunCallbacks
     public TurnChange turnChange; // 카드 개수 위해 사용
     public UserCard userCard; // 턴이 아닐 때 카드 객체 선택 방지를 위해 사용
     public UserCardFullPopup userCardFullPopup; // 턴이 아닐 때 카드 객체 선택 방지를 위해 사용
+    public FieldCard fieldCard; //단어완성 성공 시 다른 유저들 보드판에 실제 업데이트
 
     public GameObject[] InTurnUserList; // 턴에 있는 상태의 유저 이미지 배열
-    public Image[] InTurnUserImg; // 턴에 있는 유저들의 프로필사진
+    public Image[] InTurnUserImg, timerImages; // 턴에 있는 유저들의 프로필사진, 남은 타이머 UI 이미지
     public TMP_Text[] InTurnUserName, timerText; // 턴에 있는 유저들의 닉네임, 남은 시간을 보여주는 텍스트
     public Color overlayColor = new Color(0, 0, 0, 0.3f); // 검정색 그림자
-    public int NextPlayerNum, MyIndexNum; // 다음 플레이어의 액터넘버, 내 UI 인덱스 번호
+    public int NextPlayerNum; // 다음 플레이어의 액터넘버, 내 UI 인덱스 번호
     public TMP_Text[] CardCount, InTurnCardCount; // 턴에 없을 때와 있을 때의 카드 개수 표시 텍스트 배열
 
     public UnityEngine.UI.Button endFullPopupButton; //UserCardFullPopup 닫기 버튼
 
-    private float remainingTime = 0f;
+    private float TimeLimit = 0f; //방에서 설정된 제한시간
+    private float remainingTime = 0f; //타이머에서 남은 시간
     Coroutine TurnRoutine;
 
     private void Awake()
     {
         instance = this;
+    }
+
+    private void Start()
+    {
+        // 방의 커스텀 속성에서 "timeLimit" 값을 가져오기
+        if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("timeLimit"))
+        {
+            // "timeLimit" 값을 가져옴
+            TimeLimit = (int)PhotonNetwork.CurrentRoom.CustomProperties["timeLimit"];
+        }
     }
 
     // 카운트다운 3 2 1 후 실행
@@ -47,11 +59,15 @@ public class TurnManager : MonoBehaviourPunCallbacks
         // 현재 내 턴
         ObjectManager.instance.IsMyTurn = true;
 
-        // 카드 드래그 활성화 상태를 턴 여부에 따라 설정함
-        SetActiveCards();
-
-        // 각종 버튼들과 활성화 및 선택 여부를 턴에 따라 설정함
+        // 턴이 바뀌었으므로 버튼들 공통 상태 반영
         SetActiveBtns();
+
+        // 카드 드래그 가능하게
+        userCard.DeActivateCard(userCard.displayedCards, true);
+        userCard.DeActivateCard(userCardFullPopup.fullDisplayedCards, true);
+
+        // 카드 추가 버튼 활성화
+        getCard.getCardButton.interactable = true;
 
         photonView.RPC("CurrentTurnUI", RpcTarget.All, UserInfoManager.instance.MyActNum);
 
@@ -65,7 +81,6 @@ public class TurnManager : MonoBehaviourPunCallbacks
     [PunRPC]
     public void CurrentTurnUI(int nextnum)  // 현재 턴 UI 모두에게 같은 모습으로 표시
     {
-
         for (int i = 0; i < userProfileLoad.sortedPlayers.Length; i++)
         {
             if (nextnum == userProfileLoad.sortedPlayers[i])
@@ -103,19 +118,14 @@ public class TurnManager : MonoBehaviourPunCallbacks
             if (nextnum == userProfileLoad.sortedPlayers[i])
             {
                 timerText[i].text = Mathf.CeilToInt(time).ToString(); // 남은 시간을 정수로 표시
+                timerImages[i].fillAmount = time / TimeLimit; //남은 시간에 맞게 타이머이미지 업데이트
             }
         }
     }
 
     IEnumerator StartTimer()
     {
-        // 방의 커스텀 속성에서 "timeLimit" 값을 가져오기
-        if (PhotonNetwork.CurrentRoom.CustomProperties.ContainsKey("timeLimit"))
-        {
-            // "timeLimit" 값을 가져와서 사용할 수 있습니다.
-            int timeLimit = (int)PhotonNetwork.CurrentRoom.CustomProperties["timeLimit"];
-            remainingTime = Convert.ToSingle(timeLimit);
-        }
+        remainingTime = Convert.ToSingle(TimeLimit);
 
         while (remainingTime > 0)
         {
@@ -142,11 +152,8 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
         endFullPopupButton.onClick.Invoke(); // UserCardFullPopup 창 닫기
 
-        // 카드 한 장 먹고 ui 업데이트, 롤백도 수행
+        // 카드 한 장 먹고 ui 업데이트, 롤백 수행, 턴 넘기기
         getCard.GetCardToUserCard();
-
-        // 다음 턴의 플레이어 찾기 
-        FindNextPlayer();
     }
 
     public void FindNextPlayer() // 다음 플레이어의 넘버 찾기(마지막 플레이어일 경우 0번 인덱스로 순환)
@@ -154,22 +161,35 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
         ObjectManager.instance.IsMyTurn = false; // 내 턴이 아님
 
-        // 카드 드래그 활성화 상태를 턴 여부에 따라 설정함
-        SetActiveCards();
+        // 내 카드들의 선택 상태 변경
+        userCard.DeActivateCard(userCard.displayedCards, false);
+        userCard.DeActivateCard(userCardFullPopup.fullDisplayedCards, false);
 
         // 각종 버튼들과 활성화 및 선택 여부를 턴에 따라 설정함
         SetActiveBtns();
 
+        // 카드 추가 버튼 비활성화
+        getCard.getCardButton.interactable = false;
+        
+        // 다음 유저 인덱스 찾고 요청
+        FindNextPlayerIndex();
+
+        // 카드 전부 원위치
+        turnChange.RollBackAreas();
+    }
+
+    private void FindNextPlayerIndex()
+    {
         // 플레이어 목록에서 현재 플레이어의 인덱스를 찾음
-        MyIndexNum = Array.IndexOf(userProfileLoad.sortedPlayers, UserInfoManager.instance.MyActNum);
+        ObjectManager.instance.MyIndexNum = Array.IndexOf(userProfileLoad.sortedPlayers, UserInfoManager.instance.MyActNum);
 
         // 다음 플레이어의 인덱스를 계산 (마지막 플레이어일 경우 순환)
-        int nextIndex = (MyIndexNum + 1) % userProfileLoad.sortedPlayers.Length;
+        int nextIndex = (ObjectManager.instance.MyIndexNum + 1) % userProfileLoad.sortedPlayers.Length;
 
         // 다음 플레이어의 액터 넘버
         int nextActorNumber = userProfileLoad.sortedPlayers[nextIndex];
         NextPlayerNum = nextActorNumber;
-        Debug.Log($"[턴 순서] 다음 플레이어 ActorNumber: {NextPlayerNum}");
+        //Debug.Log($"[턴 순서] 다음 플레이어 ActorNumber: {NextPlayerNum}");
 
         // 특정 유저가 다음 함수를 실행하도록 요청하기
         photonView.RPC("RequestNextPlayer", RpcTarget.All, NextPlayerNum);
@@ -180,12 +200,16 @@ public class TurnManager : MonoBehaviourPunCallbacks
     {
         if (targetActorNumber == UserInfoManager.instance.MyActNum)
         {
+            // 상태메시지 업데이트 요청
+            photonView.RPC("RequestTurnMsg", RpcTarget.All, UserInfoManager.instance.MyName);
+
             AfterCountdown();
         }
         else
         {
             return;
         }
+
     }
 
     // 낼 카드가 없어, 카드를 한 장 먹기로 결정 했을 때(카드 추가 버튼에 리스너 연결)
@@ -201,7 +225,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
             Debug.Log("카드를 추가하고 턴을 넘깁니다.");
 
-            // 카드 한 장 먹고 ui 업데이트, 롤백 수행
+            // 카드 한 장 먹고 ui 업데이트, 롤백 수행, 턴 넘기기
             getCard.GetCardToUserCard();
         }
     }
@@ -220,6 +244,13 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
             Debug.Log("단어 완성 성공! 턴을 넘깁니다.");
 
+            // 만든 단어, 리스트 모두 비우기
+            ObjectManager.instance.rollBackList.Clear();
+            ObjectManager.instance.FinIndexX.Clear(); // x좌표 정보 삭제
+            ObjectManager.instance.FinIndexY.Clear(); // y좌표 정보 삭제
+            ObjectManager.instance.createdWordList.Clear(); //객체 삭제
+            ObjectManager.instance.dropCount = 0; //카운트 0
+
             // 단어완성횟수 +1 증가시키기
             ObjectManager.instance.MyCompleteWordCount++;
 
@@ -232,15 +263,9 @@ public class TurnManager : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.InRoom)
         {
-            // 나갈때 내가 현재 턴이라면?
-            // 현재 작동하던 코루틴을 멈추고 다음사람에게 턴 넘기기
             if (ObjectManager.instance.IsMyTurn) //현재 내 턴일 때
             {
-                if (TurnRoutine != null)
-                {
-                    StopCoroutine(TurnRoutine); // 현재 코루틴 중지
-                }
-                TurnRoutine = null;
+                StopAllCoroutines(); // 실행되고 있는 모든 코루틴 중단
 
                 FindNextPlayer(); // 다음 턴을 탐색
 
@@ -257,8 +282,48 @@ public class TurnManager : MonoBehaviourPunCallbacks
             // 액터넘버 번호 삭제 요청하기, 기존의 ui 변화 주의
             userProfileLoad.photonView.RPC("RequestRemoveUserInfo", RpcTarget.MasterClient, UserInfoManager.instance.MyActNum);
 
+            // 네트워크 및 로컬 객체 삭제
+            DestroyPlayRoomAndAllChildren();
+
             //나가기
             PhotonNetwork.LeaveRoom();
+        }
+        //로딩바 ui 애니메이션 보여주기
+        LoadingSceneController.Instance.LoadScene("Main");
+    }
+
+    void DestroyPlayRoomAndAllChildren()
+    {
+        // PlayRoom 객체 찾기
+        GameObject playRoom = GameObject.Find("PlayRoom");
+
+        if (playRoom != null)
+        {
+            // PlayRoom 객체 하위의 모든 자식 객체들을 순차적으로 삭제
+            foreach (Transform child in playRoom.transform)
+            {
+                PhotonView photonView = child.GetComponent<PhotonView>();
+
+                if (photonView != null && photonView.IsMine)
+                {
+                    // PhotonView가 있는 객체는 네트워크에서도 삭제
+                    PhotonNetwork.Destroy(child.gameObject);  // 네트워크에서 객체 삭제
+                }
+                else
+                {
+                    // PhotonView가 없는 일반 객체는 로컬에서 삭제
+                    Destroy(child.gameObject);  // 로컬 씬에서 객체 삭제
+                }
+                //Debug.Log("삭제된 객체: " + child.gameObject.name);
+            }
+
+            // 이제 PlayRoom 객체 자체도 삭제
+            Destroy(playRoom);
+            Debug.Log("PlayRoom 객체와 하위 객체들 삭제 완료!");
+        }
+        else
+        {
+            Debug.LogWarning("PlayRoom 객체를 찾을 수 없습니다.");
         }
     }
 
@@ -266,8 +331,6 @@ public class TurnManager : MonoBehaviourPunCallbacks
     {
         Debug.Log("놀이를 성공적으로 종료했습니다.");
 
-        //로딩바 ui 애니메이션 보여주기
-        LoadingSceneController.Instance.LoadScene("Main");
     }
 
     // 모두가 수행하는 작업 ui관련
@@ -280,21 +343,21 @@ public class TurnManager : MonoBehaviourPunCallbacks
         // 만약 현재 방에 있는 플레이어가 2명 미만이라면 - 결과는 정해짐
         // 멀티 테스트 시 주석 해제
 
-        //if (userProfileLoad.sortedPlayers.Length < 2)
-        //{
-        //    if (ObjectManager.instance.IsMyTurn) //현재 내 턴일 때
-        //    {
-        //        if (TurnRoutine != null)
-        //        {
-        //            StopCoroutine(TurnRoutine); // 현재 코루틴 중지
-        //        }
-        //        TurnRoutine = null;
-        //    }
-        //    Debug.Log($"현재 플레이어가 2명 미만으로 게임이 종료됩니다.");
+        if (userProfileLoad.sortedPlayers.Length < 2)
+        {
+            if (ObjectManager.instance.IsMyTurn) //현재 내 턴일 때
+            {
+                if (TurnRoutine != null)
+                {
+                    StopCoroutine(TurnRoutine); // 현재 코루틴 중지
+                }
+                TurnRoutine = null;
+            }
+            Debug.Log($"현재 플레이어가 2명 미만으로 게임이 종료됩니다.");
 
-        //    // 놀이가 종료되었음을 알리는 메시지 1초 정도 표시 후 결과 창 띄우기
-        //    gameResult.EndGameDelay();
-        //}
+            // 놀이가 종료되었음을 알리는 메시지 1초 정도 표시 후 결과 창 띄우기
+            gameResult.EndGameDelay();
+        }
     }
 
     [PunRPC]
@@ -325,7 +388,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
     public void FindMyIndex() // 내 액터넘버를 바탕으로 현재 나의 UI 인덱스 위치 찾기
     {
         // 플레이어 목록에서 현재 플레이어의 인덱스를 찾음
-        MyIndexNum = Array.IndexOf(userProfileLoad.sortedPlayers, UserInfoManager.instance.MyActNum);
+        ObjectManager.instance.MyIndexNum = Array.IndexOf(userProfileLoad.sortedPlayers, UserInfoManager.instance.MyActNum);
     }
 
     [PunRPC]
@@ -362,29 +425,22 @@ public class TurnManager : MonoBehaviourPunCallbacks
     }
 
     
-    public void SetActiveBtns() // 턴이 끝난 사람, 이제 턴인 사람에게 버튼의 활성화 여부를 정해줌
+    public void SetActiveBtns() // 턴이 바뀌면 모두에게 공통의 버튼 활성화 여부를 정해줌
     {
-        bool IsMyTurn = ObjectManager.instance.IsMyTurn;
-
-        // 카드 추가 버튼 
-        getCard.getCardButton.interactable = IsMyTurn;
-
         //카드 내기 완료 버튼
-        turnChange.CardDropBtn.interactable = IsMyTurn;
+        turnChange.CardDropBtn.interactable = false;
 
-        // 카드 내기 완료 버튼이 가장 먼저 보이고
-        turnChange.CardDropBtn.gameObject.SetActive(true);
+        // 롤백버튼은 항상 처음 비활성화
+        ObjectManager.instance.RollBackBtn.gameObject.SetActive(false);
 
-        // 인풋필드는 기본적으로 안보이게
-        turnChange.cardInputField.gameObject.SetActive(false);
+        // 알람메시지 없애기
+        ObjectManager.instance.AlaramMsg.gameObject.SetActive(false);
     }
 
-    public void SetActiveCards()
-    {
-        // 내 카드들의 선택을 활성화
-        userCard.DeActivateCard(userCard.displayedCards);
 
-        // 내 카드들의 선택을 활성화 - 팝업
-        userCard.DeActivateCard(userCardFullPopup.fullDisplayedCards);
+    [PunRPC]
+    private void RequestTurnMsg(string turnUsername) // 현재 턴 메시지를 모두가 업데이트하는 함수
+    {
+        ObjectManager.instance.StatusMsg.text = $"{turnUsername}님의 차례";
     }
 }

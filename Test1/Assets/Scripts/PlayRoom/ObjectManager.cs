@@ -9,6 +9,7 @@ using UnityEngine.UI;
 
 public class ObjectManager : MonoBehaviourPun
 {
+    public CardPool cardPool; //카드 생성을 위해 연결
     public static ObjectManager instance = null;
 
     private void Awake()
@@ -36,20 +37,26 @@ public class ObjectManager : MonoBehaviourPun
     public int cardIndexY;
     public string createdWord;
     public string createdWords;
+    public List<string> rollBackList; // 최종 전달할 문자열 리스트
+    public List<int> FinIndexX; //최종 전달할 카드들의 x좌표 배열들
+    public List<int> FinIndexY; //최종 전달할 카드들의 y좌표 배열들
     public List<GameObject> createdWordList;
     public string inputWords;
     public int gridCount = 9;
     public GameObject[,] grid;
     public int dropCount = 0;
     public TMP_Text StatusMsg; //카드를 놓는 중의 상태 표시 텍스트
+    public TMP_Text AlaramMsg; //잘못 놓았을 때 알람 텍스트
     public List<string> cardFrontRed = new List<string> { "ㄱ", "ㅇ", "ㅎ" };
     public List<string> cardFrontBlack; //난이도에 따라 내용이 달라짐
     public List<string> cardFrontSpecial = new List<string> { "C", "B" };
-    public List<string> usedIndices = new List<string>();
+    public List<string> usedIndices = new List<string>(); // 롤백 시에는 해당 문자를 리스트에서 제거해야함
     public bool IsFirstTurn = true; // 첫 시작을 알리는 bool 변수
     public bool IsCardDrop = false;  // 카드를 드래그해서 드롭했을 때 true -> rpc함수 호출의 조건이 됨
     public bool IsMyTurn = false;  // 내 턴인지 아닌지에 따라 드래그 및 버튼 활성화
     public int MyCompleteWordCount = 0; // 나의 단어 완성 횟수 변수
+    public int MyIndexNum; //게임 내 나의 UI 인덱스번호
+    public Button RollBackBtn; //롤백버튼은 놓은 게 있으면 활성화
 
 
     private void Start()
@@ -72,10 +79,16 @@ public class ObjectManager : MonoBehaviourPun
 
                 // 이제 List<string>으로 사용 가능
                 Debug.Log(string.Join(", ", cardFrontBlack));
+
+                // 난이도 반영된 카드로 생성
+                cardPool.CreateCard();
             }
         }
         //상태메시지 비우기
         StatusMsg.text = "";
+        AlaramMsg.gameObject.SetActive(false);
+
+        RollBackBtn.gameObject.SetActive(false); //롤백버튼 비활
     }
 
     public void SortAfterMove() 

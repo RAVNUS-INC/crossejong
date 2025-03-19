@@ -11,7 +11,7 @@ using UnityEditor;
 using Unity.VisualScripting;
 using System.Text.RegularExpressions;
 
-public class TurnChange : MonoBehaviour
+public class TurnChange : MonoBehaviourPun
 {
     public UserCard userCard;
     public FieldCard fieldCard;
@@ -48,7 +48,6 @@ public class TurnChange : MonoBehaviour
         });
     }
 
-
     public void IsCreateWord()
     {
         Debug.Log(ObjectManager.instance.dropCount);
@@ -64,6 +63,12 @@ public class TurnChange : MonoBehaviour
                 ObjectManager.instance.dropCount = 0;
                 ObjectManager.instance.inputWords = wordInput;
                 StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
+            }
+            else
+            {
+                RollBackAreas();
+                ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
+                ObjectManager.instance.AlaramMsg.text = "단어를 올바르게 입력해주세요.";
             }
 
             for (int i = 0; i < ObjectManager.instance.createdWords.Length; i++)
@@ -119,9 +124,9 @@ public class TurnChange : MonoBehaviour
         {
             Debug.Log("오류입니다");
             RollBackAreas();
+            ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
+            ObjectManager.instance.AlaramMsg.text = "만든 단어와 입력한 단어가 일치하지 않습니다.";
         }
-
-        
     }
 
     public void OnlyKoreanOK(string text) // 단어 입력필드에 한글만 작성할 수 있도록 함
@@ -153,37 +158,95 @@ public class TurnChange : MonoBehaviour
         userCardCount = count; // 변수에 개수 저장
 
         // 모두에게 자신의 카드 개수 전달 요청하기 - 자신의 카드개수, 자신의 인덱스 번호
-        turnManager.photonView.RPC("SyncAllCardCount", RpcTarget.All, userCardCount, turnManager.MyIndexNum);
+        turnManager.photonView.RPC("SyncAllCardCount", RpcTarget.All, userCardCount, ObjectManager.instance.MyIndexNum);
 
         if (userCardCount == 0) // 카드를 다 소진했을 때 - 카드 개수가 현재 0개이면
         {
             // 놀이가 종료되었음을 알리는 메시지 1초 정도 표시 후 결과 창 띄우기
             gameResult.EndGameDelay();
         }
-        else if ((userCardCount > 0) && (ObjectManager.instance.IsFirstTurn)) // 카드는 남아있고 지금이 첫 턴에서의 함수 호출이라면
+        else if (userCardCount > 0) // 처음 카드개수 셀 때만 이 함수를 거침. 카드는 남아있고 지금이 첫 턴에서의 함수 호출일 때 수행
         {
-            // 턴 넘기기 방지를 위한 변수를 이제는 false로 변경
-            ObjectManager.instance.IsFirstTurn = false;
+            if (ObjectManager.instance.IsFirstTurn == true)
+            {
+                // 턴 넘기기 방지를 위한 변수를 이제는 false로 변경
+                ObjectManager.instance.IsFirstTurn = false;
 
-            return; // 턴을 넘기지 않음
+                if (ObjectManager.instance.IsMyTurn == true)
+                {
+                    // 카드 드래그 가능하게
+                    userCard.SelectedUserCard(userCard.displayedCards);
+                    userCard.SelectedUserCard(userCardFullPopup.fullDisplayedCards);
+                }
+                else
+                {
+                    // 카드 드래그 불가능하게
+                    userCard.DeActivateCard(userCard.displayedCards, false);
+                    userCard.DeActivateCard(userCardFullPopup.fullDisplayedCards, false);
+                }
+
+                return; // 턴을 넘기지 않음
+            }
+            else // 첫 턴이 아닌 재호출이라면 턴을 넘김
+            {
+                turnManager.FindNextPlayer();
+            }
         }
-        else // 첫 턴이 아닌 재호출이라면 턴을 넘김
+        else 
         {
-            turnManager.FindNextPlayer();
+            return;
         }
 
     }
 
+    // 롤백 버튼을 누르면 수행되는 함수
     public void RollBackAreas()
     {
         for (int i = 0; i < ObjectManager.instance.createdWordList.Count; i++)
         {
             ObjectManager.instance.createdWordList[i].transform.parent.name = "";
         }
+        
+        if (ObjectManager.instance.createdWordList.Count > 0)
+        {
+            cardPool.GetCardsToTarGetArea(ObjectManager.instance.createdWordList, userCard.userCardContainer, userCard.displayedCards); //디스플레이에 카드 되돌리기
+            fieldCard.RollBackColorAreas();
+            userCard.SelectedUserCard(userCard.displayedCards);
+        }
+        
+        // 다른 유저에게 내가 롤백했음을 알려 카드를 다시 되돌리도록 요청
+        // ObjectManager.instance.rollBackList.ToArray() 리스트를 배열로 전환해 받아서 이것을 사용
+        //  - 보드판에 해당 문자가 있는지 돌면서 검사 - 있으면 해당 위치 파악, 해당 위치 빈 객체로 초기화
+        if (ObjectManager.instance.rollBackList.Count > 0) // 롤백할 무언가가 있으면
+        {
+            //다른 유저들에게 보드판의 카드 롤백을 요청함
+            fieldCard.photonView.RPC(
+                "SyncRollCard", RpcTarget.Others, 
+                ObjectManager.instance.FinIndexX.ToArray(), 
+                ObjectManager.instance.FinIndexY.ToArray(), 
+                ObjectManager.instance.rollBackList.ToArray()
+                );
 
-        cardPool.GetCardsToTarGetArea(ObjectManager.instance.createdWordList, userCard.userCardContainer, userCard.displayedCards);
-        fieldCard.RollBackColorAreas();
-        userCard.SelectedUserCard(userCard.displayedCards);
+            //다른 유저들에게 보드판의 카드 롤백 애니메이션을 요청함
+            CardAnimation.instance.photonView.RPC(
+                "RollBackCardAnimation", RpcTarget.All,
+                ObjectManager.instance.MyIndexNum
+                );
+
+            // 롤백리스트, 드롭카운트 초기화
+            ObjectManager.instance.rollBackList.Clear(); //문자열 정보 삭제
+            ObjectManager.instance.FinIndexX.Clear(); // x좌표 정보 삭제
+            ObjectManager.instance.FinIndexY.Clear(); // y좌표 정보 삭제
+            ObjectManager.instance.createdWordList.Clear(); //객체 삭제
+            ObjectManager.instance.dropCount = 0; // 드롭카운트 초기화
+
+            // UI 상태 초기화
+            ObjectManager.instance.RollBackBtn.gameObject.SetActive(false);
+            CardDropBtn.gameObject.SetActive(true);
+            CardDropBtn.interactable = false;
+            cardInputField.gameObject.SetActive(false);
+            ObjectManager.instance.inputWords = "";
+        }
     }
 
 }

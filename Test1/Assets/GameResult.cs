@@ -94,11 +94,7 @@ public class GameResult : MonoBehaviourPunCallbacks
 
         Debug.Log("15초가 지나 메인으로 돌아갑니다.");
 
-        // 메인으로 돌아가기
-        LoadingSceneController.Instance.LoadScene("Main");
-
-        // 방 나가기
-        PhotonNetwork.LeaveRoom();
+        TurnManager.instance.LeaveRoom(); // 게임 도중 방을 나갈 때와 같은 원리
     }
 
     // 게임 종료 대기 메시지가 끝났을 때 - 결과창 보여주기
@@ -115,38 +111,13 @@ public class GameResult : MonoBehaviourPunCallbacks
 
         // 모두에게 코루틴을 멈출 것을 요청함
         turnManager.photonView.RPC("StopTurnCoroutine", RpcTarget.All);
+
+        MainCheckTime(); // 메인 되돌아가는 타이머 시작
     }
 
     public void OnConfirmButton() // 게임 결과 확인 버튼을 눌렀을 때 -> 메인 이동
     {
-        if (PhotonNetwork.InRoom)
-        {
-
-            Debug.Log($"확인 버튼 클릭. 메인으로 이동합니다.");
-
-            //로딩바 ui 애니메이션 보여주기
-            LoadingSceneController.Instance.LoadScene("Main");
-
-            // 방 나가기
-            PhotonNetwork.LeaveRoom();
-
-            // 메인 이동 후 다시 방 생성 시도 -> makeroom 씬 전환 문제 발생
-        }
-
-        if (BacktoMainRoutine != null)
-        {
-            StopCoroutine(BacktoMainRoutine); // 코루틴 중지
-        }
-        BacktoMainRoutine = null;
-    }
-
-    public override void OnLeftRoom() // 방을 성공적으로 나왔을 때
-    {
-        // 마지막 남은 유저가 나갈때 출력될 메시지
-        if (PhotonNetwork.CurrentRoom == null)
-        {
-            Debug.Log("빈 방 자동 삭제 확인");
-        }
+        TurnManager.instance.LeaveRoom(); // 게임 도중 방을 나갈 때와 같은 원리
     }
 
     public void SetActive()
@@ -163,28 +134,26 @@ public class GameResult : MonoBehaviourPunCallbacks
     [PunRPC]
     public void UpdateResultData(int actorNum, int completeCount) 
     {
+        // 해당 액터넘버에 해당하는 Player 찾기
+        Player targetPlayer = userProfileLoad.players.FirstOrDefault(p => p.myActNum == actorNum);
 
-            // 해당 액터넘버에 해당하는 Player 찾기
-            Player targetPlayer = userProfileLoad.players.FirstOrDefault(p => p.myActNum == actorNum);
+        if (targetPlayer != null)
+        {
+            targetPlayer.completeCount = completeCount; // 단어 완성 횟수 저장
+            Debug.Log($"{targetPlayer.displayName}님의 단어 완성 횟수: {completeCount}");
+        }
 
-            if (targetPlayer != null)
-            {
-                targetPlayer.completeCount = completeCount; // 단어 완성 횟수 저장
-                Debug.Log($"{targetPlayer.displayName}님의 단어 완성 횟수: {completeCount}");
-            }
+        // 모든 유저의 정보가 수신되었는지 확인
+        if (userProfileLoad.players.All(p => p.completeCount >= 0))
+        {
+            Debug.Log("모든 유저의 단어 완성 횟수를 받았습니다!");
 
-            // 모든 유저의 정보가 수신되었는지 확인
-            if (userProfileLoad.players.All(p => p.completeCount >= 0))
-            {
-                Debug.Log("모든 유저의 단어 완성 횟수를 받았습니다!");
+            // 플레이어들 정보를 내림차순으로 정렬
+            userProfileLoad.players.Sort((x, y) => y.completeCount.CompareTo(x.completeCount));
 
-                // 플레이어들 정보를 내림차순으로 정렬
-                userProfileLoad.players.Sort((x, y) => y.completeCount.CompareTo(x.completeCount));
-
-                // 정보를 업데이트
-                UpdatePlayerInfo();
-            }
-        //}
+            // 정보를 업데이트
+            UpdatePlayerInfo();
+        }
     }
 
     public void UpdatePlayerInfo()

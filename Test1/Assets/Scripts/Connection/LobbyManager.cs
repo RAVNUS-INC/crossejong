@@ -25,6 +25,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     // 방 생성 관련 UI
     [SerializeField] TMP_InputField input_RoomName; //방 이름
     [SerializeField] Button[] btn_MaxPlayers, btn_Difficulty, btn_TimeLimit; // 최대인원, 난이도, 제한시간 버튼
+    [SerializeField] Image[] PlayerSel, DiffSel, TimeSel; //선택된 상태를 나타내는 이미지 배열
 
     // 방 생성 시 이름 규칙 경고메시지
     [SerializeField] TMP_Text warningText;
@@ -62,9 +63,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     public void ResetRoomSetPanel()
     {
         // 기본 버튼 설정값 (0,0,0) 노란색으로 표시
-        SetDefaultSelection(btn_MaxPlayers, 0);
-        SetDefaultSelection(btn_Difficulty, 0);
-        SetDefaultSelection(btn_TimeLimit, 0);
+        SetDefaultSelection(0);
 
         // 옵션 버튼 선택하면 노란색으로 바뀌도록 하는 코드
         MaxPlayerSet(btn_MaxPlayers);
@@ -256,19 +255,25 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     }
 
     // 방 생성 후 유저가 옵션 변경 패널을 열었을 때, 현재 방 옵션 색상을 칠해서 보여준다
-    private void SetDefaultSelection(Button[] buttons, int defaultIndex)
+    private void SetDefaultSelection(int defaultIndex)
     {
 
-        for (int i = 0; i < buttons.Length; i++) //세번 반복(각 버튼 배열 길이)
+        for (int i = 0; i < 3; i++) //세번 반복(각 버튼 배열 길이)
         {
-            int index = i;
-
-            ColorBlock colorBlock = buttons[i].colors;
-            colorBlock.normalColor = Color.white; // 기본 색상 화이트
-            colorBlock.selectedColor = Color.yellow; //선택된 색상 노란색
-            buttons[i].colors = colorBlock;
+            if (i == defaultIndex) //현재 선택한 인덱스(0)와 i값이 같을때
+            {
+                PlayerSel[i].gameObject.SetActive(true);
+                TimeSel[i].gameObject.SetActive(true);
+                DiffSel[i].gameObject.SetActive(true);
+            }
+            else
+            {
+                PlayerSel[i].gameObject.SetActive(false);
+                TimeSel[i].gameObject.SetActive(false);
+                DiffSel[i].gameObject.SetActive(false);
+            }
         }
-        UpdateButtonColors(buttons, defaultIndex);  //기본값 버튼 색상을 노란색으로
+
     }
 
     // 선택된 버튼을 실제로 색칠하는 함수
@@ -276,17 +281,36 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         for (int i = 0; i < buttons.Length; i++)
         {
-            ColorBlock colorBlock = buttons[i].colors; //colorBlock에 색상 정보 넘겨주기
-
             if (i == selectedIndex) //현재 선택한 인덱스와 i값이 같을때
             {
-                colorBlock.normalColor = Color.yellow; //노란색
+                if (buttons == btn_MaxPlayers)
+                {
+                    PlayerSel[i].gameObject.SetActive(true);
+                }
+                else if (buttons == btn_TimeLimit)
+                {
+                    TimeSel[i].gameObject.SetActive(true);
+                }
+                else
+                {
+                    DiffSel[i].gameObject.SetActive(true);
+                }
             }
             else //현재 선택한 인덱스와 i값이 다를때
             {
-                colorBlock.normalColor = Color.white; //하얀색
+                if (buttons == btn_MaxPlayers)
+                {
+                    PlayerSel[i].gameObject.SetActive(false);
+                }
+                else if (buttons == btn_TimeLimit)
+                {
+                    TimeSel[i].gameObject.SetActive(false);
+                }
+                else
+                {
+                    DiffSel[i].gameObject.SetActive(false);
+                }
             }
-            buttons[i].colors = colorBlock; //버튼에 색상 업데이트
         }
     }
 

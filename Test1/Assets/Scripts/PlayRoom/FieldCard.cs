@@ -17,6 +17,7 @@ using System.Linq;
 public class FieldCard : MonoBehaviourPun
 
 {
+    public TurnChange turnChange;
     public UserCardFullPopup fullPopup;
 
     public Transform fieldContainer; // FieldArea의 Contents
@@ -63,6 +64,17 @@ public class FieldCard : MonoBehaviourPun
 
     public void RollBackColorAreas()
     {
+        if (ObjectManager.instance.IsCardDrop)
+        {
+            // 나를 제외한 모든 유저들이 드롭한 카드를 보드판에 보이도록 요청함
+            photonView.RPC("SyncDropCard", RpcTarget.Others, ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY, ObjectManager.instance.createdWord);
+
+            turnChange.CardDropBtn.interactable = true; //카드 내기 버튼 활성화
+            ObjectManager.instance.RollBackBtn.gameObject.SetActive(true); // 드롭한게 있으면 롤백버튼 보여주기
+
+            ObjectManager.instance.IsCardDrop = false;
+        }
+
         for (int x = 0; x < ObjectManager.instance.gridCount; x++)
         {
             for (int y = 0; y < ObjectManager.instance.gridCount; y++)
@@ -92,14 +104,6 @@ public class FieldCard : MonoBehaviourPun
                     ChangeColorAreas(x, y + 1);
                 }
             }
-        }
-
-        if (ObjectManager.instance.IsCardDrop)
-        {
-            //다른 모든 유저들에게 카드 드롭 이미지 업데이트 요청
-            photonView.RPC("SyncDropCard", RpcTarget.Others, ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY, ObjectManager.instance.createdWord);
-
-            ObjectManager.instance.IsCardDrop = false;
         }
     }
         
@@ -133,7 +137,6 @@ public class FieldCard : MonoBehaviourPun
         else
             isTop = false;
     }
-
     public void IsPosition()
     {
         IsLeft();
@@ -204,39 +207,58 @@ public class FieldCard : MonoBehaviourPun
     }
 
     [PunRPC] //카드를 놓은 사람을 제외한 나머지는 모두 카드의 좌표, 이름을 전달받아 그리드에 추가 수행
-    public void SyncDropCard(int cardIndexX, int cardIndexY, string cardName) //카드의 x,y좌표와 이름을 전달
+    public void SyncDropCard(int cardIndexX, int cardIndexY, string cardName) 
     {
-        Debug.Log("상대방 카드 전달받음");
-
         // 그리드 내에서 x, y 좌표에 해당하는 오브젝트 찾기
         GameObject targetGridObject = ObjectManager.instance.grid[cardIndexX, cardIndexY];
 
-        // 입력받은 카드 이름에 해당하는 오브젝트 찾기
-        GameObject targetCard = null;
-
-        foreach (GameObject card in cardPool.cards) // cardPool.cards는 카드들이 저장된 리스트로 가정
-        {
-            if (card.name == cardName) // 카드 이름이 일치하는지 확인
-            {
-                targetCard = card;
-                break; // 일치하는 카드 찾으면 종료
-            }
-        }
+        GameObject originalCard = cardPool.cards.FirstOrDefault(card => card.name == cardName);
+        GameObject targetCard = Instantiate(originalCard); // 새로운 복제본 생성
 
         if (targetCard != null && targetGridObject != null)
         {
             // 해당 카드의 오브젝트를 targetGridObject 위치로 이동시키기
-            targetCard.SetActive(true);
             targetCard.transform.SetParent(targetGridObject.transform, false);
-            ObjectManager.instance.grid[cardIndexX, cardIndexY] = targetCard; // 그리드에 카드 정보 업데이트
+
+            // 부모 오브젝트 객체 이름 변경
+            targetGridObject.name = cardName;
 
             // 그리드에 카드를 배치한 후, 드롭 영역 업데이트
-            OnOffDropAreas();
+            RollBackColorAreas();
         }
         else
         {
             Debug.LogError("카드를 찾을 수 없거나, 잘못된 그리드 위치입니다.");
         }
+    }
+
+    [PunRPC] //롤백 요청 카드를 받아 보드판에서 보이지 않게 함
+    public void SyncRollCard(int[] cardIndexX, int[] cardIndexY, string[] cardNames) 
+    {
+        for (int i = 0; i < cardNames.Length; i++)
+        {
+            string cardName = cardNames[i];
+            int x = cardIndexX[i];
+            int y = cardIndexY[i];
+
+            // 그리드 내에서 x, y 좌표에 해당하는 오브젝트 찾기
+            GameObject targetGridObject = ObjectManager.instance.grid[x, y];
+
+            // targetGridObject가 자식 요소를 가지고 있다면, 자식들을 모두 삭제-----------
+            Transform targetTransform = targetGridObject.transform;
+
+            for (int j = targetTransform.childCount - 1; j >= 0; j--)
+            {
+                Transform child = targetTransform.GetChild(j);
+                Destroy(child.gameObject); // 자식 객체 삭제
+            }
+
+            // 부모 오브젝트 객체 이름 변경
+            targetGridObject.name = "";
+        }
+        // 그리드에 카드를 제거한 후, 드롭 영역 업데이트
+        // 일정 시간 후에 RollBackColorAreas 함수 호출
+        Invoke("RollBackColorAreas", 0.07f); 
     }
 
     public void FirstFieldCard()

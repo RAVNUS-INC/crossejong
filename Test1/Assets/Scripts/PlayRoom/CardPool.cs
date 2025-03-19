@@ -41,30 +41,6 @@ public class CardPool : MonoBehaviour
 
     public RectTransform rectTransform; // 카드의 RectTransform
 
-    void Start()
-    {
-        ObjectManager.instance.cardFrontRed = new List<string>
-       {"ㄱ", "ㅇ", "ㅎ" };
-
-        ObjectManager.instance.cardFrontBlack = new List<string>
-       {"가", "거", "고", "구", "그", "금", "기",
-        "나",
-        "다", "대", "도", "동", "드",
-        "라", "로", "리",
-        "마",
-        "보", "부", "비",
-        "사", "상", "생", "소", "수", "스", "시", "식",
-        "아", "안", "어", "오", "요", "우", "음", "이", "인", "일",
-        "자", "장", "전", "정", "제", "주", "지", "진",
-        "하", "한", "해" };
-
-        ObjectManager.instance.cardFrontSpecial = new List<string>
-       {"C", "B"};
-
-        // 카드 생성
-        CreateCard();
-    }
-
     public void CreateCards(List<string> cardList, Color color)
     {
         for (int i = 0; i < cardList.Count; i++)
@@ -159,7 +135,7 @@ public class CardPool : MonoBehaviour
         }
     }
 
-    private void CreateCard()
+    public void CreateCard()
     {
         CreateCards(ObjectManager.instance.cardFrontRed, Color.red);
         CreateCards(ObjectManager.instance.cardFrontBlack, Color.black);
@@ -176,7 +152,7 @@ public class CardPool : MonoBehaviour
             int randomIndex = UnityEngine.Random.Range(0, cards.Count);
             string cardName = cards[randomIndex].name; // 카드의 이름을 사용
 
-            // 카드 이름이 이미 사용되었는지 확인
+            // 해당 카드가 아직 사용되지 않았다면
             if (!ObjectManager.instance.usedIndices.Contains(cardName))
             {
                 usedCardNames.Add(cardName); // 카드 이름을 추가
@@ -211,13 +187,23 @@ public class CardPool : MonoBehaviour
 
     public void MoveCardsToTarGetArea(List<GameObject> startList, Transform targetArea, List<GameObject> targetList)
     {
-        targetList.Clear();
+        if (targetList == UserCardFullPopup.instance.fullDisplayedCards) { }
+        else
+        {
+            targetList.Clear();
+        }
 
         foreach (var card in startList)
         {
             MoveCardToParent(card, targetArea); // 각 카드를 TargetArea로 이동
             card.SetActive(true); // 카드가 보이도록 활성화
-            targetList.Add(card); // 보여지는 리스트에 추가
+
+            // 만약 타겟리스트가 풀팝업 리스트라면 카드 추가는 수행하지 않는다 -> 이미 디스플레이리스트 추가할 때 동기화 함
+            if (targetList == UserCardFullPopup.instance.fullDisplayedCards) { }
+            else
+            {
+                targetList.Add(card); // 보여지는 리스트에 추가
+            }
 
             for (int i = 0; i < cards.Count; i++) 
             {
@@ -244,6 +230,17 @@ public class CardPool : MonoBehaviour
             else
             {
                 targetList.Add(card); // 보여지는 리스트에 추가
+
+                // 타겟리스트가 유저카드리스트인 경우
+                if (targetList == UserCard.instance.displayedCards)
+                {
+                    // 팝업카드 리스트에도 유저카드 리스트와 동일하게 카드 상태 바로 동기화
+                    if (!UserCardFullPopup.instance.fullDisplayedCards.Contains(card))
+                    {
+                        UserCardFullPopup.instance.fullDisplayedCards.Add(card);
+                    }
+                }
+                
             }
 
 

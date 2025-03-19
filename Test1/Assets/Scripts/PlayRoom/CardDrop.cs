@@ -17,6 +17,7 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
     public FieldCard fieldCard;
     public CardPool cardPool;
     public UserCardFullPopup userCardFullPopup;
+    
 
 
     void Awake()
@@ -100,6 +101,8 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
 
             ObjectManager.instance.createdWord = card.name;
 
+            ObjectManager.instance.rollBackList.Add(card.name); // 롤백 할지도 모르니 놓은 카드 리스트들을 저장
+
             ObjectManager.instance.createdWordList.Add(card);
 
             // 카드 놓인 그리드 위치 파악
@@ -110,16 +113,19 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
                     if (ObjectManager.instance.createdWord == ObjectManager.instance.grid[x, y].transform.name)
                     {
                         ObjectManager.instance.cardIndexX = x;
+                        ObjectManager.instance.FinIndexX.Add(x); // 전달할 리스트 배열에 저장
+
                         ObjectManager.instance.cardIndexY = y;
+                        ObjectManager.instance.FinIndexY.Add(y); // 전달할 리스트 배열에 저장
                     }
                 }
             }
-
+            ObjectManager.instance.dropCount += 1;
             ObjectManager.instance.IsCardDrop = true;
 
-            fieldCard.OnOffDropAreas(); // 여기에서 다른 모두가 놓은 카드를 그리드에 실시간으로 업데이트
+            fieldCard.RollBackColorAreas(); // 여기에서 다른 모두가 놓은 카드를 그리드에 실시간으로 업데이트
 
-            ObjectManager.instance.dropCount += 1;
+            ObjectManager.instance.createdWord = ""; // 드롭한 카드 목록 비우기
 
         }
     }

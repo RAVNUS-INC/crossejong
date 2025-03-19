@@ -9,6 +9,7 @@ using Photon.Pun;
 using static UserProfileLoad;
 using System.Linq;
 using Photon.Realtime;
+using DG.Tweening.Plugins;
 
 public class UserCard : MonoBehaviourPun
 {
@@ -30,18 +31,17 @@ public class UserCard : MonoBehaviourPun
     public CardPool cardPool; // CardPool 참조 
     public FieldCard fieldCard;
     public CardDrag cardDrag;
-    public Transform userCardContainer; // UserCardArea의 Contents
-    public List<GameObject> displayedCards; // UserCardArea에서 보여지는 카드 리스트
     public UserProfileLoad userProfileLoad; // UserProfileLoad 참조
     public UserCardFullPopup userCardFullPopup; // 턴이 아닐 때 카드 객체 선택 방지를 위해 사용
+    public GetCard getCard;
+
+    public Transform userCardContainer; // UserCardArea의 Contents
+    public List<GameObject> displayedCards; // UserCardArea에서 보여지는 카드 리스트
 
 
     //UserCardArea로 11개의 랜덤 카드 이동
     public void FirstUserCardArea()
     {
-        // 정렬된 플레이어 리스트와 함께 모든 유저에게 전달
-        //photonView.RPC("SyncSortedPlayers", RpcTarget.All, userProfileLoad.sortedPlayers);
-
         for (int i = 0; i < userProfileLoad.sortedPlayers.Length; i++) //players수만큼 반복
         {
             // 방장만 랜덤으로 11장의 카드 인덱스를 뽑음
@@ -50,6 +50,7 @@ public class UserCard : MonoBehaviourPun
 
             // 방장이 자신을 포함한 모든 유저에게 11장의 카드를 추가, 배치하도록 요청
             photonView.RPC("AddCardObjectToAll", RpcTarget.All, randomnames, i);
+
         }
     }
 
@@ -57,19 +58,21 @@ public class UserCard : MonoBehaviourPun
     [PunRPC]
     void AddCardObjectToAll(string[] RandomNames, int count)
     {
-        Debug.Log("카드 추가를 수행하는 중");
-
         // 정렬된 리스트를 반복문으로 순차적으로 처리
-        if (userProfileLoad.sortedPlayers[count] != PhotonNetwork.LocalPlayer.ActorNumber) return; //해당 인덱스 플레이어의 actnum이 나와 같다면 다음 수행
-        Debug.Log($"현재 {count}번째 유저: 액터넘버 {userProfileLoad.sortedPlayers[count]}");
-        foreach (string name in RandomNames) //뽑은 리스트들 기존 변수에 저장
+        if (userProfileLoad.sortedPlayers[count] == UserInfoManager.instance.MyActNum)
         {
-            Debug.Log($"{name}");
-        }
-        List<GameObject> randomCards = cardPool.GetRandomCardsObject(RandomNames); //랜덤인덱스에 해당하는 오브젝트 추가
-        cardPool.MoveCardsToTarGetArea(randomCards, userCardContainer, displayedCards);
+            Debug.Log($"나는 현재 {count}번째 유저: Num {userProfileLoad.sortedPlayers[count]}");
 
-        
+            List<GameObject> randomCards = cardPool.GetRandomCardsObject(RandomNames); //랜덤인덱스에 해당하는 오브젝트 추가
+            cardPool.GetCardsToTarGetArea(randomCards, userCardContainer, displayedCards); // 디스플레이 카드 상태 업데이트
+
+            // 카드를 배분받은 뒤, 드롭 영역 생성 수행
+            fieldCard.CreateDropAreas();
+        }
+        else // 자신의 차례가 아니면 끝내기
+        {
+            return;
+        }
     }
 
     public void SelectedUserCard(List<GameObject> userLists)
@@ -100,42 +103,18 @@ public class UserCard : MonoBehaviourPun
 
             cardDrag.cardIndex = i;
         }
-        // 내 카드들의 선택을 비활성화
-        DeActivateCard(displayedCards);
-
-        // 내 카드들의 선택을 비활성화 - 팝업
-        DeActivateCard(userCardFullPopup.fullDisplayedCards);
     }
 
-    public void DeActivateCard(List<GameObject> fullDisplayedCards)
+    public void DeActivateCard(List<GameObject> fullDisplayedCards, bool isTurn)
     {
-        // 만약 내 턴이 아니라면
-        if (!ObjectManager.instance.IsMyTurn)
+        // 현재 팝업에 있는 카드들의 선택을 활성화하기
+        foreach (GameObject obj in fullDisplayedCards)
         {
-            // 현재 팝업에 있는 카드들의 선택을 비활성화하기
-            foreach (GameObject obj in fullDisplayedCards)
+            Image image = obj.GetComponent<Image>();
+            if (image != null)
             {
-                Image image = obj.GetComponent<Image>();
-                if (image != null)
-                {
-                    image.raycastTarget = false;  // 이미지 비활성화
-                }
-            }
-
-        }
-        else
-        {
-            // 현재 팝업에 있는 카드들의 선택을 활성화하기
-            foreach (GameObject obj in fullDisplayedCards)
-            {
-                Image image = obj.GetComponent<Image>();
-                if (image != null)
-                {
-                    image.raycastTarget = true;  // 이미지 활성화
-                }
+                image.raycastTarget = isTurn;  // 이미지 활성/비활성화
             }
         }
     }
-
-
 }
