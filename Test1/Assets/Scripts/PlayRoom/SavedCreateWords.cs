@@ -8,8 +8,6 @@ using UnityEditor.ShaderKeywordFilter;
 
 public class SavedCreateWords : MonoBehaviour
 {
-    //public string _playerCreateWord;
-    //public int _playerCreateWordNum;
     public Dictionary<string, int> playerCreateWords = new Dictionary<string, int>();  // 플레이어가 만든 단어와 횟수
     public string filePath;
 
@@ -19,8 +17,9 @@ public class SavedCreateWords : MonoBehaviour
     }
     private void ReadCSV()
     {
-        filePath = Path.Combine(Application.persistentDataPath, "우왕좌왕세종대왕.csv");
-        Debug.Log(filePath);
+        filePath = Path.Combine(Application.dataPath, "Scripts/CSV/사용자데이터.csv");  // 유니티 내 scripts의 CSV 파일에 저장
+        // 저장된 CSV 파일을 가공을 위해 외부로 빼두는 함수가 필요할 것 같음
+        Debug.Log(filePath);  // /사용자데이터.csv를 지우고 복사한 뒤 파일 검색에 붙여넣기로 해당 위치를 알 수 있음
         LoadCSVData(); // 실행 시 CSV 데이터 불러오기
     }
 
@@ -96,7 +95,7 @@ public class SavedCreateWords : MonoBehaviour
     }
 
 
-    // CSV 파일을 지우는 함수
+    // CSV 파일을 지우는 함수 (필요시 사용)
     private void DeleteCSVFile()
     {
         if (File.Exists(filePath))
@@ -110,7 +109,7 @@ public class SavedCreateWords : MonoBehaviour
         }
     }
 
-    // CSV 파일 내용을 지우는 함수
+    // CSV 파일 내용을 지우는 함수 (필요시 사용)
     private void ClearCSVContent()
     {
         if (File.Exists(filePath))
