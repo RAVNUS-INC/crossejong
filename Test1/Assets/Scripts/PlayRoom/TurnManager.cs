@@ -66,9 +66,16 @@ public class TurnManager : MonoBehaviourPunCallbacks
         userCard.DeActivateCard(userCard.displayedCards, true);
         userCard.DeActivateCard(userCardFullPopup.fullDisplayedCards, true);
 
-        // 카드 추가 버튼 활성화
-        getCard.getCardButton.interactable = true;
-
+        // 카드를 다 쓴 상황에서는 카드 추가 버튼 비활성화 유지
+        if (ObjectManager.instance.AllUsedCard)
+        {
+            getCard.getCardButton.interactable = false;
+        }
+        else
+        {
+            getCard.getCardButton.interactable = true;
+        }
+        
         photonView.RPC("CurrentTurnUI", RpcTarget.All, UserInfoManager.instance.MyActNum);
 
         // 첫 번째 플레이어로 돌아올 때, 코루틴을 다시 시작
@@ -152,8 +159,20 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
         endFullPopupButton.onClick.Invoke(); // UserCardFullPopup 창 닫기
 
-        // 카드 한 장 먹고 ui 업데이트, 롤백 수행, 턴 넘기기
-        getCard.GetCardToUserCard();
+        if (!ObjectManager.instance.AllUsedCard)// 카드를 다 쓴 상태가 아직 아니라면
+        {
+            // 카드 한 장 먹고 ui 업데이트, 롤백 수행, 턴 넘기기
+            getCard.GetCardToUserCard();
+        }
+        else //카드를 다 쓴 상태라면
+        {
+            // 나는 게임 턴에서 이제 제외됨
+            ObjectManager.instance.EndMyTurn = true;
+
+            // 모두에게 턴 제외 리스트 추가 및 동기화 요청(uI인덱스 번호를 넘겨줌)
+            photonView.RPC("UpdateExcludedList", RpcTarget.All, ObjectManager.instance.MyIndexNum);
+        }
+
     }
 
     public void FindNextPlayer() // 다음 플레이어의 넘버 찾기(마지막 플레이어일 경우 0번 인덱스로 순환)
@@ -176,20 +195,27 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
         // 카드 전부 원위치
         turnChange.RollBackAreas();
+
+        
     }
 
     private void FindNextPlayerIndex()
     {
-        // 플레이어 목록에서 현재 플레이어의 인덱스를 찾음
-        ObjectManager.instance.MyIndexNum = Array.IndexOf(userProfileLoad.sortedPlayers, UserInfoManager.instance.MyActNum);
-
         // 다음 플레이어의 인덱스를 계산 (마지막 플레이어일 경우 순환)
-        int nextIndex = (ObjectManager.instance.MyIndexNum + 1) % userProfileLoad.sortedPlayers.Length;
+        int CurrentIndex = ObjectManager.instance.MyIndexNum;
+
+        int NextIndex = (CurrentIndex + 1) % userProfileLoad.sortedPlayers.Length; // 다음 인덱스 계산
+
+        while (ObjectManager.instance.turnExcluded.Contains(NextIndex)) //포함하지 않을때까지 돌림
+        {
+            CurrentIndex = NextIndex;  // 현재 인덱스 갱신
+            NextIndex = (CurrentIndex + 1) % userProfileLoad.sortedPlayers.Length;  // 다음 인덱스 계산
+        }
 
         // 다음 플레이어의 액터 넘버
-        int nextActorNumber = userProfileLoad.sortedPlayers[nextIndex];
+        int nextActorNumber = userProfileLoad.sortedPlayers[NextIndex];
+
         NextPlayerNum = nextActorNumber;
-        //Debug.Log($"[턴 순서] 다음 플레이어 ActorNumber: {NextPlayerNum}");
 
         // 특정 유저가 다음 함수를 실행하도록 요청하기
         photonView.RPC("RequestNextPlayer", RpcTarget.All, NextPlayerNum);
@@ -424,7 +450,6 @@ public class TurnManager : MonoBehaviourPunCallbacks
         }
     }
 
-    
     public void SetActiveBtns() // 턴이 바뀌면 모두에게 공통의 버튼 활성화 여부를 정해줌
     {
         //카드 내기 완료 버튼
@@ -442,5 +467,36 @@ public class TurnManager : MonoBehaviourPunCallbacks
     private void RequestTurnMsg(string turnUsername) // 현재 턴 메시지를 모두가 업데이트하는 함수
     {
         ObjectManager.instance.StatusMsg.text = $"{turnUsername}님의 차례";
+    }
+
+    [PunRPC]
+    private void UpdateExcludedList(int UserIndex)
+    {
+        // 턴 제외 리스트에 해당 유저를 추가
+        ObjectManager.instance.turnExcluded.Add(UserIndex);
+
+        // 해당 유저 이미지 비활성화 상태로 보이게
+        userProfileLoad.InRoomUserImg[UserIndex].color = overlayColor;
+        InTurnUserImg[UserIndex].color = overlayColor;
+
+        // 턴에서 제외된 사람의 수가 현재 게임 내 플레이어 수 - 1의 값과 같다면(턴에 한 명만 남은 상태)
+        if (ObjectManager.instance.turnExcluded.Count == userProfileLoad.sortedPlayers.Length - 1)
+        {
+            // 남은 한 명의 승리이므로 게임 결과창 표시 - 방장의 요청에 의해
+            if (PhotonNetwork.IsMasterClient)
+            {
+                // 놀이가 종료되었음을 알리는 메시지 1초 정도 표시 후 결과 창 띄우기
+                gameResult.EndGameDelay();
+            }
+            else { return; }
+        }
+        else
+        {
+            if (ObjectManager.instance.EndMyTurn) //턴에서 제외된 사람이 다음 플레이어 요청
+            {
+                FindNextPlayer();
+            }
+            else { return; }
+        }
     }
 }

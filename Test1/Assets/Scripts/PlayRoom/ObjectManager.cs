@@ -54,6 +54,9 @@ public class ObjectManager : MonoBehaviourPun
     public bool IsFirstTurn = true; // 첫 시작을 알리는 bool 변수
     public bool IsCardDrop = false;  // 카드를 드래그해서 드롭했을 때 true -> rpc함수 호출의 조건이 됨
     public bool IsMyTurn = false;  // 내 턴인지 아닌지에 따라 드래그 및 버튼 활성화
+    public bool AllUsedCard = false; // 54장의 카드를 다 썼는지 아닌지에 따라 상태 변경\
+    public bool EndMyTurn = false; // 나의 턴이 게임 내에서 종료되었음을 나타냄.
+    public List<int> turnExcluded = new List<int>(); // 턴 제외 리스트 관리
     public int MyCompleteWordCount = 0; // 나의 단어 완성 횟수 변수
     public int MyIndexNum; //게임 내 나의 UI 인덱스번호
     public Button RollBackBtn; //롤백버튼은 놓은 게 있으면 활성화
@@ -86,7 +89,8 @@ public class ObjectManager : MonoBehaviourPun
         }
         //상태메시지 비우기
         StatusMsg.text = "";
-        AlaramMsg.gameObject.SetActive(false);
+
+        AlaramMsg.gameObject.SetActive(false); // 알람메시지 처음엔 안보이게
 
         RollBackBtn.gameObject.SetActive(false); //롤백버튼 비활
     }

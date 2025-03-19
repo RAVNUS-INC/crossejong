@@ -3848,6 +3848,9 @@ MonoBehaviour:
   IsFirstTurn: 1
   IsCardDrop: 0
   IsMyTurn: 0
+  AllUsedCard: 0
+  EndMyTurn: 0
+  turnExcluded: 
   MyCompleteWordCount: 0
   MyIndexNum: 0
   RollBackBtn: {fileID: 602382653}
@@ -14765,7 +14768,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 398.85004, y: -265.03357}
+  m_AnchoredPosition: {x: 398.85004, y: -265.03354}
   m_SizeDelta: {x: 654.9, y: 69.595}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1621074974
