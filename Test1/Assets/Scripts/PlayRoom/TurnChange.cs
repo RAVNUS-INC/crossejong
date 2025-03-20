@@ -64,12 +64,6 @@ public class TurnChange : MonoBehaviourPun
                 ObjectManager.instance.inputWords = wordInput;
                 StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
             }
-            else
-            {
-                RollBackAreas();
-                ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
-                ObjectManager.instance.AlaramMsg.text = "단어를 올바르게 입력해주세요.";
-            }
 
             for (int i = 0; i < ObjectManager.instance.createdWords.Length; i++)
             {
@@ -103,7 +97,7 @@ public class TurnChange : MonoBehaviourPun
             }
 
             for (int i = 0; i < ObjectManager.instance.createdWords.Length; i++)
-            {
+            {    
                 if (ObjectManager.instance.createdWords[i] == 'C' || ObjectManager.instance.createdWords[i] == 'B')  // 특수카드가 포함된 경우
                 {
                     if (44032 <= wordInput[i] && wordInput[i] <= 54616)
@@ -116,8 +110,6 @@ public class TurnChange : MonoBehaviourPun
                         break;
                     }
                 }
-                else
-                    break;
             }
         }
         else
@@ -202,6 +194,7 @@ public class TurnChange : MonoBehaviourPun
     // 롤백 버튼을 누르면 수행되는 함수
     public void RollBackAreas()
     {
+        Debug.Log("롤백을 시작합니다.");
         for (int i = 0; i < ObjectManager.instance.createdWordList.Count; i++)
         {
             ObjectManager.instance.createdWordList[i].transform.parent.name = "";

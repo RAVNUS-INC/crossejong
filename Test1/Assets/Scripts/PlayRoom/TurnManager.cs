@@ -274,8 +274,8 @@ public class TurnManager : MonoBehaviourPunCallbacks
             ObjectManager.instance.rollBackList.Clear();
             ObjectManager.instance.FinIndexX.Clear(); // x좌표 정보 삭제
             ObjectManager.instance.FinIndexY.Clear(); // y좌표 정보 삭제
-            ObjectManager.instance.createdWordList.Clear(); //객체 삭제
-            ObjectManager.instance.dropCount = 0; //카운트 0
+            ObjectManager.instance.createdWordList.Clear(); //객체 삭제  
+            ObjectManager.instance.dropCount = 0; //카운트 0  
 
             // 단어완성횟수 +1 증가시키기
             ObjectManager.instance.MyCompleteWordCount++;
