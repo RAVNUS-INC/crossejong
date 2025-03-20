@@ -220,9 +220,12 @@ public class TurnChange : MonoBehaviourPun
                 ObjectManager.instance.rollBackList.ToArray()
                 );
 
+            //현재 유저에게 보드판의 카드 롤백 애니메이션을 요청함
+            CardAnimation.instance.RollBackCardAnimationUser();
+
             //다른 유저들에게 보드판의 카드 롤백 애니메이션을 요청함
             CardAnimation.instance.photonView.RPC(
-                "RollBackCardAnimation", RpcTarget.All,
+                "RollBackCardAnimation", RpcTarget.Others,
                 ObjectManager.instance.MyIndexNum
                 );
 

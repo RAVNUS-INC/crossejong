@@ -260,16 +260,26 @@ public class CardPool : MonoBehaviour
 
     public void SortCardIndex(List<GameObject> cardList)
     {
-        if (cardList.Count != 0)
+        // 가나다라 순 정렬
+        UserCard.instance.displayedCards.Sort((a, b) => string.Compare(a.name, b.name, StringComparison.CurrentCulture));
+
+        // 정렬된 순서대로 UI에 적용
+        for (int i = 0; i < UserCard.instance.displayedCards.Count; i++)
         {
-            for (int i = 0; i < cardList.Count; i++)
-            {
-                CardDrag CD = cardList[i].GetComponent<CardDrag>();
-                if (CD != null)
-                {
-                    CD.cardIndex = i;
-                }
-            }
+            UserCard.instance.displayedCards[i].transform.SetSiblingIndex(i);
         }
+
+        //if (cardList.Count != 0)
+        //{
+        //    for (int i = 0; i < cardList.Count; i++)
+        //    {
+        //        CardDrag CD = cardList[i].GetComponent<CardDrag>();
+        //        if (CD != null)
+        //        {
+        //            CD.cardIndex = i;
+        //        }
+        //    }
+        //}
     }
+
 }

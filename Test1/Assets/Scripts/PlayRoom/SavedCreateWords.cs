@@ -4,7 +4,6 @@ using System.Linq;
 using UnityEngine;
 using System.IO;
 using System.Text;
-using UnityEditor.ShaderKeywordFilter;
 
 public class SavedCreateWords : MonoBehaviour
 {
