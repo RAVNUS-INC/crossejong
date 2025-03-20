@@ -26,6 +26,9 @@ public class LoginManager : MonoBehaviour
     // 알림 창 내 버튼들
     public Button NextBtn, OkBtn, ReBtn;
 
+    // 로그인 관련 버튼들
+    public Button LoginBtn, RegisterBtn, IsNewUserBtn;
+
     //토글 버튼(비밀번호)
     public Toggle PasswordToggle;  // 비밀번호 보기 버튼
 
@@ -36,7 +39,10 @@ public class LoginManager : MonoBehaviour
     public TMP_Text popupText;
 
     //알림창 테스트 메시지, 처음 접속 테스트 메시지 배치
-    public Text TestText, InitialTestText; 
+    public Text TestText, InitialTestText;
+
+    public bool isLoginMode = true;  // 로그인 모드 (true: 로그인, false: 회원가입)
+
 
     void Awake()
     {
@@ -60,7 +66,18 @@ public class LoginManager : MonoBehaviour
         UseridInput.onValueChanged.AddListener((text) => ValidateUserID(UseridInput.text));
 
         // 비밀번호 토글 체크하면 입력한 문자 보기(*을 알파벳 형태로)
+        PasswordToggle.isOn = true; // 처음엔 체크되어 보이도록
         PasswordToggle.onValueChanged.AddListener(TogglePasswordVisibility);
+
+        // 로그인, 회원가입 버튼은 다 채워지면 활성화
+        LoginBtn.interactable = false;
+        RegisterBtn.interactable = false;
+
+        // 각 인풋필드의 변경 이벤트 등록
+        EmailInput.onValueChanged.AddListener(delegate { CheckInputFields(); });
+        PasswordInput.onValueChanged.AddListener(delegate { CheckInputFields(); });
+        UseridInput.onValueChanged.AddListener(delegate { CheckInputFields(); });
+
     }
 
     private void CheckLoginStatus() //로그인 상태에 따라 다른 씬으로 이동
@@ -73,9 +90,25 @@ public class LoginManager : MonoBehaviour
 
         // 첫 로그인인 경우, 로그인으로 이동
         //SceneManager.LoadScene("Login");
-        
-
     }
+
+    void CheckInputFields() // 인풋 필드가 하나라도 비어있으면 로그인/회원가입 버튼의 비활성화 상태 유지
+    {
+        // 모든 인풋필드가 비어있지 않은지 확인
+        bool allFilled = !string.IsNullOrWhiteSpace(EmailInput.text) &&
+                         !string.IsNullOrWhiteSpace(PasswordInput.text) &&
+                         (isLoginMode || !string.IsNullOrWhiteSpace(UseridInput.text)); // 회원가입일 때만 Userid 검사
+
+        // 모든 에러 메시지가 비활성화 상태인지 확인
+        bool noErrors = !PasswordErrorText.gameObject.activeSelf &&
+                        !EmailErrorText.gameObject.activeSelf &&
+                        (isLoginMode || !IDErrorText.gameObject.activeSelf); // 회원가입일 때만 Userid 오류 체크
+
+        // 버튼 활성화 여부 설정
+        LoginBtn.interactable = allFilled && noErrors; ;
+        RegisterBtn.interactable = allFilled && noErrors; ;
+    }
+
     private void LoadUserInfoFromPrefs() // 플레이어 정보 로컬에 저장된 값 불러오기
     {
         // GetString의 두번째 값은 기본값을 나타냄
@@ -86,15 +119,21 @@ public class LoginManager : MonoBehaviour
        Debug.Log($"로컬 - DisplayName: {UserInfoManager.instance.MyName}, ImageIndex: {UserInfoManager.instance.MyImageIndex}");
     }
 
+    // 로그인/회원가입 전환 함수 - 신규회원이신가요? 버튼을 누를 때
+    public void ToggleLoginMode()
+    {
+        isLoginMode = false;
+    }
+
     // 로그인 버튼 클릭 시
-    public void LoginBtn() //로그인 버튼에 연결
+    public void TryLogin() //로그인 버튼에 연결
     {
         var request = new LoginWithEmailAddressRequest { Email = EmailInput.text, Password = PasswordInput.text };
         PlayFabClientAPI.LoginWithEmailAddress(request, OnLoginSuccess, OnLoginFailure);
     }
 
     // 회원가입 버튼 클릭 시
-    public void RegisterBtn() //회원가입 버튼에 연결
+    public void TryRegister() //회원가입 버튼에 연결
     {
         var request = new RegisterPlayFabUserRequest { Email = EmailInput.text, Password = PasswordInput.text, Username = UseridInput.text};
         PlayFabClientAPI.RegisterPlayFabUser(request, OnRegisterSuccess, OnRegisterFailure);
@@ -273,6 +312,8 @@ public class LoginManager : MonoBehaviour
         // 경고 텍스트 숨기기
         ResetWarningTexts();
 
+        isLoginMode = true;
+
     }
 
     public void ResetPasswordToggle() // 비밀번호보기 토글의 초기화(비활성화 상태)
@@ -341,7 +382,7 @@ public class LoginManager : MonoBehaviour
 
         if (!Regex.IsMatch(inputEmail, emailPattern))
         {
-            EmailErrorText.text = "이메일 형식이 올바르지 않습니다. (@와 .com이 포함된 형식이어야 합니다.)";
+            EmailErrorText.text = "이메일 형식이 올바르지 않습니다.";
         }
         else
         {
