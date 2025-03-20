@@ -32,6 +32,8 @@ public class CardDrag : MonoBehaviourPun, IDragHandler, IBeginDragHandler, IEndD
         startPosition = transform.position;
         startParent = transform.parent;
 
+        ObjectManager.instance.startDragPosition = startPosition;
+
         // 카드가 UI 요소일 경우 Raycast 차단을 해제
         GetComponent<Image>().raycastTarget = false;
 
@@ -63,6 +65,8 @@ public class CardDrag : MonoBehaviourPun, IDragHandler, IBeginDragHandler, IEndD
             transform.SetParent(startParent);
             transform.SetSiblingIndex(cardIndex);
             ObjectManager.instance.moveCardObejct = null;
+
+            CardPool.instance.SortCardIndex(UserCard.instance.displayedCards);
 
             // 카드 필드로 옮기면 UserCard, UserCardPopup 에서 옮긴거 제거
             // 일단 카드 넣으면 그리드 개수 변경 알아서

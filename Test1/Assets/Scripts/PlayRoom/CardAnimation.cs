@@ -89,4 +89,26 @@ public class CardAnimation : MonoBehaviourPun
 
     }
 
+    public void RollBackCardAnimationUser()
+    {
+        // 이미지를 활성화하고 애니메이션 시작
+        imageTransform.gameObject.SetActive(true);
+        imageTransform.anchoredPosition = RollPosition; // 위치 초기화
+
+        // 이동과 투명도 증가 (0 → 1)
+        imageCanvasGroup.DOFade(1, fadeDuration);
+
+        // 게임 UI내에서의 인덱스 번호가 i와 같다면
+        // 이동 애니메이션 수행
+        imageTransform.DOAnchorPos(ObjectManager.instance.startDragPosition, duration)
+            .SetEase(Ease.OutQuad);
+
+        // 이동이 끝날 때 투명도 감소 (1 → 0)
+        imageCanvasGroup.DOFade(0, duration).SetDelay(duration - fadeDuration).OnComplete(() =>
+        {
+            imageCanvasGroup.gameObject.SetActive(false);  // 비활성화
+            imageTransform.anchoredPosition = ZeroPosition; // 위치 초기화
+        });
+    }
+
 }
