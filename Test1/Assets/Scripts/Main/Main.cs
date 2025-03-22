@@ -56,11 +56,20 @@ public class Main : MonoBehaviour
             PhotonNetwork.JoinLobby();  // 로비로 이동
         }
 
+        // PlayRoom 객체 찾기
+        GameObject playRoom = GameObject.Find("PlayRoom");
+
+        // playRoom이 null이 아니라면 파괴 함수 수행
+        if (playRoom != null)
+        {
+            // 네트워크 및 로컬 객체 삭제
+            TurnManager.instance.DestroyPlayRoomAndAllChildren();
+        }
+
         profilePanel.SetActive(false); //프로필 패널 비활성화
 
         GetProfileImageIndex(); // PlayFab에서 저장된 이미지 인덱스를 불러와 이미지 업데이트
         GetUserDisplayName(); //유저 네임 불러와서 텍스트로 표시
-        //UpdateBtn(); //리더보드 업데이트
     }
 
 

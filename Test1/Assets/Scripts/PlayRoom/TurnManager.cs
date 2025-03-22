@@ -12,6 +12,7 @@ using PlayFab.ClientModels;
 using Unity.VisualScripting;
 using UnityEngine.UIElements;
 using Image = UnityEngine.UI.Image;
+using DG.Tweening;
 
 public class TurnManager : MonoBehaviourPunCallbacks
 {
@@ -285,7 +286,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
         }
     }
 
-    public void LeaveRoom() // 방을 나갈때 - exit 버튼에 연결
+    public void LeaveRoom() // 방을 나갈때 - exit 나가기 버튼에 연결
     {
         if (PhotonNetwork.InRoom)
         {
@@ -308,8 +309,8 @@ public class TurnManager : MonoBehaviourPunCallbacks
             // 액터넘버 번호 삭제 요청하기, 기존의 ui 변화 주의
             userProfileLoad.photonView.RPC("RequestRemoveUserInfo", RpcTarget.MasterClient, UserInfoManager.instance.MyActNum);
 
-            // 네트워크 및 로컬 객체 삭제
-            DestroyPlayRoomAndAllChildren();
+            //// 네트워크 및 로컬 객체 삭제
+            //DestroyPlayRoomAndAllChildren();
 
             //나가기
             PhotonNetwork.LeaveRoom();
@@ -318,7 +319,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
         LoadingSceneController.Instance.LoadScene("Main");
     }
 
-    void DestroyPlayRoomAndAllChildren()
+    public void DestroyPlayRoomAndAllChildren()
     {
         // PlayRoom 객체 찾기
         GameObject playRoom = GameObject.Find("PlayRoom");
