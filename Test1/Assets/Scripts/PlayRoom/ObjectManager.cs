@@ -42,7 +42,7 @@ public class ObjectManager : MonoBehaviourPun
     public List<int> FinIndexY; //최종 전달할 카드들의 y좌표 배열들
     public List<GameObject> createdWordList;
     public string inputWords;
-    public int gridCount = 9;
+    public int gridCount = 11;
     public GameObject[,] grid;
     public int dropCount = 0;
     public TMP_Text StatusMsg; //카드를 놓는 중의 상태 표시 텍스트
