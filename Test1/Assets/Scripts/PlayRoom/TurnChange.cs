@@ -28,6 +28,8 @@ public class TurnChange : MonoBehaviourPun
     public WordLists wordLists;
     public DictionaryAPI dictionaryAPI;
 
+    public bool isCorrectWord = false;
+
     public List<char> charList = new List<char>
      {'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'};
 
@@ -56,13 +58,16 @@ public class TurnChange : MonoBehaviourPun
 
         if (wordInput.Length > ObjectManager.instance.dropCount)
         {
-            if (ObjectManager.instance.createdWords.Contains(wordInput))  // 글자로 이루어진 단어일 경우
+            if (ObjectManager.instance.dropCount != 0)
             {
-                Debug.Log("글자로만 이루어진 단어를 사전 API 검사를 시작합니다");
-                // wordInput  (사전 API 검사 돌리기)
-                ObjectManager.instance.dropCount = 0;
-                ObjectManager.instance.inputWords = wordInput;
-                StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
+                if (ObjectManager.instance.createdWords.Contains(wordInput))  // 글자로 이루어진 단어일 경우
+                {
+                    Debug.Log("글자로만 이루어진 단어를 사전 API 검사를 시작합니다");
+                    // wordInput  (사전 API 검사 돌리기)
+                    ObjectManager.instance.dropCount = 0;
+                    ObjectManager.instance.inputWords = wordInput;
+                    StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
+                }
             }
 
             for (int i = 0; i < ObjectManager.instance.createdWords.Length; i++)
@@ -75,20 +80,23 @@ public class TurnChange : MonoBehaviourPun
                 {
                     for (int j = 0; j < 19; j++)
                     {
-                        if (ObjectManager.instance.createdWords[i] == charList[j])  // 자음카드가 포함된 경우
+                        if (ObjectManager.instance.dropCount != 0)
                         {
-                            List<char> words = wordLists.choDictionary[charList[j]];
-                            for (int k = 0; k < 588; k++)
+                            if (ObjectManager.instance.createdWords[i] == charList[j])  // 자음카드가 포함된 경우
                             {
-                                if (wordInput[i] == words[k])
+                                List<char> words = wordLists.choDictionary[charList[j]];
+                                for (int k = 0; k < 588; k++)
                                 {
-                                    Debug.Log("자음 카드로 이루어진 단어를 사전 API 검사를 시작합니다");
-                                    // wordInput (사전 API 검사 돌리기)
-                                    isContinue = false;
-                                    ObjectManager.instance.dropCount = 0;
-                                    ObjectManager.instance.inputWords = wordInput;
-                                    StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
-                                    break;
+                                    if (wordInput[i] == words[k])
+                                    {
+                                        Debug.Log("자음 카드로 이루어진 단어를 사전 API 검사를 시작합니다");
+                                        // wordInput (사전 API 검사 돌리기)
+                                        isContinue = false;
+                                        ObjectManager.instance.dropCount = 0;
+                                        ObjectManager.instance.inputWords = wordInput;
+                                        StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
+                                        break;
+                                    }
                                 }
                             }
                         }
@@ -96,18 +104,37 @@ public class TurnChange : MonoBehaviourPun
                 }
             }
 
+            // 드롭한 카드의 위치로부터 만든 단어에 부합하는 단어가 있는 위치(right, left, top, bottom을 찾아 wordInput.Length 만큼 잘라내 비교하는 로직으로 수정해야 함
+            // '가나다' 뒤에 '라마'를 오른쪽에 붙여 '다라마'를 만들었다면, '가나다라마'에서 마지막으로 둔 '마'의 위치로부터 왼쪽으로 3개 잘라내 '다라마'와 wordInput과 일치하는지 판단
+            // 만약 잘라내었을 때 특수카드나 자음카드가 포함된 경우 추가 로직 필요
+            // 하지만 이 부분은 캡스톤 이후에 고려할 예정
+           
             for (int i = 0; i < ObjectManager.instance.createdWords.Length; i++)
             {    
-                if (ObjectManager.instance.createdWords[i] == 'C' || ObjectManager.instance.createdWords[i] == 'B')  // 특수카드가 포함된 경우
+                if (ObjectManager.instance.dropCount != 0)
                 {
-                    if (44032 <= wordInput[i] && wordInput[i] <= 54616)
+                    if (ObjectManager.instance.createdWords[i] == 'C' || ObjectManager.instance.createdWords[i] == 'B')  // 특수카드가 포함된 경우 // 이 부분이 오류임
                     {
-                        Debug.Log("특수 카드로 이루어진 단어를 사전 API 검사를 시작합니다");
-                        // wordInput (사전 API 검사 돌리기)
-                        ObjectManager.instance.dropCount = 0;
-                        ObjectManager.instance.inputWords = wordInput;
-                        StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
-                        break;
+                        for (int j = 0; j < wordInput.Length; j++)
+                        {
+                            if (44032 <= wordInput[j] && wordInput[j] <= 54616)
+                            {
+                                isCorrectWord = true;
+                            }
+                            else
+                            {
+                                isCorrectWord = false;
+                            }
+                        }
+                        if (isCorrectWord)
+                        {
+                            Debug.Log("특수 카드로 이루어진 단어를 사전 API 검사를 시작합니다");
+                            // wordInput (사전 API 검사 돌리기)
+                            ObjectManager.instance.dropCount = 0;
+                            ObjectManager.instance.inputWords = wordInput;
+                            StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
+                            break;
+                        }
                     }
                 }
             }
