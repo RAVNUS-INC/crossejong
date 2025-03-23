@@ -34,7 +34,7 @@ public class Countdown : MonoBehaviourPun
         if (isCountingDown) return; // 이미 실행 중이면 중복 실행 방지
         isCountingDown = true;
 
-        StartCoroutine(CountDownRoutine(1)); // 타이머 시작
+        StartCoroutine(CountDownRoutine(3)); // 타이머 시작
     }
 
     private IEnumerator CountDownRoutine(int count)
