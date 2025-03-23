@@ -98,10 +98,23 @@ public class FieldCard : MonoBehaviourPun
             {
                 if (ObjectManager.instance.grid[x, y].transform.childCount == 1)
                 {
-                    ChangeColorAreas(x - 1, y);
-                    ChangeColorAreas(x + 1, y);
-                    ChangeColorAreas(x, y - 1);
-                    ChangeColorAreas(x, y + 1);
+                    if (x != 0)
+                    {
+                        ChangeColorAreas(x - 1, y);
+                    }
+                    if (x != ObjectManager.instance.gridCount - 1)
+                    {
+                        ChangeColorAreas(x + 1, y);
+                    }
+                    if (y != 0)
+                    {
+                        ChangeColorAreas(x, y - 1);
+                    }
+                    if (y != ObjectManager.instance.gridCount - 1)
+                    { 
+                        ChangeColorAreas(x, y + 1);
+                    }
+
                 }
             }
         }
