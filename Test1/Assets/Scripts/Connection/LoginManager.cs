@@ -6,6 +6,8 @@ using UnityEngine.UI;
 using PlayFab;
 using PlayFab.ClientModels;
 using TMPro;
+using DG.Tweening;
+using UnityEngine.EventSystems;
 
 
 // 로그인 화면 전체를 구성하는 코드
@@ -14,8 +16,10 @@ public class LoginManager : MonoBehaviour
 {
     public UserSetManager  UserSetManager;
 
+    public CanvasGroup AnimElement; // 나타났다 사라졌다 할 오브젝트
+
     //패널 관련 선언
-    public GameObject emailPanel, registerPanel, playersetPanel, AlarmPanel; //이메일, 회원가입, 유저초기세팅, 알람 패널 4종류
+    public GameObject emailPanel, registerPanel, playersetPanel, AlarmPanel, TouchPanel; //이메일, 회원가입, 유저초기세팅, 알람 패널, 초기터치 패널
 
     //인풋 관련 선언
     public TMP_InputField EmailInput, PasswordInput, UseridInput;  // 이메일, 비밀번호, 아이디 인풋필드
@@ -42,14 +46,22 @@ public class LoginManager : MonoBehaviour
     public Text TestText, InitialTestText;
 
     public bool isLoginMode = true;  // 로그인 모드 (true: 로그인, false: 회원가입)
+    public bool isTouched = false; // 터치 여부 체크
 
+    // IPointerDownHandler 인터페이스를 통해 클릭 또는 터치 이벤트 감지
+    public void ShowLoginPanel()
+    {
+        isTouched = true;
+        TouchPanel.SetActive(false);
+        emailPanel.SetActive(true);
+    }
 
     void Awake()
     {
-       // 실제 앱 빌드 시 playerprefs정보 초기화 수행!
+        // 실제 앱 빌드 시 playerprefs정보 초기화 수행!
 
-       //PlayerPrefs.DeleteAll();
-       //Debug.Log("PlayerPrefs 모두 삭제함");
+        //PlayerPrefs.DeleteAll();
+        // Debug.Log("PlayerPrefs 모두 삭제함");
     }
 
     void Start() 
@@ -78,6 +90,17 @@ public class LoginManager : MonoBehaviour
         PasswordInput.onValueChanged.AddListener(delegate { CheckInputFields(); });
         UseridInput.onValueChanged.AddListener(delegate { CheckInputFields(); });
 
+    }
+
+    void StartTwinkle()
+    {
+        // 초기 알파값 설정 (투명)
+        AnimElement.alpha = 0f;
+
+        // 0.8초 간격으로 0 → 1 → 0 반복
+        AnimElement.DOFade(1f, 1f)
+            .SetLoops(-1, LoopType.Yoyo) // 무한 반복, Yoyo 방식 (왔다 갔다)
+            .SetEase(Ease.InOutSine);    // 부드럽게 페이드 인/아웃
     }
 
     private void CheckLoginStatus() //로그인 상태에 따라 다른 씬으로 이동
@@ -241,6 +264,8 @@ public class LoginManager : MonoBehaviour
         {
             Debug.Log("첫 로그인 감지. 자동 로그인 실패: " + error.GenerateErrorReport());
             InitialTestText.text = "로그아웃 상태";
+            TouchPanel.SetActive(true);
+            StartTwinkle();
         });
     }
 
@@ -280,18 +305,18 @@ public class LoginManager : MonoBehaviour
         registerPanel.gameObject.SetActive(registerPanelActive);
     }
 
-    public void BackBtn1() //뒤로가기 버튼을 눌렀을 때 ->초기 홈 화면으로 이동
-    {
-        if (EmailInput != null) EmailInput.text = ""; //값 초기화
-        if (PasswordInput != null) PasswordInput.text = ""; //값 초기화
+    //public void BackBtn1() //뒤로가기 버튼을 눌렀을 때 ->초기 홈 화면으로 이동
+    //{
+    //    if (EmailInput != null) EmailInput.text = ""; //값 초기화
+    //    if (PasswordInput != null) PasswordInput.text = ""; //값 초기화
 
-        // PasswordToggle을 초기 상태로 설정
-        ResetPasswordToggle();
+    //    // PasswordToggle을 초기 상태로 설정
+    //    ResetPasswordToggle();
 
-        // 경고 텍스트 숨기기
-        ResetWarningTexts();
+    //    // 경고 텍스트 숨기기
+    //    ResetWarningTexts();
 
-    }
+    //}
 
     public void BackBtn2() //뒤로가기 버튼을 눌렀을 때 ->로그인 화면으로 이동
     {
