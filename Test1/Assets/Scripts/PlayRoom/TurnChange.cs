@@ -29,6 +29,7 @@ public class TurnChange : MonoBehaviourPun
     public DictionaryAPI dictionaryAPI;
 
     public bool isCorrectWord = false;
+    public bool isCleared = false;
 
     public List<char> charList = new List<char>
      {'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'};
@@ -46,7 +47,11 @@ public class TurnChange : MonoBehaviourPun
         CardDropBtn.onClick.AddListener(() => {
             CardDropBtn.gameObject.SetActive(false); // CardDropBtn 비활성화
             cardInputField.gameObject.SetActive(true); // cardInputField 활성화
-            cardInputField.text = ""; // 인풋필드 입력란을 비워놓음
+            if (isCleared == false)
+            {
+                cardInputField.text = ""; // 인풋필드 입력란을 비워놓음
+                isCleared = true;
+            }
         });
     }
 
@@ -154,10 +159,12 @@ public class TurnChange : MonoBehaviourPun
         // 한글만 허용하는 정규식 (띄어쓰기 포함 X)
         string koreanPattern = "^[가-힣]*$";
 
+
         if (!Regex.IsMatch(text, koreanPattern))
         {
             cardInputField.text = Regex.Replace(text, "[^가-힣]", ""); // 한글 이외의 문자 제거
         }
+
     }
 
     public void TurnEnd()
@@ -170,6 +177,8 @@ public class TurnChange : MonoBehaviourPun
         CountUserCard(userCard.displayedCards.Count);
 
         ObjectManager.instance.createdWordList.Clear();
+
+        isCleared = false;
     }
 
     public void CountUserCard(int count)  //자신의 카드 개수 업데이트
