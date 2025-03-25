@@ -52,15 +52,15 @@ public class CardDrag : MonoBehaviourPun, IDragHandler, IBeginDragHandler, IEndD
         {
             // 모바일 터치 입력
             Touch touch = Input.GetTouch(0);
-            newPosition = Camera.main.ScreenToWorldPoint(new Vector3(touch.position.x, touch.position.y, -Camera.main.transform.position.z));
+            newPosition = Camera.main.ScreenToWorldPoint(new Vector3(touch.position.x, touch.position.y, Camera.main.nearClipPlane));
         }
         else
         {
             // PC 마우스 입력
-            newPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -Camera.main.transform.position.z));
+            newPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
         }
 
-        // 드래그 중 카드 이동
+        // 드래그 중에는 카드가 마우스 또는 터치 위치를 따르도록 설정
         transform.position = newPosition;
 
         // 상태 메시지 업데이트 함수 호출

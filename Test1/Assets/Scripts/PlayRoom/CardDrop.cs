@@ -45,6 +45,12 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
             return false;
     }
 
+    public void ExtendDropAreas()
+    {
+
+    }
+
+
     public void OnDrop(PointerEventData eventData)
     {
         GameObject card = ObjectManager.instance.moveCardObejct;
@@ -120,6 +126,15 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
 
                         ObjectManager.instance.cardIndexY = y;
                         ObjectManager.instance.FinIndexY.Add(y); // 전달할 리스트 배열에 저장
+
+                        if (x == 0 || x == ObjectManager.instance.gridCount - 1)
+                        {
+                            ExtendDropAreas();
+                        }
+                        if (y == 0 || y == ObjectManager.instance.gridCount - 1)
+                        {
+                            ExtendDropAreas();
+                        }
                     }
                 }
             }
@@ -129,6 +144,7 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
             fieldCard.RollBackColorAreas(); // 여기에서 다른 모두가 놓은 카드를 그리드에 실시간으로 업데이트
 
             ObjectManager.instance.createdWord = ""; // 드롭한 카드 목록 비우기
+
         }
     }
 }
