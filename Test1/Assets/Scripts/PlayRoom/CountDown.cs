@@ -53,7 +53,7 @@ public class Countdown : MonoBehaviourPun
 
         countDownText.gameObject.SetActive(false); // 카운트다운 텍스트 숨김
 
-        ObjectManager.instance.gridCount = 13;
+        ObjectManager.instance.gridCount = 9;
 
         if (PhotonNetwork.IsMasterClient)
         {
