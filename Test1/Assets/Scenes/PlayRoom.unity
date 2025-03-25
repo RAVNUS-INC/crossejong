@@ -3832,7 +3832,7 @@ MonoBehaviour:
   FinIndexY: 
   createdWordList: []
   inputWords: 
-  gridCount: 9
+  gridCount: 0
   dropCount: 0
   StatusMsg: {fileID: 1992441032}
   AlaramMsg: {fileID: 1532533441}
@@ -3851,6 +3851,7 @@ MonoBehaviour:
   MyCompleteWordCount: 0
   MyIndexNum: 0
   RollBackBtn: {fileID: 602382653}
+  startDragPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &452245613
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4774,6 +4775,7 @@ MonoBehaviour:
   isContinue: 0
   wordLists: {fileID: 1463587110}
   dictionaryAPI: {fileID: 1941395651}
+  isCorrectWord: 0
   charList: 313132313431373138313931413142314331453146314731483149314a314b314c314d314e31
 --- !u!114 &542433696
 MonoBehaviour:
