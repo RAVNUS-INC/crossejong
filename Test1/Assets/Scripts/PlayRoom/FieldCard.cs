@@ -123,32 +123,52 @@ public class FieldCard : MonoBehaviourPun
 
     public void IsRight()
     {
-        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + 1, ObjectManager.instance.cardIndexY].transform.childCount == 1)
-            isRight = true;
+        if (ObjectManager.instance.cardIndexX != ObjectManager.instance.gridCount - 1)
+        {
+            if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + 1, ObjectManager.instance.cardIndexY].transform.childCount == 1)
+                isRight = true;
+            else
+                isRight = false;
+        }
         else
-            isRight = false;
+            isRight = true;
     }
 
     public void IsLeft()
     {
-        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - 1, ObjectManager.instance.cardIndexY].transform.childCount == 1)
-            isLeft = true;
+        if (ObjectManager.instance.cardIndexX != 0)
+        {
+            if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - 1, ObjectManager.instance.cardIndexY].transform.childCount == 1)
+                isLeft = true;
+            else
+                isLeft = false;
+        }
         else
-            isLeft = false;
+            isLeft = true;
     }
     public void IsBottom()
     {
-        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + 1].transform.childCount == 1)
-            isBottom = true;
+        if (ObjectManager.instance.cardIndexY != ObjectManager.instance.gridCount - 1)
+        {
+            if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + 1].transform.childCount == 1)
+                isBottom = true;
+            else
+                isBottom = false;
+        }
         else
-            isBottom = false;
+            isBottom = true;
     }
     public void IsTop()
     {
-        if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - 1].transform.childCount == 1)
-            isTop = true;
+        if (ObjectManager.instance.cardIndexY != 0)
+        {
+            if (ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - 1].transform.childCount == 1)
+                isTop = true;
+            else
+                isTop = false;
+        }
         else
-            isTop = false;
+            isTop = true;
     }
     public void IsPosition()
     {
@@ -176,6 +196,11 @@ public class FieldCard : MonoBehaviourPun
             for (int i = 0; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - x + i, ObjectManager.instance.cardIndexY].transform.childCount == 1; i++)
             {
                 ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX - x + i, ObjectManager.instance.cardIndexY].transform.name;
+
+                if (ObjectManager.instance.cardIndexX - x + i == ObjectManager.instance.gridCount - 1)
+                {
+                    break;
+                }
             }
             isLeft = false;
             isRight = false;
@@ -186,6 +211,10 @@ public class FieldCard : MonoBehaviourPun
             for (int i = 0; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + i, ObjectManager.instance.cardIndexY].transform.childCount == 1; i++)
             {
                 ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX + i, ObjectManager.instance.cardIndexY].transform.name;
+                if (ObjectManager.instance.cardIndexX + i == ObjectManager.instance.gridCount - 1)
+                {
+                    break;
+                }
             }
         }
 
@@ -199,6 +228,11 @@ public class FieldCard : MonoBehaviourPun
             for (int i = 0; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - y + i].transform.childCount == 1; i++)
             {
                 ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY - y + i].transform.name;
+
+                if (ObjectManager.instance.cardIndexY - y + i == ObjectManager.instance.gridCount - 1)
+                {
+                    break;
+                }
             }
             isTop = false;
             isBottom = false;
@@ -209,6 +243,11 @@ public class FieldCard : MonoBehaviourPun
             for (int i = 0; ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + i].transform.childCount == 1; i++)
             {
                 ObjectManager.instance.createdWords += ObjectManager.instance.grid[ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY + i].transform.name;
+
+                if (ObjectManager.instance.cardIndexY + i == ObjectManager.instance.gridCount - 1)
+                {
+                    break;
+                }
             }
         }
 
