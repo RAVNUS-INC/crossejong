@@ -373,7 +373,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             };
             count++;
         }
-        UnityEngine.Debug.Log($"생성된 방 UI 개수: {count}");
+        //UnityEngine.Debug.Log($"생성된 방 UI 개수: {count}");
     }
 
     // 방 생성 할 때(변수고정불변)
@@ -431,7 +431,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom() // 방에 입장했을 때 자동 호출
     {
-        Debug.Log("방 입장 성공!");
+        //Debug.Log("방 입장 성공!");
 
         // 메시지 큐 정지
         PhotonNetwork.IsMessageQueueRunning = false;

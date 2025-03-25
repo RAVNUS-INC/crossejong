@@ -8,6 +8,7 @@ using PlayFab.ClientModels;
 using TMPro;
 using DG.Tweening;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 
 // 로그인 화면 전체를 구성하는 코드
@@ -61,7 +62,7 @@ public class LoginManager : MonoBehaviour
         // 실제 앱 빌드 시 playerprefs정보 초기화 수행!
 
         //PlayerPrefs.DeleteAll();
-        // Debug.Log("PlayerPrefs 모두 삭제함");
+        //Debug.Log("PlayerPrefs 모두 삭제함");
     }
 
     void Start() 
