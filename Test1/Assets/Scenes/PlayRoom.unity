@@ -5827,7 +5827,7 @@ MonoBehaviour:
   FinIndexY: 
   createdWordList: []
   inputWords: 
-  gridCount: 9
+  gridCount: 0
   dropCount: 0
   StatusMsg: {fileID: 1992441032}
   AlaramMsg: {fileID: 1532533441}

@@ -47,12 +47,15 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
 
     public void OnDrop(PointerEventData eventData)
     {
-
         GameObject card = ObjectManager.instance.moveCardObejct;
 
         if (card != null && !HasCard() && IsColorWhite())
         {
             card.GetComponent<Image>().raycastTarget = true;
+
+            // 터치나 마우스 이벤트에서 드래그된 카드를 처리
+            Vector3 newPosition = (Input.touchCount > 0) ? Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position) : Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -Camera.main.transform.position.z));
+
             card.transform.position = this.transform.position;
             card.transform.SetParent(transform);
             card.transform.parent.name = card.transform.name;

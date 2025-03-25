@@ -17,12 +17,13 @@ public class CardDrag : MonoBehaviourPun, IDragHandler, IBeginDragHandler, IEndD
     [HideInInspector] public Transform startParent; // 원래 부모
     public int cardIndex;
 
+
     public void OnBeginDrag(PointerEventData eventData)
     {
         ObjectManager.instance.AlaramMsg.gameObject.SetActive(false);
 
         if (eventData == null) return;
-        if (eventData.pointerId >= 0) return;
+        //if (eventData.pointerId >= 0) return;
 
         print(gameObject.name);
 
@@ -39,14 +40,28 @@ public class CardDrag : MonoBehaviourPun, IDragHandler, IBeginDragHandler, IEndD
 
         // 드래그할 카드의 부모를 onDragParent로 변경
         transform.SetParent(onDragParent);
+
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        Vector3 point = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -Camera.main.transform.position.z));
+        Vector3 newPosition;
 
-        // 드래그 중에는 카드가 마우스 위치를 따르도록 설정
-        transform.position = point;
+        // PC와 모바일 입력 처리
+        if (Input.touchCount > 0)
+        {
+            // 모바일 터치 입력
+            Touch touch = Input.GetTouch(0);
+            newPosition = Camera.main.ScreenToWorldPoint(new Vector3(touch.position.x, touch.position.y, -Camera.main.transform.position.z));
+        }
+        else
+        {
+            // PC 마우스 입력
+            newPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -Camera.main.transform.position.z));
+        }
+
+        // 드래그 중 카드 이동
+        transform.position = newPosition;
 
         // 상태 메시지 업데이트 함수 호출
         ObjectManager.instance.ShowCardSelectingMessage(true);

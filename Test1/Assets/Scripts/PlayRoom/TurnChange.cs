@@ -218,6 +218,36 @@ public class TurnChange : MonoBehaviourPun
 
     }
 
+    //public void RollBackCardLists(GameObject card)
+    //{
+    //    if (fieldCard.fieldDisplayedCards.Contains(card))
+    //    {
+    //        fieldCard.fieldDisplayedCards.Remove(card);
+    //    }
+    //    else
+    //    {
+    //        Debug.Log("RollBack : 필드카드에 해당 카드가 이미 존재하지 않습니다");
+    //    }
+
+    //    if (userCard.displayedCards.Contains(card))
+    //    {
+    //        Debug.Log("RollBack : 보유카드에 해당 카드가 이미 존재합니다");
+    //    }
+    //    else
+    //    {
+    //        userCard.displayedCards.Add(card);
+    //    }
+
+    //    if (userCardFullPopup.fullDisplayedCards.Contains(card))
+    //    {
+    //        Debug.Log("RollBack : 전체보유카드에 해당 카드가 이미 존재합니다");
+    //    }
+    //    else
+    //    {
+    //        userCardFullPopup.fullDisplayedCards.Add(card);
+    //    }
+    //}
+
     // 롤백 버튼을 누르면 수행되는 함수
     public void RollBackAreas()
     {
@@ -230,6 +260,10 @@ public class TurnChange : MonoBehaviourPun
         if (ObjectManager.instance.createdWordList.Count > 0)
         {
             cardPool.GetCardsToTarGetArea(ObjectManager.instance.createdWordList, userCard.userCardContainer, userCard.displayedCards); //디스플레이에 카드 되돌리기
+            //for (int i = 0; i < ObjectManager.instance.createdWordList.Count; ++i)
+            //{
+            //    RollBackCardLists(ObjectManager.instance.createdWordList[i]);
+            //}
             fieldCard.RollBackColorAreas();
             userCard.SelectedUserCard(userCard.displayedCards);
         }
