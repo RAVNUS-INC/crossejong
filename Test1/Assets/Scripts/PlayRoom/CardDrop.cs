@@ -80,9 +80,21 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
                     Image image = empty.GetComponent<Image>();
                     image.color = Color.clear;
                     ObjectManager.instance.grid[x, y] = empty;
-
                 }
             }
+        }
+
+        // 좌표 관련 인덱스 옮기기
+        ObjectManager.instance.cardIndexX += 1;
+        ObjectManager.instance.cardIndexY += 1;
+
+        for (int i = 0; i < ObjectManager.instance.FinIndexX.Count; i++)
+        {
+            ObjectManager.instance.FinIndexX[i] += 1;
+        }
+        for (int i = 0; i < ObjectManager.instance.FinIndexY.Count; i++)
+        {
+            ObjectManager.instance.FinIndexY[i] += 1;
         }
     }
 
@@ -163,14 +175,14 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
                         ObjectManager.instance.cardIndexY = y;
                         ObjectManager.instance.FinIndexY.Add(y); // 전달할 리스트 배열에 저장
 
-                        if (x == 0 || x == ObjectManager.instance.gridCount - 1)
-                        {
-                            //ExtendDropAreas();
-                        }
-                        if (y == 0 || y == ObjectManager.instance.gridCount - 1)
-                        {
-                            //ExtendDropAreas();
-                        }
+                        //if (x == 0 || x == ObjectManager.instance.gridCount - 1)
+                        //{
+                        //    ExtendDropAreas();
+                        //}
+                        //if (y == 0 || y == ObjectManager.instance.gridCount - 1)
+                        //{
+                        //    ExtendDropAreas();
+                        //}
                     }
                 }
             }

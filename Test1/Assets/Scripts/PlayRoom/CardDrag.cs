@@ -51,7 +51,7 @@ public class CardDrag : MonoBehaviourPun, IDragHandler, IBeginDragHandler, IEndD
         if (Input.touchCount > 0)
         {
             // 모바일 터치 입력
-            newPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.GetTouch(0).position.x, Input.GetTouch(0).position.y, Camera.main.transform.position.z));
+            newPosition = Camera.main.ScreenToWorldPoint(new Vector3(Input.GetTouch(0).position.x, Input.GetTouch(0).position.y, -Camera.main.transform.position.z));
         }
         else
         {
