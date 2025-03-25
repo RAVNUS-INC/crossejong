@@ -37,9 +37,6 @@ public class TurnChange : MonoBehaviourPun
 
     private void Start()
     {
-        // 카드를 내고 인풋필드에 입력할 때 한글만 입력 가능하도록 함
-        cardInputField.onValueChanged.AddListener(OnlyKoreanOK);
-
         //카드 내기 완료 버튼을 처음엔 비활성화
         CardDropBtn.interactable = false;
 
@@ -48,7 +45,19 @@ public class TurnChange : MonoBehaviourPun
             cardInputField.gameObject.SetActive(true); // cardInputField 활성화
             cardInputField.text = ""; // 인풋필드 입력란을 비워놓음
         });
+
+        //cardInputField.onSubmit.AddListener(delegate { EmitChat(); });
     }
+
+    //public void EmitChat() 
+    //{ 
+    //    if (cardInputField.text.Length > 0) 
+    //    {
+    //        IsCreateWord();
+    //    } 
+    //}
+
+
 
     public void IsCreateWord()
     {
@@ -148,17 +157,17 @@ public class TurnChange : MonoBehaviourPun
         }
     }
 
-    public void OnlyKoreanOK(string text) // 단어 입력필드에 한글만 작성할 수 있도록 함
-    {
-        // 한글을 제외한 모든 문자 제외
-        // 한글만 허용하는 정규식 (띄어쓰기 포함 X)
-        string koreanPattern = "^[가-힣]*$";
+    //public void OnlyKoreanOK(string text) // 단어 입력필드에 한글만 작성할 수 있도록 함
+    //{
+    //    // 한글을 제외한 모든 문자 제외
+    //    // 한글만 허용하는 정규식 (띄어쓰기 포함 X)
+    //    string koreanPattern = "^[가-힣]*$";
 
-        if (!Regex.IsMatch(text, koreanPattern))
-        {
-            cardInputField.text = Regex.Replace(text, "[^가-힣]", ""); // 한글 이외의 문자 제거
-        }
-    }
+    //    if (!Regex.IsMatch(text, koreanPattern))
+    //    {
+    //        cardInputField.text = Regex.Replace(text, "[^가-힣]", ""); // 한글 이외의 문자 제거
+    //    }
+    //}
 
     public void TurnEnd()
     {
