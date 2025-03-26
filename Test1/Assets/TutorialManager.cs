@@ -55,10 +55,6 @@ public class TutorialManager : MonoBehaviour
 
     private Tween[] tweens = new Tween[4]; // 4개의 트윈을 저장할 배열
 
-    void Awake()
-    {
-        DontDestroyOnLoad(gameObject);
-    }
 
     void Start()
     {

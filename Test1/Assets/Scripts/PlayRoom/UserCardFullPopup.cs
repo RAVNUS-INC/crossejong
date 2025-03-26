@@ -32,14 +32,14 @@ public class UserCardFullPopup : MonoBehaviour
     {
         cardPool.MoveCardsToTarGetArea(userCard.displayedCards, fullCardContainer, fullDisplayedCards);
 
-        userCard.SelectedUserCard(fullDisplayedCards);
+       // userCard.SelectedUserCard(fullDisplayedCards);
     }
     
     public void MoveCardsToUserCardArea()
     {
         cardPool.MoveCardsToTarGetArea(fullDisplayedCards, userCard.userCardContainer, userCard.displayedCards);
 
-        userCard.SelectedUserCard(userCard.displayedCards);
+       // userCard.SelectedUserCard(userCard.displayedCards);
     }
 
 }

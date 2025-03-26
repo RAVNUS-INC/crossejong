@@ -13,6 +13,7 @@ using Unity.VisualScripting;
 using UnityEngine.UIElements;
 using Image = UnityEngine.UI.Image;
 using DG.Tweening;
+using Button = UnityEngine.UI.Button;
 
 public class TurnManager : MonoBehaviourPunCallbacks
 {
@@ -230,6 +231,14 @@ public class TurnManager : MonoBehaviourPunCallbacks
             // 상태메시지 업데이트 요청
             photonView.RPC("RequestTurnMsg", RpcTarget.All, UserInfoManager.instance.MyName);
 
+            if (ObjectManager.instance.IsFirstTurn == true)
+            {
+                // 카드 드래그 가능하게
+                userCard.SelectedUserCard(userCard.displayedCards);
+                userCard.SelectedUserCard(userCardFullPopup.fullDisplayedCards);
+                // 나의 첫 턴은 끝
+                ObjectManager.instance.IsFirstTurn = false;
+            }
             AfterCountdown();
         }
         else
@@ -448,6 +457,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
             TurnRoutine = null;
 
             ObjectManager.instance.IsMyTurn = false; // 턴 상태 비활성화
+            gameResult.MainCheckTime();
         }
     }
 

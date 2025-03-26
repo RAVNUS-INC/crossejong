@@ -126,5 +126,16 @@ public class ObjectManager : MonoBehaviourPun
         }
     }
 
+    // 메시지를 2초 동안 띄우는 메서드
+    public void ShowMessageFor2Seconds(string message)
+    {
+        StartCoroutine(ShowMessageCoroutine(message));
+    }
 
+    private IEnumerator ShowMessageCoroutine(string message)
+    {
+        AlaramMsg.text = message;  // 메시지 설정
+        yield return new WaitForSeconds(2.5f);  // 2초 기다리기
+        AlaramMsg.text = "";  // 메시지 제거
+    }
 }

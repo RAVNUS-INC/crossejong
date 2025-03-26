@@ -13,6 +13,8 @@ using System.Text.RegularExpressions;
 
 public class TurnChange : MonoBehaviourPun
 {
+    public static TurnChange instance; // 싱글톤 인스턴스
+
     public UserCard userCard;
     public FieldCard fieldCard;
     public CardPool cardPool;
@@ -28,12 +30,17 @@ public class TurnChange : MonoBehaviourPun
     public WordLists wordLists;
     public DictionaryAPI dictionaryAPI;
 
+    public TMP_Text APIStatusMsg;
+
     public bool isCorrectWord = false;
 
     public List<char> charList = new List<char>
      {'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'};
 
-
+    private void Awake()
+    {
+        instance = this;
+    }
 
     private void Start()
     {
@@ -46,16 +53,16 @@ public class TurnChange : MonoBehaviourPun
             cardInputField.text = ""; // 인풋필드 입력란을 비워놓음
         });
 
-        //cardInputField.onSubmit.AddListener(delegate { EmitChat(); });
+        cardInputField.onEndEdit.AddListener(delegate { EmitChat(); });
     }
 
-    //public void EmitChat() 
-    //{ 
-    //    if (cardInputField.text.Length > 0) 
-    //    {
-    //        IsCreateWord();
-    //    } 
-    //}
+    public void EmitChat()
+    {
+        if (cardInputField.text.Length > 0)
+        {
+            ObjectManager.instance.StatusMsg.text = cardInputField.text;
+        }
+    }
 
 
 
@@ -72,10 +79,16 @@ public class TurnChange : MonoBehaviourPun
                 if (ObjectManager.instance.createdWords.Contains(wordInput))  // 글자로 이루어진 단어일 경우
                 {
                     Debug.Log("글자로만 이루어진 단어를 사전 API 검사를 시작합니다");
+                    APIStatusMsg.text = "검사 시작";
                     // wordInput  (사전 API 검사 돌리기)
                     ObjectManager.instance.dropCount = 0;
                     ObjectManager.instance.inputWords = wordInput;
                     StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
+
+                }
+                else
+                {
+                    APIStatusMsg.text = "검사 실패햇음";
                 }
             }
 
@@ -151,23 +164,15 @@ public class TurnChange : MonoBehaviourPun
         else
         {
             Debug.Log("오류입니다");
+            APIStatusMsg.text = "오류";
             RollBackAreas();
             ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
-            ObjectManager.instance.AlaramMsg.text = "만든 단어와 입력한 단어가 일치하지 않습니다.";
+            ObjectManager.instance.ShowMessageFor2Seconds("만든 단어와 입력한 단어가 일치하지 않습니다.");
+            //ObjectManager.instance.AlaramMsg.text = "만든 단어와 입력한 단어가 일치하지 않습니다.";
         }
+        cardInputField.gameObject.SetActive(false);
+        CardDropBtn.gameObject.SetActive(true);
     }
-
-    //public void OnlyKoreanOK(string text) // 단어 입력필드에 한글만 작성할 수 있도록 함
-    //{
-    //    // 한글을 제외한 모든 문자 제외
-    //    // 한글만 허용하는 정규식 (띄어쓰기 포함 X)
-    //    string koreanPattern = "^[가-힣]*$";
-
-    //    if (!Regex.IsMatch(text, koreanPattern))
-    //    {
-    //        cardInputField.text = Regex.Replace(text, "[^가-힣]", ""); // 한글 이외의 문자 제거
-    //    }
-    //}
 
     public void TurnEnd()
     {
@@ -198,19 +203,19 @@ public class TurnChange : MonoBehaviourPun
             if (ObjectManager.instance.IsFirstTurn == true)
             {
                 // 턴 넘기기 방지를 위한 변수를 이제는 false로 변경
-                ObjectManager.instance.IsFirstTurn = false;
+                //ObjectManager.instance.IsFirstTurn = false;
 
                 if (ObjectManager.instance.IsMyTurn == true)
                 {
                     // 카드 드래그 가능하게
                     userCard.SelectedUserCard(userCard.displayedCards);
                     userCard.SelectedUserCard(userCardFullPopup.fullDisplayedCards);
+                    // 나의 첫 턴은 끝
+                    ObjectManager.instance.IsFirstTurn = false;
                 }
                 else
                 {
-                    // 카드 드래그 불가능하게
-                    userCard.DeActivateCard(userCard.displayedCards, false);
-                    userCard.DeActivateCard(userCardFullPopup.fullDisplayedCards, false);
+                    return;
                 }
 
                 return; // 턴을 넘기지 않음

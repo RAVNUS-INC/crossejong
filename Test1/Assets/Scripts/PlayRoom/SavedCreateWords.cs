@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEngine;
 using System.IO;
 using System.Text;
+using System;
 
 public class SavedCreateWords : MonoBehaviour
 {
@@ -49,6 +50,8 @@ public class SavedCreateWords : MonoBehaviour
 
     public void AddWordToCSV(string newWord)
     {
+        TurnChange.instance.APIStatusMsg.text = $"단어: {newWord}";
+
         if (playerCreateWords.ContainsKey(newWord))
         {
             playerCreateWords[newWord] += 1; // 기존 단어면 +1
@@ -65,31 +68,39 @@ public class SavedCreateWords : MonoBehaviour
 
     private void SaveCSVData()
     {
-        List<string> lines = new List<string> { "_playerCreateWord,_playerCreateWordNum"};  // CVS 제목
-
-        foreach (var entry in playerCreateWords)
+        try
         {
-            lines.Add($"{entry.Key},{entry.Value}"); // 단어, 횟수 추가
-        }
+            //TurnChange.instance.APIStatusMsg.text = "SaveCSVData 시작";
 
-        // UTF-8 BOM을 포함해서 저장
-        using (StreamWriter writer = new StreamWriter(filePath, false, new System.Text.UTF8Encoding(true)))
-        {
-            foreach (string line in lines)
+            List<string> lines = new List<string> { "_playerCreateWord,_playerCreateWordNum" }; // CSV 제목
+
+            foreach (var entry in playerCreateWords)
             {
-                writer.WriteLine(line);
+                lines.Add($"{entry.Key},{entry.Value}"); // 단어, 횟수 추가
             }
+            //TurnChange.instance.APIStatusMsg.text = $"마지막부분은 {lines[lines.Count - 1]}";
+
+            // UTF-8 BOM을 포함해서 저장
+            using (StreamWriter writer = new StreamWriter(filePath, false, new System.Text.UTF8Encoding(true)))
+            {
+                foreach (string line in lines)
+                {
+                    writer.WriteLine(line);
+                }
+            }
+
+            //TurnChange.instance.APIStatusMsg.text = "csv 최종 저장 완료";
         }
-
-        Debug.Log("CSV 데이터 저장 완료 (UTF-8 인코딩 적용)!");
-
-        //File.WriteAllLines(filePath, lines); // 파일로 저장
-        //Debug.Log("CSV 데이터 저장 완료!");
+        catch (Exception e)
+        {
+            Debug.LogError($"CSV 저장 중 오류 발생: {e.Message}");
+            //TurnChange.instance.APIStatusMsg.text = $"CSV 저장 오류: {e.Message}";
+        }
     }
 
     public void OnUserCreatesWord(string newWord)
     {
-        Debug.Log("단어 저장을 시작합니다");
+        Debug.Log("단어 저장을 시작합니다");    
         AddWordToCSV(newWord);
     }
 

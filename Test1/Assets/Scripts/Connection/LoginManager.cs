@@ -59,16 +59,23 @@ public class LoginManager : MonoBehaviour
 
     void Awake()
     {
+        TouchPanel.SetActive(false);
+
         // 실제 앱 빌드 시 playerprefs정보 초기화 수행!
 
         //PlayerPrefs.DeleteAll();
-        //Debug.Log("PlayerPrefs 모두 삭제함");
+        //PlayFabClientAPI.ForgetAllCredentials(); // 자동 로그인 방지 (PlayFab 인증 정보 초기화)
+
+        // 자동 로그인 수행
+        AutoLoginWithDeviceID();
+
+        //Debug.Log("PlayerPrefs 삭제 및 디바이스 연결 해제");
     }
 
     void Start() 
     {
         // 로그인 상태 확인 및 첫 로그인 체크
-        CheckLoginStatus();
+        //AutoLoginWithDeviceID();
 
         ResetPasswordToggle(); //토글 비활성화
         ResetWarningTexts(); //경고메시지 비활성화
@@ -104,18 +111,6 @@ public class LoginManager : MonoBehaviour
             .SetEase(Ease.InOutSine);    // 부드럽게 페이드 인/아웃
     }
 
-    private void CheckLoginStatus() //로그인 상태에 따라 다른 씬으로 이동
-    {
-        // 기기 ID로 자동 로그인
-        AutoLoginWithDeviceID();
-
-        // playerprefs에서 정보 불러오기(디버그를 위한)
-        // LoadUserInfoFromPrefs();
-
-        // 첫 로그인인 경우, 로그인으로 이동
-        //SceneManager.LoadScene("Login");
-    }
-
     void CheckInputFields() // 인풋 필드가 하나라도 비어있으면 로그인/회원가입 버튼의 비활성화 상태 유지
     {
         // 모든 인풋필드가 비어있지 않은지 확인
@@ -133,15 +128,15 @@ public class LoginManager : MonoBehaviour
         RegisterBtn.interactable = allFilled && noErrors; ;
     }
 
-    private void LoadUserInfoFromPrefs() // 플레이어 정보 로컬에 저장된 값 불러오기
-    {
-        // GetString의 두번째 값은 기본값을 나타냄
-        UserInfoManager.instance.MyName = PlayerPrefs.GetString(UserInfoManager.DISPLAYNAME_KEY, "Guest");
-        UserInfoManager.instance.MyImageIndex = PlayerPrefs.GetInt(UserInfoManager.IMAGEINDEX_KEY, 0);
+    //private void LoadUserInfoFromPrefs() // 플레이어 정보 로컬에 저장된 값 불러오기
+    //{
+    //    // GetString의 두번째 값은 기본값을 나타냄
+    //    UserInfoManager.instance.MyName = PlayerPrefs.GetString(UserInfoManager.DISPLAYNAME_KEY, "Guest");
+    //    UserInfoManager.instance.MyImageIndex = PlayerPrefs.GetInt(UserInfoManager.IMAGEINDEX_KEY, 0);
 
-        // 필요한 곳에 정보를 설정하거나 UI에 반영
-       Debug.Log($"로컬 - DisplayName: {UserInfoManager.instance.MyName}, ImageIndex: {UserInfoManager.instance.MyImageIndex}");
-    }
+    //    // 필요한 곳에 정보를 설정하거나 UI에 반영
+    //   Debug.Log($"로컬 - DisplayName: {UserInfoManager.instance.MyName}, ImageIndex: {UserInfoManager.instance.MyImageIndex}");
+    //}
 
     // 로그인/회원가입 전환 함수 - 신규회원이신가요? 버튼을 누를 때
     public void ToggleLoginMode()
@@ -245,6 +240,31 @@ public class LoginManager : MonoBehaviour
         });
     }
 
+    void UnlinkDeviceID() // 계정 로그인한 기기를 해제
+    {
+        var request = new UnlinkAndroidDeviceIDRequest
+        {
+            AndroidDeviceId = SystemInfo.deviceUniqueIdentifier
+        };
+
+        PlayFabClientAPI.UnlinkAndroidDeviceID(request, result =>
+        {
+            // PlayFab 인증 정보 초기화
+            Debug.Log("기기 ID 연결 해제 완료");
+            InitialTestText.text = "기기 연결 해제됨. 첫 로그인 감지됨";
+
+            // 터치패널 활성화
+            TouchPanel.SetActive(true);
+            StartTwinkle();
+        },
+        error =>
+        {
+            Debug.LogError("기기 ID 연결 해제 실패: " + error.GenerateErrorReport());
+            InitialTestText.text = "기기 연결 해제 실패";
+        });
+
+    }
+
     public void AutoLoginWithDeviceID() // 연동된 기기를 통해 자동로그인 수행
     {
         var request = new LoginWithAndroidDeviceIDRequest
@@ -265,10 +285,13 @@ public class LoginManager : MonoBehaviour
         {
             Debug.Log("첫 로그인 감지. 자동 로그인 실패: " + error.GenerateErrorReport());
             InitialTestText.text = "로그아웃 상태";
+            // 터치패널 활성화
             TouchPanel.SetActive(true);
             StartTwinkle();
         });
     }
+
+
 
     // 회원가입 실패 시
     public void OnRegisterFailure(PlayFabError error)
@@ -305,19 +328,6 @@ public class LoginManager : MonoBehaviour
         emailPanel.gameObject.SetActive(emailPanelActive);
         registerPanel.gameObject.SetActive(registerPanelActive);
     }
-
-    //public void BackBtn1() //뒤로가기 버튼을 눌렀을 때 ->초기 홈 화면으로 이동
-    //{
-    //    if (EmailInput != null) EmailInput.text = ""; //값 초기화
-    //    if (PasswordInput != null) PasswordInput.text = ""; //값 초기화
-
-    //    // PasswordToggle을 초기 상태로 설정
-    //    ResetPasswordToggle();
-
-    //    // 경고 텍스트 숨기기
-    //    ResetWarningTexts();
-
-    //}
 
     public void BackBtn2() //뒤로가기 버튼을 눌렀을 때 ->로그인 화면으로 이동
     {

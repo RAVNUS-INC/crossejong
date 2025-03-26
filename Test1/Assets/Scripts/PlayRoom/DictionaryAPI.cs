@@ -62,7 +62,7 @@ public class DictionaryAPI : MonoBehaviour
                             }
                         }
 
-                        if (wordExists)
+                        if (wordExists == true)
                         {
                             Debug.Log("단어 '" + word + "'가 존재하며, 명사입니다.");
 
