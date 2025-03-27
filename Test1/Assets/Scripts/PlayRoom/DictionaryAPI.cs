@@ -62,7 +62,7 @@ public class DictionaryAPI : MonoBehaviour
                             }
                         }
 
-                        if (wordExists)
+                        if (wordExists == true)
                         {
                             Debug.Log("단어 '" + word + "'가 존재하며, 명사입니다.");
 
@@ -77,7 +77,7 @@ public class DictionaryAPI : MonoBehaviour
                             Debug.Log("단어 '" + word + "'가 존재하지 않거나, 명사가 아닙니다.");
                             turnChange.RollBackAreas(); // API검사에 통과하지 못했으므로 카드를 다시 돌려놓기
                             ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
-                            ObjectManager.instance.AlaramMsg.text = "해당 단어는 존재하지 않거나, 명사가 아닙니다.";
+                            ObjectManager.instance.AlaramMsg.text = "해당 단어가 존재하지 않거나, 명사가 아닙니다.";
                         }
                     }
                     else

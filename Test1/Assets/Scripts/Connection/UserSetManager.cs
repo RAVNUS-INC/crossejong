@@ -169,7 +169,7 @@ public class UserSetManager : MonoBehaviourPunCallbacks
             },
             error =>
             {
-                Debug.LogError($"[Playfab] 유저 데이터 저장 실패: {error.GenerateErrorReport()}");
+                Debug.LogError($"[Playfab] 유저 이미지 저장 실패: {error.GenerateErrorReport()}");
             });
 
         // 변경된 이미지 인덱스를 playerprefs에 저장(기존 유저의 경우 덮어쓰기, 신규 유저는 새로 추가하는 상황)

@@ -37,6 +37,8 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     // 변경 전 난이도, 제한시간 저장
     private int beforeDifficultyIndex, beforeTimeLimitIndex;
 
+    [SerializeField] Image[] DiffSel, TimeSel; //선택된 상태를 나타내는 이미지 배열
+
     private string myMesseages; //내 이름, 내가 보낸 메시지
     private Dictionary<int, bool> playerReadyStates = new Dictionary<int, bool>(); // 플레이어 준비 상태 저장
 
@@ -86,7 +88,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         // 방장 여부에 따른 버튼 처리
         RoomSetBtn.interactable = PhotonNetwork.IsMasterClient;
 
-        // 각 버튼 배열에 리스너 추가(클릭시 색상 변경)
+        // 각 버튼 배열에 리스너 추가(클릭시 테두리 유무 변경)
         DifficultySet(DifButton);
         TimeLimitSet(TimeButton);
 
@@ -147,7 +149,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         // 방 속성 다시 업데이트
         LoadRoomInfo();
 
-        // 처음 선택했던 버튼들(난이도, 제한시간)은 색상 다르게(바뀐 정보에만 노란색) 
+        // 처음 선택했던 버튼들(난이도, 제한시간)은 색상 다르게(바뀐 정보에만 테두리)
         UpdateButtonColors(DifButton, selectedDifficultyIndex);
         UpdateButtonColors(TimeButton, selectedTimeLimitIndex);
 
@@ -229,16 +231,33 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     }
     private void UpdateButtonColors(Button[] buttons, int selectedIndex) // 선택한 버튼을 색칠
     {
-        // 초기화 작업 때 버튼 색상 표시하기 위해 쓰이는 반복문
         for (int i = 0; i < buttons.Length; i++)
         {
-            ColorBlock colorBlockbg = buttons[i].colors; //colorBlock에 색상 정보 넘겨주기
-            colorBlockbg.normalColor = Color.white; // 기본 색상 화이트
-            colorBlockbg.normalColor = (i == selectedIndex) ? Color.yellow : Color.white; //현재 인덱스와 같으면 노란색
-            colorBlockbg.selectedColor = Color.yellow;
-            buttons[i].colors = colorBlockbg; //버튼에 색상 업데이트
+            if (i == selectedIndex) //현재 선택한 인덱스와 i값이 같을때
+            {
+                if (buttons == DifButton)
+                {
+                    DiffSel[i].gameObject.SetActive(true);
+                }
+                else
+                {
+                    TimeSel[i].gameObject.SetActive(true);
+                }
+            }
+            else //현재 선택한 인덱스와 i값이 다를때
+            {
+                if (buttons == DifButton)
+                {
+                    DiffSel[i].gameObject.SetActive(false);
+                }
+                else
+                {
+                    TimeSel[i].gameObject.SetActive(false);
+                }
+            }
         }
-        if (selectedDifficultyIndex == beforeDifficultyIndex && selectedTimeLimitIndex == beforeTimeLimitIndex) //기존의 방정보와 모두 같다면
+        //기존의 방정보와 모두 같다면
+        if (selectedDifficultyIndex == beforeDifficultyIndex && selectedTimeLimitIndex == beforeTimeLimitIndex)
         {
             SaveBtn.interactable = false; //저장버튼 비활성화
         }

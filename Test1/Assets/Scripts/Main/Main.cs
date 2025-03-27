@@ -9,6 +9,8 @@ using System;
 using TMPro;
 using Unity.VisualScripting;
 using System.Collections;
+using DG.Tweening;
+using Sequence = DG.Tweening.Sequence;
 
 // 메인에 존재하는 기능에 관한 스크립트
 public class Main : MonoBehaviour
@@ -26,11 +28,15 @@ public class Main : MonoBehaviour
 
     // ---------------대시보드에 보여질 랭킹 오브젝트---------------
     public GameObject[] ranklist; //활성화/비활성화를 위한 오브젝트
+    public Image[] ranklistBgImg; //랭크 자신위치 나타내는 bg
     public Image[] userimage; //유저 이미지
     public TMP_Text[] username; //유저 이름
     public TMP_Text[] wordcount; //단어완성횟수
 
     public Text TestText, LogTestText; //빌드 테스트 텍스트 상태, 로그아웃 텍스트 상태
+
+    public RectTransform RankICON; //ㄱㄴㄷ 아이콘 무빙 효과
+    private Tween AnimRank;
 
     private void Awake()
     {
@@ -56,11 +62,29 @@ public class Main : MonoBehaviour
             PhotonNetwork.JoinLobby();  // 로비로 이동
         }
 
+        // PlayRoom 객체 찾기
+        GameObject playRoom = GameObject.Find("PlayRoom");
+
+        // playRoom이 null이 아니라면 파괴 함수 수행
+        if (playRoom != null)
+        {
+            // 네트워크 및 로컬 객체 삭제
+            TurnManager.instance.DestroyPlayRoomAndAllChildren();
+        }
+
+        // 씬 내에서 "DOTween"이라는 이름을 가진 객체를 찾기
+        GameObject dotweenObject = GameObject.Find("[DOTween]");
+
+        // 만약 객체가 존재한다면 삭제
+        if (dotweenObject != null)
+        {
+            Destroy(dotweenObject); // 해당 객체 삭제
+            Debug.Log("[DOTween] 객체가 삭제되었습니다.");
+        }
         profilePanel.SetActive(false); //프로필 패널 비활성화
 
         GetProfileImageIndex(); // PlayFab에서 저장된 이미지 인덱스를 불러와 이미지 업데이트
         GetUserDisplayName(); //유저 네임 불러와서 텍스트로 표시
-        //UpdateBtn(); //리더보드 업데이트
     }
 
 
@@ -153,6 +177,7 @@ public class Main : MonoBehaviour
     {
         for (int i = 0; i < ranklist.Length; i++)
         {
+            ranklistBgImg[i].gameObject.SetActive(false);
             ranklist[i].SetActive(false);
         }
     }
@@ -186,7 +211,7 @@ public class Main : MonoBehaviour
                 {
                     int actualRank = curBoard.Position + 1; // 0위는 1위로 변환
                     myRankText.text = $"현재 {actualRank}위";
-                    Debug.Log($"현재 {curBoard.Position + 1}위:");
+                    ranklistBgImg[i].gameObject.SetActive(true); //내위치 확인 bg
                 }
                 //유저수, 순위에 따른 오브젝트 활성화
                 ranklist[i].SetActive(true);
@@ -245,5 +270,33 @@ public class Main : MonoBehaviour
         });
     }
 
+    public void MoveRankICON()
+    {
+        // 현재 anchoredPosition 저장
+        Vector2 startPos = RankICON.anchoredPosition;
 
+        // Sequence 생성
+        Sequence mySequence = DOTween.Sequence();
+
+        // 첫 번째 위아래 반복 애니메이션 추가
+        mySequence.Append(RankICON.DOAnchorPosY(startPos.y + 20f, 0.5f)
+            .SetEase(Ease.InOutSine) // 부드러운 가속 & 감속
+            .SetLoops(2, LoopType.Yoyo)); // Yoyo 애니메이션을 한 번만 실행
+
+        // Sequence 자체를 무한 반복하도록 설정
+        mySequence.SetLoops(-1);
+
+        // Sequence를 AnimRank에 저장
+        AnimRank = mySequence;
+    }
+
+
+    public void DetroyAnimRank() //뒤로가기 해서 메인으로 다시 오면
+    {
+        if (AnimRank != null && AnimRank.IsActive())
+        {
+            AnimRank.Kill(); // 트윈 중지 및 제거
+            AnimRank = null; // 참조 제거 (메모리 관리)
+        }
+    }
 }

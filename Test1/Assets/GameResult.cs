@@ -1,4 +1,6 @@
 using Photon.Pun;
+using PlayFab;
+using PlayFab.ClientModels;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,16 +36,47 @@ public class GameResult : MonoBehaviourPunCallbacks
     // 결과 확인 버튼 누르면 메인으로 돌아가도록
     // 확인 버튼을 누르지 않아도 15초뒤에 메인으로 자동으로 이동하도록 알림메시지 수행하기
 
+    public void SetStat() //유저 초기 세팅 확인버튼(usersetmanager)에 연결
+    {
+        // 1. 현재 통계 값 가져오기
+        PlayFabClientAPI.GetPlayerStatistics(new GetPlayerStatisticsRequest(),
+            result =>
+            {
+                // 기존 값을 가져와서
+                var currentCompletionCount = result.Statistics.FirstOrDefault(stat => stat.StatisticName == "WordCompletionCount")?.Value ?? 0;
+
+                // 기존 값에 더하기
+                var newCompletionCount = currentCompletionCount + ObjectManager.instance.MyCompleteWordCount;
+
+                // 2. 새로운 값으로 통계 업데이트
+                var request = new UpdatePlayerStatisticsRequest
+                {
+                    Statistics = new List<StatisticUpdate>
+                    {
+                new StatisticUpdate { StatisticName = "WordCompletionCount", Value = newCompletionCount }
+                    }
+                };
+
+                PlayFabClientAPI.UpdatePlayerStatistics(request,
+                    (updateResult) => print("단어완성횟수 저장 완료"),
+                    (error) => print("변수 저장 실패"));
+            },
+            error => print("현재 통계 값 가져오기 실패"));
+    }
+
     public void MainCheckTime()
     {
-        // 결과창이 띄워지면 15초 타이머를 시작 - 메인 도달까지 남은 시간
-        if (BacktoMainRoutine == null)
-        {
-            BacktoMainRoutine = StartCoroutine(StartTimer()); // 새 코루틴 시작
-        }
+        SetStat(); // 단어완성횟수를 playfab에 즉시 업데이트
+
+        //// 결과창이 띄워지면 15초 타이머를 시작 - 메인 도달까지 남은 시간
+        //if (BacktoMainRoutine == null)
+        //{
+        //    BacktoMainRoutine = StartCoroutine(StartTimer()); // 새 코루틴 시작
+        //}
     }
     public void EndGameDelay()
     {
+
         // 게임 종료를 알리는 메시지 약 1초간 표시 타이머 시작
         if (EndGameDelayRoutine == null)
         {
@@ -112,7 +145,7 @@ public class GameResult : MonoBehaviourPunCallbacks
         // 모두에게 코루틴을 멈출 것을 요청함
         turnManager.photonView.RPC("StopTurnCoroutine", RpcTarget.All);
 
-        MainCheckTime(); // 메인 되돌아가는 타이머 시작
+        //MainCheckTime(); // 메인 되돌아가는 타이머 시작
     }
 
     public void OnConfirmButton() // 게임 결과 확인 버튼을 눌렀을 때 -> 메인 이동

@@ -62,6 +62,7 @@ public class UserCard : MonoBehaviourPun
         if (userProfileLoad.sortedPlayers[count] == UserInfoManager.instance.MyActNum)
         {
             Debug.Log($"나는 현재 {count}번째 유저: Num {userProfileLoad.sortedPlayers[count]}");
+            TurnChange.instance.APIStatusMsg.text = $"나는 현재 {count}번째 유저";
 
             List<GameObject> randomCards = cardPool.GetRandomCardsObject(RandomNames); //랜덤인덱스에 해당하는 오브젝트 추가
             cardPool.GetCardsToTarGetArea(randomCards, userCardContainer, displayedCards); // 디스플레이 카드 상태 업데이트

@@ -57,6 +57,7 @@ public class FieldCard : MonoBehaviourPun
         if (image.color != Color.white)
         {
             image.color = Color.white;
+            TurnChange.instance.APIStatusMsg.text = "영역 색상 흰색 변경";
         }
     }
 
@@ -90,6 +91,7 @@ public class FieldCard : MonoBehaviourPun
 
     public void OnOffDropAreas()
     {
+
         for (int x = 0; x < ObjectManager.instance.gridCount; x++)
         {
             for (int y = 0; y < ObjectManager.instance.gridCount; y++)
@@ -116,6 +118,7 @@ public class FieldCard : MonoBehaviourPun
                 }
             }
         }
+        TurnChange.instance.APIStatusMsg.text = $"OnOffDropAreas 수행";
     }
         
 
@@ -328,6 +331,7 @@ public class FieldCard : MonoBehaviourPun
         foreach (string i in usedNames)
         {
             Debug.Log($"첫 카드 '{i}' 받음");
+            TurnChange.instance.APIStatusMsg.text = $"첫 카드 '{i}' 받음";
         }
         List<GameObject> randomCards = cardPool.GetRandomCardsObject(usedNames);
 
@@ -339,7 +343,7 @@ public class FieldCard : MonoBehaviourPun
         ObjectManager.instance.grid[ObjectManager.instance.gridCount / 2, ObjectManager.instance.gridCount / 2] = firstCards;
 
         firstCards.transform.parent.name = firstCards.transform.name;
-
+        TurnChange.instance.APIStatusMsg.text = $"드롭영역 생성 전";
         OnOffDropAreas();
     }
 

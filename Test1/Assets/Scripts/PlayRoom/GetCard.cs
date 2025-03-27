@@ -23,6 +23,7 @@ public class GetCard : MonoBehaviourPun
         // 처음엔 카드 추가 버튼 비활성화 - 자신의 턴이 오면 바로 활성화
         getCardButton.interactable = false;
     }
+
     public void GetCardToUserCard() // 카드 얻기
     {
         // 보드판에 있던 카드를 다시 슬롯으로 되돌려놓기
@@ -47,6 +48,16 @@ public class GetCard : MonoBehaviourPun
         {
             photonView.RPC("ReceiveRandomCards", targetPlayer, string.Join(", ", usedNames));
         }
+
+        // 만약 사용한 카드가 54개(다 씀)가 되면
+        if (ObjectManager.instance.usedIndices.Count == 54)
+        {
+            if (!ObjectManager.instance.AllUsedCard) 
+            {
+                // 모두가 카드 추가 버튼을 쓰지 못하도록 업데이트 요청
+                photonView.RPC("DeActivateAddCardBtn", RpcTarget.All);
+            }
+        }
     }
 
     [PunRPC]
@@ -69,5 +80,13 @@ public class GetCard : MonoBehaviourPun
         }
         // 카드 개수 UI 업데이트 요청
         turnChange.TurnEnd();
+    }
+
+    [PunRPC]
+    void DeActivateAddCardBtn() // 카드 추가 버튼을 비활성화 상태로 만듦(카드를 다써서)
+    {
+        getCardButton.interactable = false;
+
+        ObjectManager.instance.AllUsedCard = true; // 카드 다 썼음을 나타냄
     }
 }
