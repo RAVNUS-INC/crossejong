@@ -29,7 +29,6 @@ public class TurnChange : MonoBehaviourPun
     public DictionaryAPI dictionaryAPI;
 
     public bool isCorrectWord = false;
-    public bool isCleared = false;
 
     public List<char> charList = new List<char>
      {'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'};
@@ -47,13 +46,33 @@ public class TurnChange : MonoBehaviourPun
         CardDropBtn.onClick.AddListener(() => {
             CardDropBtn.gameObject.SetActive(false); // CardDropBtn 비활성화
             cardInputField.gameObject.SetActive(true); // cardInputField 활성화
-            if (isCleared == false)
-            {
-                cardInputField.text = ""; // 인풋필드 입력란을 비워놓음
-                isCleared = true;
-            }
+            cardInputField.text = ""; // 인풋필드 입력란을 비워놓음
+
         });
+
+        // 입력이 끝났을 때 (PC에서 Enter 키 or 모바일에서 완료 버튼)
+        cardInputField.onEndEdit.AddListener(OnInputEnd);
     }
+    private void OnInputEnd(string text)
+    {
+        // 입력된 값이 비어있지 않으면 실행
+        if (!string.IsNullOrEmpty(text))
+        {
+            IsCreateWord();
+        }
+    }
+
+
+    // 모바일에서 가상 키보드가 사라질 때 자동으로 실행하는 함수
+    //private void Update()
+    //{
+    //    if (TouchScreenKeyboard.visible == false && cardInputField.isFocused)
+    //    {
+    //        // 가상 키보드가 닫힐 때 실행 (모바일에서)
+    //        IsCreateWord();
+    //    }
+    //}
+
 
     public void IsCreateWord()
     {
@@ -177,8 +196,6 @@ public class TurnChange : MonoBehaviourPun
         CountUserCard(userCard.displayedCards.Count);
 
         ObjectManager.instance.createdWordList.Clear();
-
-        isCleared = false;
     }
 
     public void CountUserCard(int count)  //자신의 카드 개수 업데이트

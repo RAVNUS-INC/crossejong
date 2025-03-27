@@ -45,58 +45,68 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
             return false;
     }
 
-    public void ExtendDropAreas()
-    {
-        ObjectManager.instance.gridCount += 2;
-        GameObject[,] newGrid = new GameObject[ObjectManager.instance.gridCount, ObjectManager.instance.gridCount];
+    //public void ExtendDropAreas()
+    //{
+    //    ObjectManager.instance.gridCount += 2;
+    //    GameObject[,] newGrid = new GameObject[ObjectManager.instance.gridCount, ObjectManager.instance.gridCount];
 
-        // 기존 데이터를 중앙에 맞추기 위한 오프셋
-        int offset = 1;
+    //    //    0  0  0  (0, 0) (0, 1)
+    //    //    0  0  0
+    //    //    0  0  0
 
-        // 새로운 배열에 기존 그리드를 중앙으로 옮김
-        for (int x = 0; x < ObjectManager.instance.gridCount - 2; x++)
-        {
-            for (int y = 0; y < ObjectManager.instance.gridCount - 2; y++)
-            {
-                newGrid[x + offset, y + offset] = ObjectManager.instance.grid[x, y];
-            }
-        }
 
-        // 새로운 가장자리 셀 생성
-        for (int x = 0; x < ObjectManager.instance.gridCount; x++)
-        {
-            for (int y = 0; y < ObjectManager.instance.gridCount; y++)
-            {
-                if (ObjectManager.instance.grid[x, y] == null)
-                {
-                    GameObject empty = new GameObject("");
-                    empty.transform.SetParent(fieldCard.fieldContainer, false);
-                    RectTransform rect = empty.AddComponent<RectTransform>();
-                    rect.sizeDelta = new Vector2(200, 200);
-                    Image img = empty.AddComponent<Image>();
-                    img.color = Color.white;
-                    empty.AddComponent<CardDrop>();
-                    ObjectManager.instance.emptyList.Add(empty);
-                    Image image = empty.GetComponent<Image>();
-                    image.color = Color.clear;
-                    ObjectManager.instance.grid[x, y] = empty;
-                }
-            }
-        }
+    //    //    1  1  1  1  1
+    //    //    1  0  0  0  1  (1, 1) (1, 2)
+    //    //    1  0  0  0  1
+    //    //    1  0  0  0  1
+    //    //    1  1  1  1  1
 
-        // 좌표 관련 인덱스 옮기기
-        ObjectManager.instance.cardIndexX += 1;
-        ObjectManager.instance.cardIndexY += 1;
 
-        for (int i = 0; i < ObjectManager.instance.FinIndexX.Count; i++)
-        {
-            ObjectManager.instance.FinIndexX[i] += 1;
-        }
-        for (int i = 0; i < ObjectManager.instance.FinIndexY.Count; i++)
-        {
-            ObjectManager.instance.FinIndexY[i] += 1;
-        }
-    }
+    //    // 새로운 배열에 기존 그리드를 중앙으로 옮김
+    //    for (int x = 0; x < ObjectManager.instance.gridCount - 2; x++)
+    //    {
+    //        for (int y = 0; y < ObjectManager.instance.gridCount - 2; y++)
+    //        {
+    //            newGrid[x + 1, y + 1] = ObjectManager.instance.grid[x, y];
+    //        }
+    //    }
+    //    ObjectManager.instance.grid = newGrid;
+
+    //    // 새로운 가장자리 셀 생성
+    //    for (int x = 0; x < ObjectManager.instance.gridCount; x++)
+    //    {
+    //        for (int y = 0; y < ObjectManager.instance.gridCount; y++)
+    //        {
+    //            if (ObjectManager.instance.grid[x, y] == null)
+    //            {
+    //                GameObject empty = new GameObject("");
+    //                empty.transform.SetParent(fieldCard.fieldContainer, false);
+    //                RectTransform rect = empty.AddComponent<RectTransform>();
+    //                rect.sizeDelta = new Vector2(200, 200);
+    //                Image img = empty.AddComponent<Image>();
+    //                img.color = Color.clear;
+    //                empty.AddComponent<CardDrop>();
+    //                ObjectManager.instance.emptyList.Add(empty);
+    //                ObjectManager.instance.grid[x, y] = empty;
+    //            }
+    //        }
+    //    }
+
+    //    // 좌표 관련 인덱스 옮기기
+    //    ObjectManager.instance.cardIndexX += 1;
+    //    ObjectManager.instance.cardIndexY += 1;
+
+    //    for (int i = 0; i < ObjectManager.instance.FinIndexX.Count; i++)
+    //    {
+    //        ObjectManager.instance.FinIndexX[i] += 1;
+    //    }
+    //    for (int i = 0; i < ObjectManager.instance.FinIndexY.Count; i++)
+    //    {
+    //        ObjectManager.instance.FinIndexY[i] += 1;
+    //    }
+
+    //    fieldCard.OnOffDropAreas();
+    //}
 
 
     public void OnDrop(PointerEventData eventData)

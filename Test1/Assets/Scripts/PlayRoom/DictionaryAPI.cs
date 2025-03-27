@@ -10,7 +10,7 @@ public class DictionaryAPI : MonoBehaviour
     public SavedCreateWords savedCreateWrods;
 
     private string apiUrl = "https://krdict.korean.go.kr/api/search";  // API 엔드포인트
-    private string apiKey = "BD6ACB6A46D2336CBFB3EF7283A0279C";  // 네가 설정한 인증키
+    private string apiKey = "BD6ACB6A46D2336CBFB3EF7283A0279C";  // 인증키
 
     public IEnumerator CheckWordExists(string word)
     {

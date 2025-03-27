@@ -42,11 +42,9 @@ public class FieldCard : MonoBehaviourPun
                 RectTransform rect = empty.AddComponent<RectTransform>();
                 rect.sizeDelta = new Vector2(200, 200);
                 Image img = empty.AddComponent<Image>();
-                img.color = Color.white;
+                img.color = Color.clear;
                 empty.AddComponent<CardDrop>();
                 ObjectManager.instance.emptyList.Add(empty);
-                Image image = empty.GetComponent<Image>();
-                image.color = Color.clear;
                 ObjectManager.instance.grid[x, y] = empty;
 
             }
