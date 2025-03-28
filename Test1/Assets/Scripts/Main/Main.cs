@@ -17,7 +17,7 @@ public class Main : MonoBehaviour
 {
     //usersetmanager에서 가져온 변수들    
     private TMP_InputField inputField; //프로필 패널 안의 이름입력필드
-    private TMP_Text SaveText; //프로필 패널 안의 저장메시지
+    private TMP_Text SaveText, warnText; //프로필 패널 안의 저장메시지
     private Image ProfileCenImg; //프로필 패널 중심 이미지
     private Button SaveBtn; //프로필 패널 정보 변경 후 저장 버튼
 
@@ -44,6 +44,7 @@ public class Main : MonoBehaviour
         UserSetManager userSetManager = FindObjectOfType<UserSetManager>();
 
         // UserSetManager에서 InputField를 가져옴
+        warnText = userSetManager.warningText;
         inputField = userSetManager.inputText;
         SaveText = userSetManager.saveText;
         ProfileCenImg = userSetManager.centralImage; //프로필 패널 중심사진
@@ -85,6 +86,7 @@ public class Main : MonoBehaviour
 
         GetProfileImageIndex(); // PlayFab에서 저장된 이미지 인덱스를 불러와 이미지 업데이트
         GetUserDisplayName(); //유저 네임 불러와서 텍스트로 표시
+        GetUserBirth(); //유저 출생연도 불러오기만 하기
     }
 
 
@@ -112,6 +114,14 @@ public class Main : MonoBehaviour
         TestText.text = "DisplayName 로딩 완료";
     }
 
+    // 출생연도 불러오기
+    private void GetUserBirth()
+    {
+        // playerprefs에서 이름 정보 불러오기
+        UserInfoManager.instance.MyBirthYear = PlayerPrefs.GetInt(UserInfoManager.BIRTHYEAR_KEY);
+    }
+
+
     //프로필 패널의 닫기 버튼을 누르면(닫기 버튼에 연결해둠)
     public void ExitBtn() 
     {
@@ -119,6 +129,7 @@ public class Main : MonoBehaviour
         inputField.interactable = false; //이름입력란 비활성화
         SaveText.text = ""; //저장 메시지 초기화
         SaveBtn.interactable = false; //저장버튼 비활성화
+        warnText.text = ""; //경고메시지 초기화
 
         //유저 프로필 이미지 재로드, 이름 재로드 텍스트 보여주기
         GetUserDisplayName();
