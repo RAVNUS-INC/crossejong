@@ -16,9 +16,9 @@ using UnityEngine.UI;
 // 유저 프로필 설정 화면에서 작동하는 코드(닉네임, 유저프로필사진 변경 저장)
 public class UserSetManager : MonoBehaviourPunCallbacks
 {
-    [SerializeField] public TMP_InputField inputText; //닉네임 입력(나중에 바꿀 수 있는 Displayname)
-    [SerializeField] public Button confirmButton; //제출(저장) 버튼
-    [SerializeField] TMP_Text warningText; // 경고 메시지를 출력할 UI 텍스트
+    [SerializeField] public TMP_InputField inputText, birthInput; //닉네임 입력(나중에 바꿀 수 있는 Displayname), 출생연도 인풋
+    [SerializeField] public Button Next2, confirmButton; //제출(저장) 버튼
+    [SerializeField] public TMP_Text warningText, birthWarningText; // 경고 메시지를 출력할 UI 텍스트
     [SerializeField] public TMP_Text saveText; // 저장완료 메시지를 출력할 UI 텍스트(profile panel에만 존재)
 
     // displayname 조건
@@ -31,7 +31,6 @@ public class UserSetManager : MonoBehaviourPunCallbacks
     public GameObject profilePanel; //프로필 설정 패널(메인패널에서 미리 준비해야 작동)
     public GameObject usersetPanel; //유저 초기 설정 패널
 
-    
 
     void Start()
     {
@@ -41,17 +40,30 @@ public class UserSetManager : MonoBehaviourPunCallbacks
             LoadDefaultDisplayName(); // 기존 이름 정보 불러와 변수에 저장
             LoadDefaultImageIndex(); // 기존 이미지 인덱스를 불러와 변수에 저장, 업데이트
         }
-        
+
+        if (Next2 == null)
+        {
+            
+        }
+        else
+        {
+            Next2.interactable = false;
+        }
+
         confirmButton.interactable = false; // 기본적으로 버튼 비활성화
+
         warningText.text = ""; // 초기 경고 메시지 비우기
+        birthWarningText.text = ""; 
         saveText.text = ""; // 초기 저장 메시지 비우기
 
         //내용이 변경되었을때 규칙 검사
-        inputText.onValueChanged.AddListener(ValidateNickname);
+        inputText.onEndEdit.AddListener(ValidateNickname);
+        birthInput.onEndEdit.AddListener(ValidateBirth);
 
         //확인 버튼 누르면 이름 및 이미지 저장(playfab 및 playerprefs에 업데이트)(+ 단어완성횟수 버튼에 직접 연결)
-        confirmButton.onClick.AddListener(SaveDisplayName); //이름 저장 
         confirmButton.onClick.AddListener(SaveSelectedImageIndex); // 이미지 저장
+        confirmButton.onClick.AddListener(SaveBirthInfo); // 출생연도 저장
+        confirmButton.onClick.AddListener(SaveDisplayName); //이름 저장 및 메인 접속 여부 설정
         confirmButton.onClick.AddListener(() => { inputText.interactable=false; }); // 인풋필드 선택 비활성화
     }
 
@@ -138,16 +150,12 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         {
             // 저장 메시지 알림
             saveText.text = "저장되었습니다";
+            confirmButton.interactable = false;
         }
     }
 
     private void SaveSelectedImageIndex() // 선택된 이미지 인덱스를 저장해 playfab에 전송, playerprefs 업뎃
     {
-        if (UserInfoManager.instance.MyImageIndex == currentIndex)
-        {
-            return;
-        }
-
         UserInfoManager.instance.MyImageIndex = currentIndex; // int형
 
         string ImageIndex = UserInfoManager.instance.MyImageIndex.ToString(); // 문자열로 변환
@@ -156,7 +164,7 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         {
             Data = new Dictionary<string, string>
         {
-            { UserInfoManager.PROFILE_IMAGE_INDEX_KEY, ImageIndex}
+        { UserInfoManager.PROFILE_IMAGE_INDEX_KEY, ImageIndex}
         },
             Permission = UserDataPermission.Public // 데이터를 공개 상태로 저장
         };
@@ -173,8 +181,49 @@ public class UserSetManager : MonoBehaviourPunCallbacks
             });
 
         // 변경된 이미지 인덱스를 playerprefs에 저장(기존 유저의 경우 덮어쓰기, 신규 유저는 새로 추가하는 상황)
-        UpdateImageIndex(UserInfoManager.instance.MyImageIndex); 
+        UpdateImageIndex(UserInfoManager.instance.MyImageIndex);
         Debug.Log($"[playerprefs] Imageindex: {UserInfoManager.instance.MyImageIndex}을 저장했습니다");
+
+        if (profilePanel.activeSelf)
+        {
+            // 저장 메시지 알림
+            saveText.text = "저장되었습니다";
+            confirmButton.interactable = false;
+        }
+    }
+
+    private void SaveBirthInfo() //입력한 출생연도를 저장(값을 입력했을 경우에만)
+    {
+        if (birthInput.text.Length == 4)
+        {
+            string BirthYear = UserInfoManager.instance.MyBirthYear.ToString(); // 문자열로 변환
+
+            var request = new UpdateUserDataRequest
+            {
+                Data = new Dictionary<string, string>
+            {
+                { UserInfoManager.BIRTH_INDEX_KEY, BirthYear}
+            },
+                Permission = UserDataPermission.Public // 데이터를 공개 상태로 저장
+            };
+
+            // playfab에 저장
+            PlayFabClientAPI.UpdateUserData(request,
+                result =>
+                {
+                    Debug.Log($"[Playfab] 출생연도 데이터 저장 성공: {BirthYear}");
+                },
+                error =>
+                {
+                    Debug.LogError($"[Playfab] 출생연도 저장 실패: {error.GenerateErrorReport()}");
+                });
+            UpdateBirthYear(UserInfoManager.instance.MyBirthYear);
+            Debug.Log($"[playerprefs] Imageindex: {UserInfoManager.instance.MyImageIndex}을 저장했습니다");
+        }
+        else
+        {
+            return;
+        }
     }
 
     void UpdateDisplayName(string name) //새로운 이름 저장
@@ -188,12 +237,18 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         PlayerPrefs.SetInt(UserInfoManager.IMAGEINDEX_KEY, newIndex); // 새로운 값 저장
         PlayerPrefs.Save(); // 저장 유지
     }
-    
+
+    void UpdateBirthYear(int newIndex) //새로운 인덱스 저장
+    {
+        PlayerPrefs.SetInt(UserInfoManager.BIRTHYEAR_KEY, newIndex); // 새로운 값 저장
+        PlayerPrefs.Save(); // 저장 유지
+    }
+
     public void OnLeftButtonClicked() // 왼쪽 버튼 클릭 시 호출
     {
         currentIndex = (currentIndex - 1 + UserInfoManager.instance.profileImages.Length) % UserInfoManager.instance.profileImages.Length;
         centralImage.sprite = UserInfoManager.instance.profileImages[currentIndex];  // 인덱스에 해당하는 이미지로 업데이트
-
+        Debug.Log($"현재 인덱스: {currentIndex}");
         if (UserInfoManager.instance.MyImageIndex == currentIndex) //만약 현재 인덱스 이미지와 기존 이미지 인덱스가 같다면
         {
             confirmButton.interactable = false; //저장버튼 비활성화
@@ -208,7 +263,7 @@ public class UserSetManager : MonoBehaviourPunCallbacks
     {
         currentIndex = (currentIndex + 1) % UserInfoManager.instance.profileImages.Length;
         centralImage.sprite = UserInfoManager.instance.profileImages[currentIndex];  // 인덱스에 해당하는 이미지로 업데이트
-
+        Debug.Log($"현재 인덱스: {currentIndex}");
         if (UserInfoManager.instance.MyImageIndex == currentIndex) //만약 현재 인덱스 이미지와 기존 이미지 인덱스가 같다면
         {
             confirmButton.interactable = false; //저장버튼 비활성화
@@ -236,37 +291,104 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         if (!Regex.IsMatch(inputname, validPattern))
         {
             warningText.text = "한글과 숫자만 입력 가능합니다.";
-            confirmButton.interactable = false; 
+            if (profilePanel.activeSelf) //프로필 변경일때
+            {
+                confirmButton.interactable = false;
+            }
+            else //유저초기 설정일때
+            {
+                Next2.interactable = false;
+            }
         }
         // 길이 제한 초과 검사
         else if (GetKoreanCharCount(inputname) > MaxLength) // 한글 자음, 모음을 포함한 최대 길이 검사
         {
             warningText.text = $"최대 {MaxLength}자까지만 입력 가능합니다.";
-            confirmButton.interactable = false; 
+            if (profilePanel.activeSelf) //프로필 변경일때
+            {
+                confirmButton.interactable = false;
+            }
+            else //유저초기 설정일때
+            {
+                Next2.interactable = false;
+            }
         }
         // 최소 길이 충족 검사
         else if (GetKoreanCharCount(inputname) < MinLength) // 한글 자음, 모음을 포함한 최대 길이 검사
         {
             warningText.text = $"최소 {MinLength}자 이상이어야 합니다."; //3자 이상이어야 함
-            confirmButton.interactable = false;
+            if (profilePanel.activeSelf) //프로필 변경일때
+            {
+                confirmButton.interactable = false;
+            }
+            else //유저초기 설정일때
+            {
+                Next2.interactable = false;
+            }
         }
         else if (inputname.Length == 0) // 빈 문자열 검사
         {
             warningText.text = "닉네임을 입력해주세요.";
-            confirmButton.interactable = false; 
+            if (profilePanel.activeSelf) //프로필 변경일때
+            {
+                confirmButton.interactable = false;
+            }
+            else //유저초기 설정일때
+            {
+                Next2.interactable = false;
+            }
         }
         else if (UserInfoManager.instance.MyName == inputname && (inputText.isActiveAndEnabled)) //입력란이 기존 닉네임과 같으면서 활성화되어있는 경우
         {
             warningText.text = "기존 닉네임과 달라야 합니다.";
-            confirmButton.interactable = false;
+            if (profilePanel.activeSelf) //프로필 변경일때
+            {
+                confirmButton.interactable = false;
+            }
+            else //유저초기 설정일때
+            {
+                Next2.interactable = false;
+            }
         }
         else
         {
             warningText.text = ""; // 규칙에 맞으면 경고 메시지 제거
-            confirmButton.interactable = true; // 확인 버튼 활성화
+            if (profilePanel.activeSelf) //프로필 변경일때
+            {
+                confirmButton.interactable = true;
+            }
+            else //유저초기 설정일때
+            {
+                Next2.interactable = true;
+            }
         }
         // 입력란에 공백을 제거한 값 반영
         inputText.text = inputname;
+    }
+
+    public void ValidateBirth(string input) //출생연도 형식에 맞게 입력했는지 검사
+    {
+        // 네 자리 숫자인지 검사
+        if (int.TryParse(input, out int year) && input.Length == 4)
+        {
+            // 적절한 범위에 있는지 검사
+            if (year >= 1945 && year <= 2020) 
+            {
+                birthWarningText.text = "";
+                UserInfoManager.instance.MyBirthYear = year; //유저인포에 바로 저장
+                confirmButton.interactable = true; // 올바른 형식이면 버튼 활성화
+            }
+            else
+            {
+                birthWarningText.text = "정확한 정보를 입력해주세요";
+                confirmButton.interactable = false; // 잘못된 형식이면 버튼 비활성화
+            }
+        }
+        else
+        {
+            birthWarningText.text = "4자리 숫자만 입력해주세요";
+            confirmButton.interactable = false; // 잘못된 형식이면 버튼 비활성화
+        }
     }
 
     private int GetKoreanCharCount(string input) // 한글 음절 자음, 모음을 포함하여 글자 수를 계산하는 함수

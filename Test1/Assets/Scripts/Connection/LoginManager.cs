@@ -20,7 +20,7 @@ public class LoginManager : MonoBehaviour
     public CanvasGroup AnimElement; // 나타났다 사라졌다 할 오브젝트
 
     //패널 관련 선언
-    public GameObject emailPanel, registerPanel, playersetPanel, AlarmPanel, TouchPanel; //이메일, 회원가입, 유저초기세팅, 알람 패널, 초기터치 패널
+    public GameObject emailPanel, registerPanel, playersetPanel, AlarmPanel, TouchPanel, Contone; //이메일, 회원가입, 유저초기세팅, 알람 패널, 초기터치 패널
 
     //인풋 관련 선언
     public TMP_InputField EmailInput, PasswordInput, UseridInput;  // 이메일, 비밀번호, 아이디 인풋필드
@@ -97,6 +97,8 @@ public class LoginManager : MonoBehaviour
         EmailInput.onValueChanged.AddListener(delegate { CheckInputFields(); });
         PasswordInput.onValueChanged.AddListener(delegate { CheckInputFields(); });
         UseridInput.onValueChanged.AddListener(delegate { CheckInputFields(); });
+
+        Contone.SetActive(true); //플레이어 설정내용1만 활성화
 
     }
 
@@ -290,8 +292,6 @@ public class LoginManager : MonoBehaviour
             StartTwinkle();
         });
     }
-
-
 
     // 회원가입 실패 시
     public void OnRegisterFailure(PlayFabError error)
