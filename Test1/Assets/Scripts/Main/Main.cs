@@ -118,7 +118,17 @@ public class Main : MonoBehaviour
     private void GetUserBirth()
     {
         // playerprefs에서 이름 정보 불러오기
-        UserInfoManager.instance.MyBirthYear = PlayerPrefs.GetInt(UserInfoManager.BIRTHYEAR_KEY);
+        // 1. PlayerPrefs에서 출생연도 가져오기
+        if (PlayerPrefs.HasKey(UserInfoManager.BIRTHYEAR_KEY))
+        {
+            UserInfoManager.instance.MyBirthYear = PlayerPrefs.GetInt(UserInfoManager.BIRTHYEAR_KEY);
+            Debug.Log($"Birth Year found in PlayerPrefs: {UserInfoManager.instance.MyBirthYear}");
+        }
+        else
+        {
+            // 2. PlayerPrefs에 값이 없으면 PlayFab에서 가져오기
+            GetBirthYearFromPlayFab();
+        }
     }
 
 
@@ -279,6 +289,31 @@ public class Main : MonoBehaviour
         {
             Debug.LogError($"유저 데이터 불러오기 실패: {error.GenerateErrorReport()}");
         });
+    }
+
+    private void GetBirthYearFromPlayFab()
+    {
+        PlayFabClientAPI.GetUserData(new GetUserDataRequest(),
+            result =>
+            {
+                if (result.Data != null && result.Data.ContainsKey(UserInfoManager.BIRTH_INDEX_KEY))
+                {
+                    UserInfoManager.instance.MyBirthYear = int.Parse(result.Data[UserInfoManager.BIRTH_INDEX_KEY].Value);
+                    PlayerPrefs.SetInt(UserInfoManager.BIRTH_INDEX_KEY, UserInfoManager.instance.MyBirthYear); // PlayerPrefs에 저장
+                    PlayerPrefs.Save(); // 저장된 값을 유지
+                    Debug.Log($"[플레이팹] 출생데이터 로드완료: {UserInfoManager.instance.MyBirthYear}");
+                }
+                else
+                {
+                    Debug.Log("Birth Year not found in PlayFab, setting default value.");
+                    UserInfoManager.instance.MyBirthYear = -1; // 기본값 처리
+                }
+            },
+            error =>
+            {
+                Debug.LogError($"Failed to get birth year from PlayFab: {error.GenerateErrorReport()}");
+                UserInfoManager.instance.MyBirthYear = -1; // 기본값 처리
+            });
     }
 
     public void MoveRankICON()
