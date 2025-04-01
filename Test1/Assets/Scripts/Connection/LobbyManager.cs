@@ -36,7 +36,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     // 방 생성 시 옵션들(선택하지 않아도 기본으로 설정)
     private int selectedMaxPlayers = 2; // 최대인원(2, 3, 4) +5명까지도 추가해야함!!
-    private string selectedDifficulty = "초급"; // 난이도(초급, 중급, 고급)
+    public string selectedDifficulty = "초급"; // 난이도(초급, 중급, 고급)
     private int selectedTimeLimit = 15; // 카드 놓기까지 제한시간(15초, 30초, 45초)
 
     // 방 생성 옵션-인원을 제외한 항목의 인덱스
@@ -52,10 +52,22 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     // 생성된 방 이름을 저장하는 변수
     private string selectedRoomName = null;
     // 난이도 변경 객체 참조
-    public ChangeLevel Changelevel; 
+    public ChangeLevel Changelevel;
 
-    private void Awake() 
+    public static LobbyManager instance = null;
+
+
+    private void Awake()
     {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+        }
+
         ResetRoomSetPanel(); // 첫 메인 접속 시 최초 실행
     }
 

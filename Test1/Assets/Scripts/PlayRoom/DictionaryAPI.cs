@@ -27,8 +27,6 @@ public class DictionaryAPI : MonoBehaviour
             {
                 Debug.Log("Response: " + request.downloadHandler.text);  // 응답 내용 출력
 
-                try
-                {
                     // XML 파싱
                     XmlDocument xmlDoc = new XmlDocument();
                     xmlDoc.LoadXml(request.downloadHandler.text);  // 응답 내용 XML로 로드
@@ -66,8 +64,9 @@ public class DictionaryAPI : MonoBehaviour
                         {
                             Debug.Log("단어 '" + word + "'가 존재하며, 명사입니다.");
 
+                            Debug.Log(UserInfoManager.instance.MyBirthYear);
                             // csv 파일에 플레이어가 만든 단어 저장
-                            saveCreatedWords.OnUserCreatesWord(word);
+                            saveCreatedWords.OnUserCreatesWord(UserInfoManager.instance.MyBirthYear.ToString(), word);
 
                             // 단어가 확인되면 턴 넘기기
                             TurnManager.instance.TossNextTurn();
@@ -87,12 +86,7 @@ public class DictionaryAPI : MonoBehaviour
                         ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
                         ObjectManager.instance.AlaramMsg.text = "존재하지 않는 단어입니다.";
                     }
-                }
-                catch (Exception e)
-                {
-                    // XML 파싱 오류 처리
-                    Debug.LogError("XML 파싱 오류: " + e.Message);
-                }
+
             }
             else
             {

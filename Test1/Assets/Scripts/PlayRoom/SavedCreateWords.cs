@@ -13,7 +13,7 @@ public class SavedCreateWords : MonoBehaviour
 
     private void Start()
     {
-        ReadCSV();
+        //ReadCSV();
     }
     private void ReadCSV()
     {
@@ -100,7 +100,7 @@ public class SavedCreateWords : MonoBehaviour
 
     public void OnUserCreatesWord(string newWord)
     {
-        Debug.Log("단어 저장을 시작합니다");    
+        Debug.Log("단어 저장을 시작합니다");
         AddWordToCSV(newWord);
     }
 
