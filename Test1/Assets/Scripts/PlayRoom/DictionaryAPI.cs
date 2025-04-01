@@ -7,7 +7,7 @@ using System.Xml;  // XML 파싱을 위한 네임스페이스
 public class DictionaryAPI : MonoBehaviour
 {
     public TurnChange turnChange;
-    public SavedCreateWords savedCreateWrods;
+    public SaveCreatedWords saveCreatedWords;
 
     private string apiUrl = "https://krdict.korean.go.kr/api/search";  // API 엔드포인트
     private string apiKey = "BD6ACB6A46D2336CBFB3EF7283A0279C";  // 인증키
@@ -67,7 +67,7 @@ public class DictionaryAPI : MonoBehaviour
                             Debug.Log("단어 '" + word + "'가 존재하며, 명사입니다.");
 
                             // csv 파일에 플레이어가 만든 단어 저장
-                            savedCreateWrods.OnUserCreatesWord(word);
+                            saveCreatedWords.OnUserCreatesWord(word);
 
                             // 단어가 확인되면 턴 넘기기
                             TurnManager.instance.TossNextTurn();
