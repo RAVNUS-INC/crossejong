@@ -42,6 +42,8 @@ public class SaveCreatedWords : MonoBehaviour
             Debug.Log(userBirthYear + "_Userdata.csv 파일이 존재합니다.");
         }
 
+        //ClearCSVContent();
+
         LoadCSVData();
     }
 
@@ -80,7 +82,7 @@ public class SaveCreatedWords : MonoBehaviour
             string word = rowData[2].Trim();
             int count = int.Parse(rowData[3].Trim());  //int로 변환
 
-            if (word == newWord) // 기존 단어가 있다면
+            if (birthYear == userBirthYear && cardLevel == cardLevelInfo && word == newWord) // 출생년도와 난이도가 같은 기존 단어가 있다면
             {
                 count += 1; // 횟수 증가
                 userCreateWordData[i] = $"{birthYear},{cardLevel},{word},{count}"; // 업데이트
@@ -105,27 +107,26 @@ public class SaveCreatedWords : MonoBehaviour
     {
         try
         {
-            //TurnChange.instance.APIStatusMsg.text = "SaveCSVData 시작";
-
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("_birthYear,_cardLevel,_userCreateWord,_userCreateWordNum"); // CSV 헤더
 
-            for (int i = 0; i < userCreateWordData.Count; i++)
+            // 중복 제거 및 정렬 (선택 사항)
+            HashSet<string> uniqueWords = new HashSet<string>(userCreateWordData);
+            foreach (string line in uniqueWords)
             {
-                sb.AppendLine(userCreateWordData[i]);
+                sb.AppendLine(line);
             }
-            //TurnChange.instance.APIStatusMsg.text = $"마지막부분은 {lines[lines.Count - 1]}";
 
             File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
             Debug.Log("CSV 파일 저장 완료: " + filePath);
-            //TurnChange.instance.APIStatusMsg.text = "csv 최종 저장 완료";
         }
         catch (Exception e)
         {
             Debug.LogError($"CSV 저장 중 오류 발생: {e.Message}");
-            //TurnChange.instance.APIStatusMsg.text = $"CSV 저장 오류: {e.Message}";
         }
     }
+
+
     public void OnUserCreatesWord(string userBirthYear, string newWord)
     {
         Debug.Log("단어 저장을 시작합니다");
