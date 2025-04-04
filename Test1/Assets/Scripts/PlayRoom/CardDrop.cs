@@ -98,10 +98,6 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
 
             ObjectManager.instance.isDragged = true;
 
-            ObjectManager.instance.createdWord = card.name;
-
-            ObjectManager.instance.rollBackList.Add(card.name); // 롤백 할지도 모르니 놓은 카드 리스트들을 저장
-
             ObjectManager.instance.createdWordList.Add(card);
 
             // 카드 놓인 그리드 위치 파악
@@ -111,8 +107,11 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
                 {
                     if (ObjectManager.instance.createdWord == ObjectManager.instance.grid[x, y].transform.name)
                     {
+                        Debug.Log($"엑스 {x}");
+                        Debug.Log($"와이 {y}");
                         ObjectManager.instance.cardIndexX = x;
                         ObjectManager.instance.cardIndexY = y;
+<<<<<<< Updated upstream
                     }
                 }
             }
@@ -125,6 +124,26 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
 
             ObjectManager.instance.createdWord = ""; // 드롭한 카드 목록 비우기
 
+=======
+
+                        //if (x == 0 || x == ObjectManager.instance.gridCount - 1)
+                        //{
+                        //    //ExtendDropAreas();
+                        //}
+                        //if (y == 0 || y == ObjectManager.instance.gridCount - 1)
+                        //{
+                        //    //ExtendDropAreas();
+                        //}
+
+                        
+                    }
+                }
+            }
+            //드롭한 카드 업데이트(롤백 프로퍼티 변경)
+            CardManager.instance.DropCardsUpdate(card.name, ObjectManager.instance.cardIndexX, ObjectManager.instance.cardIndexY);
+
+            ObjectManager.instance.IsCardDrop = true;
+>>>>>>> Stashed changes
         }
     }
 }

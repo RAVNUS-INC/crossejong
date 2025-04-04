@@ -70,6 +70,7 @@ public class Countdown : MonoBehaviourPun
 
     private void StartGame() // 방장만 수행
     {
+<<<<<<< Updated upstream
         userCard.FirstUserCardArea(); // 방장이 카드를 몇장씩 뽑아 플레이어들에게 나눠줌
 
         fieldCard.FirstFieldCard(); // 방장이 첫 카드 뽑아 모두에게 수행 추가 요청
@@ -86,5 +87,11 @@ public class Countdown : MonoBehaviourPun
     private void LetsCardCount() // 자신의 카드 개수 업데이트
     {
         turnChange.TurnEnd(); 
+=======
+        ObjectManager.instance.IsMyTurn = true;
+
+        // 카드 초기화 및 분배 진행
+        CardManager.instance.InitializeAndDistributeCards();
+>>>>>>> Stashed changes
     }
 }

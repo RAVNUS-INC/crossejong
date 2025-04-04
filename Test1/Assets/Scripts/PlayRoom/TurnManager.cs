@@ -142,8 +142,25 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
         endFullPopupButton.onClick.Invoke(); // UserCardFullPopup 창 닫기
 
+<<<<<<< Updated upstream
         // 카드 한 장 먹고 ui 업데이트, 롤백 수행, 턴 넘기기
         getCard.GetCardToUserCard();
+=======
+        if (!ObjectManager.instance.AllUsedCard)// 카드를 다 쓴 상태가 아직 아니라면
+        {
+            // 카드 한 장 먹고 ui 업데이트, 롤백 수행, 턴 넘기기
+            //getCard.GetCardToUserCard();
+        }
+        else //카드를 다 쓴 상태라면
+        {
+            // 나는 게임 턴에서 이제 제외됨
+            ObjectManager.instance.EndMyTurn = true;
+
+            // 모두에게 턴 제외 리스트 추가 및 동기화 요청(uI인덱스 번호를 넘겨줌)
+            photonView.RPC("UpdateExcludedList", RpcTarget.All, ObjectManager.instance.MyIndexNum);
+        }
+
+>>>>>>> Stashed changes
     }
 
     public void FindNextPlayer() // 다음 플레이어의 넘버 찾기(마지막 플레이어일 경우 0번 인덱스로 순환)
@@ -199,7 +216,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
             Debug.Log("카드를 추가하고 턴을 넘깁니다.");
 
             // 카드 한 장 먹고 ui 업데이트, 롤백 수행, 턴 넘기기
-            getCard.GetCardToUserCard();
+            //getCard.GetCardToUserCard();
         }
     }
 

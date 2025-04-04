@@ -140,32 +140,18 @@ public class CardPool : MonoBehaviour
         CreateCards(ObjectManager.instance.cardFrontRed, Color.red);
         CreateCards(ObjectManager.instance.cardFrontBlack, Color.black);
         CreateCards(ObjectManager.instance.cardFrontSpecial, Color.clear);
-    }
 
-
-    //랜덤으로 1개의 카드 선택(change) 문자열 리스트 반환(방장만 수행)
-    public string[] GetRandomCardsName(int count)
-    {
-        List<string> usedCardNames = new List<string>(); // 지금 막 뽑은 카드 이름을 저장
-        while (usedCardNames.Count < count)
+        //cardmanager의 copycards에 원본 게임 오브젝트 복제저장
+        foreach (GameObject obj in cards)
         {
-            int randomIndex = UnityEngine.Random.Range(0, cards.Count);
-            string cardName = cards[randomIndex].name; // 카드의 이름을 사용
-
-            // 해당 카드가 아직 사용되지 않았다면
-            if (!ObjectManager.instance.usedIndices.Contains(cardName))
-            {
-                usedCardNames.Add(cardName); // 카드 이름을 추가
-                ObjectManager.instance.usedIndices.Add(cardName); // 방장만 이 리스트를 관리
-            }
+            GameObject clone = GameObject.Instantiate(obj);
+            CardManager.instance.CopyCards.Add(clone);
         }
-
-        return usedCardNames.ToArray(); // 카드 이름 배열을 반환
     }
 
 
     // 받은 인덱스 리스트를 토대로 카드 gameobject 생성(방장 포함 각 유저마다 수행)
-    public List<GameObject> GetRandomCardsObject(string[] usednames)
+    public List<GameObject> GetRandomCardsObject(params string[] usednames)
     {
         List<GameObject> randomCards = new List<GameObject>();
 
@@ -173,7 +159,6 @@ public class CardPool : MonoBehaviour
         {
             GameObject foundCard = cards.Find(c => c.name == name); // 이름으로 검색
             randomCards.Add(foundCard);
-            Debug.Log($"랜덤카드 '{name}' 생성됨");
         }
         return randomCards;
     }

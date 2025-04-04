@@ -73,7 +73,7 @@ public class ObjectManager : MonoBehaviourPun
                 cardFrontBlack = difficultyContentsList;
 
                 // 이제 List<string>으로 사용 가능
-                Debug.Log(string.Join(", ", cardFrontBlack));
+                //Debug.Log(string.Join(", ", cardFrontBlack));
 
                 // 난이도 반영된 카드로 생성
                 cardPool.CreateCard();

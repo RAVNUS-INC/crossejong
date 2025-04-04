@@ -23,6 +23,7 @@ public class GetCard : MonoBehaviourPun
         // 처음엔 카드 추가 버튼 비활성화 - 자신의 턴이 오면 바로 활성화
         getCardButton.interactable = false;
     }
+<<<<<<< Updated upstream
     public void GetCardToUserCard() // 카드 얻기
     {
         // 보드판에 있던 카드를 다시 슬롯으로 되돌려놓기
@@ -31,13 +32,28 @@ public class GetCard : MonoBehaviourPun
         //방장만이 카드 한장 추가 수행
         photonView.RPC("RequestRandomCards", RpcTarget.MasterClient, 1, UserInfoManager.instance.MyActNum);
     }
+=======
 
-    [PunRPC]
-    void RequestRandomCards(int count, int requestingPlayer)
-    {
-        // 방장이 카드를 랜덤으로 뽑는 함수
-        string[] usedNames = cardPool.GetRandomCardsName(count);
+    //public void GetCardToUserCard() // 카드 얻기
+    //{
+    //    // 보드판에 있던 카드를 다시 슬롯으로 되돌려놓기
+    //    turnChange.RollBackAreas();
 
+    //    //방장만이 카드 한장 추가 수행
+    //    photonView.RPC("RequestRandomCards", RpcTarget.MasterClient, 1, UserInfoManager.instance.MyActNum);
+
+    //    // 내 인덱스 번호를 넘겨주며 모두에게 카드 추가 애니메이션 수행 요청
+    //    CardAnimation.instance.photonView.RPC("AddCardAnimation", RpcTarget.All, ObjectManager.instance.MyIndexNum);
+    //}
+>>>>>>> Stashed changes
+
+    //[PunRPC]
+    //void RequestRandomCards(int count, int requestingPlayer)
+    //{
+    //    // 방장이 카드를 랜덤으로 뽑는 함수
+    //    string[] usedNames = cardPool.GetRandomCardsName(count);
+
+<<<<<<< Updated upstream
         // 요청한 플레이어에게만 결과를 전달
         Photon.Realtime.Player targetPlayer = PhotonNetwork.CurrentRoom.GetPlayer(requestingPlayer);
         if (targetPlayer != null)
@@ -45,6 +61,25 @@ public class GetCard : MonoBehaviourPun
             photonView.RPC("ReceiveRandomCards", targetPlayer, string.Join(", ", usedNames));
         }
     }
+=======
+    //    // 요청한 플레이어에게만 결과를 전달
+    //    Photon.Realtime.Player targetPlayer = PhotonNetwork.CurrentRoom.GetPlayer(requestingPlayer);
+    //    if (targetPlayer != null)
+    //    {
+    //        photonView.RPC("ReceiveRandomCards", targetPlayer, string.Join(", ", usedNames));
+    //    }
+
+    //    // 만약 사용한 카드가 54개(다 씀)가 되면
+    //    if (ObjectManager.instance.usedIndices.Count == 54)
+    //    {
+    //        if (!ObjectManager.instance.AllUsedCard) 
+    //        {
+    //            // 모두가 카드 추가 버튼을 쓰지 못하도록 업데이트 요청
+    //            photonView.RPC("DeActivateAddCardBtn", RpcTarget.All);
+    //        }
+    //    }
+    //}
+>>>>>>> Stashed changes
 
     [PunRPC]
     void ReceiveRandomCards(string usedNames)

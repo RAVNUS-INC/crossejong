@@ -17,6 +17,12 @@ using System.Linq;
 public class FieldCard : MonoBehaviourPun
 
 {
+<<<<<<< Updated upstream
+=======
+    public static FieldCard instance = null;
+
+    public TurnChange turnChange;
+>>>>>>> Stashed changes
     public UserCardFullPopup fullPopup;
     public UserCard userCard; // 카드 드래그 상태 설정 위해
 
@@ -29,7 +35,17 @@ public class FieldCard : MonoBehaviourPun
     public bool isTop;
     public bool isBottom;
 
-
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
     public void CreateDropAreas()
     {
         ObjectManager.instance.grid = new GameObject[ObjectManager.instance.gridCount, ObjectManager.instance.gridCount];
@@ -64,9 +80,16 @@ public class FieldCard : MonoBehaviourPun
 
     public void RollBackColorAreas()
     {
+<<<<<<< Updated upstream
         for (int x = 0; x < 7; x++)
         {
             for (int y = 0; y < 7; y++)
+=======
+
+        for (int x = 0; x < ObjectManager.instance.gridCount; x++)
+        {
+            for (int y = 0; y < ObjectManager.instance.gridCount; y++)
+>>>>>>> Stashed changes
             {
                 Image image = ObjectManager.instance.grid[x, y].GetComponent<Image>();
                 image.color = Color.clear;
@@ -95,6 +118,7 @@ public class FieldCard : MonoBehaviourPun
                 }
             }
         }
+<<<<<<< Updated upstream
 
         if (ObjectManager.instance.IsCardDrop)
         {
@@ -103,6 +127,9 @@ public class FieldCard : MonoBehaviourPun
 
             ObjectManager.instance.IsCardDrop = false;
         }
+=======
+        //TurnChange.instance.APIStatusMsg.text = $"OnOffDropAreas 수행";
+>>>>>>> Stashed changes
     }
         
 
@@ -205,14 +232,20 @@ public class FieldCard : MonoBehaviourPun
         ObjectManager.instance.ShowCardSelectingMessage(false);
     }
 
+<<<<<<< Updated upstream
     [PunRPC] //카드를 놓은 사람을 제외한 나머지는 모두 카드의 좌표, 이름을 전달받아 그리드에 추가 수행
     public void SyncDropCard(int cardIndexX, int cardIndexY, string cardName) //카드의 x,y좌표와 이름을 전달
+=======
+    //드롭된 카드의 좌표, 이름을 전달받아 그리드에 추가 수행
+    public void SyncDropCard(string cardName, int cardIndexX, int cardIndexY) 
+>>>>>>> Stashed changes
     {
         Debug.Log("상대방 카드 전달받음");
 
         // 그리드 내에서 x, y 좌표에 해당하는 오브젝트 찾기
         GameObject targetGridObject = ObjectManager.instance.grid[cardIndexX, cardIndexY];
 
+<<<<<<< Updated upstream
         // 입력받은 카드 이름에 해당하는 오브젝트 찾기
         GameObject targetCard = null;
 
@@ -224,19 +257,38 @@ public class FieldCard : MonoBehaviourPun
                 break; // 일치하는 카드 찾으면 종료
             }
         }
+=======
+        GameObject originalCard = CardManager.instance.CopyCards
+        .FirstOrDefault(card => card.name.Contains(cardName)); //이름이 포함되기만 하면 찾은걸로 인정
+>>>>>>> Stashed changes
 
+        GameObject targetCard = Instantiate(originalCard); // 새로운 복제본 생성
         if (targetCard != null && targetGridObject != null)
         {
             // 해당 카드의 오브젝트를 targetGridObject 위치로 이동시키기
             targetCard.SetActive(true);
             targetCard.transform.SetParent(targetGridObject.transform, false);
+<<<<<<< Updated upstream
             ObjectManager.instance.grid[cardIndexX, cardIndexY] = targetCard; // 그리드에 카드 정보 업데이트
+=======
+
+            // 부모 오브젝트 객체 이름 변경
+            targetGridObject.name = cardName;
+
+            // 그리드에 카드를 배치한 후, 드롭 영역 업데이트
+            RollBackColorAreas();
+
+            Debug.Log($"{cardName}");
+            Debug.Log($"{cardIndexX}");
+            Debug.Log($"{cardIndexY}");
+>>>>>>> Stashed changes
         }
         else
         {
             Debug.LogError("카드를 찾을 수 없거나, 잘못된 그리드 위치입니다.");
         }
 
+<<<<<<< Updated upstream
         // 그리드에 카드를 배치한 후, 드롭 영역 업데이트
         // 드롭영역 업데이트
         OnOffDropAreas();
@@ -280,4 +332,54 @@ public class FieldCard : MonoBehaviourPun
 
     
 
+=======
+    //롤백 요청 카드를 받아 보드판에서 보이지 않게 함
+    public void SyncRollCard(string droppedData) 
+    {
+        
+        // 예: "CardA:1:2,CardB:2:3"
+        string[] entries = droppedData.Split(',');
+
+        foreach (string entry in entries)
+        {
+            string[] parts = entry.Split(':');
+            if (parts.Length != 3) continue;
+
+            string cardName = parts[0];
+            int x = int.Parse(parts[1]);
+            int y = int.Parse(parts[2]);
+
+            Debug.Log($"{cardName}");
+            Debug.Log($"{x}");
+            Debug.Log($"{y}");
+
+            // 그리드 내에서 x, y 좌표에 해당하는 오브젝트 찾기
+            GameObject targetGridObject = ObjectManager.instance.grid[x, y];
+
+            if (targetGridObject != null)
+            {
+                // 자식 요소를 모두 제거
+                Transform targetTransform = targetGridObject.transform;
+
+                for (int j = targetTransform.childCount - 1; j >= 0; j--)
+                {
+                    Transform child = targetTransform.GetChild(j);
+                    GameObject.Destroy(child.gameObject);
+                }
+
+                // 부모 오브젝트 이름 초기화
+                targetGridObject.name = "";
+            }
+            else
+            {
+                Debug.Log("오브젝트가 없습니다");
+            }
+        }
+
+        // 일정 시간 후에 드롭 영역 색상 복원 함수 호출
+        Invoke("RollBackColorAreas", 0.07f);
+
+        //TurnChange.instance.RollBackAreas();
+    }
+>>>>>>> Stashed changes
 }

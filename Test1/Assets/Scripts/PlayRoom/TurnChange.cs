@@ -199,13 +199,37 @@ public class TurnChange : MonoBehaviourPun
         // 다른 유저에게 내가 롤백했음을 알려 카드를 다시 되돌리도록 요청
         // ObjectManager.instance.rollBackList.ToArray() 리스트를 배열로 전환해 받아서 이것을 사용
         //  - 보드판에 해당 문자가 있는지 돌면서 검사 - 있으면 해당 위치 파악, 해당 위치 빈 객체로 초기화
-        if (ObjectManager.instance.rollBackList.Count > 0) // 롤백할 무언가가 있으면
+        //if (ObjectManager.instance.rollBackList.Count > 0) // 롤백할 무언가가 있으면
         {
+<<<<<<< Updated upstream
             // 다른 유저들에게 삭제해줄 것을 요청
             userCard.photonView.RPC("RemoveRollCard", RpcTarget.Others, string.Join(",",ObjectManager.instance.rollBackList));
 
             // 롤백리스트, 드롭카운트 초기화
             ObjectManager.instance.rollBackList.Clear(); //문자열 리스트 삭제
+=======
+            //다른 유저들에게 보드판의 카드 롤백을 요청함
+            //fieldCard.photonView.RPC(
+            //    "SyncRollCard", RpcTarget.Others, 
+            //    ObjectManager.instance.FinIndexX.ToArray(), 
+            //    ObjectManager.instance.FinIndexY.ToArray(), 
+            //    ObjectManager.instance.rollBackList.ToArray()
+            //    );
+
+            //현재 유저에게 보드판의 카드 롤백 애니메이션을 요청함
+            CardAnimation.instance.RollBackCardAnimationUser();
+
+            //다른 유저들에게 보드판의 카드 롤백 애니메이션을 요청함
+            CardAnimation.instance.photonView.RPC(
+                "RollBackCardAnimation", RpcTarget.Others,
+                ObjectManager.instance.MyIndexNum
+                );
+
+            // 롤백리스트, 드롭카운트 초기화
+            //ObjectManager.instance.rollBackList.Clear(); //문자열 정보 삭제
+            //ObjectManager.instance.FinIndexX.Clear(); // x좌표 정보 삭제
+            //ObjectManager.instance.FinIndexY.Clear(); // y좌표 정보 삭제
+>>>>>>> Stashed changes
             ObjectManager.instance.createdWordList.Clear(); //객체 삭제
             ObjectManager.instance.dropCount = 0; //카운트 0
         }

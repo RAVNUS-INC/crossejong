@@ -38,6 +38,7 @@ public class UserCard : MonoBehaviourPun
     public Countdown countDown; // 11장 배분 뒤 모두에게 요청 위해
 
 
+<<<<<<< Updated upstream
     //UserCardArea로 11개의 랜덤 카드 이동
     public void FirstUserCardArea()
     {
@@ -74,6 +75,8 @@ public class UserCard : MonoBehaviourPun
         }
     }
 
+=======
+>>>>>>> Stashed changes
     public void SelectedUserCard(List<GameObject> userLists)
     {
         for (int i = 0; i < userLists.Count; i++) { 
