@@ -419,16 +419,13 @@ public class UserSetManager : MonoBehaviourPunCallbacks
     {
         Debug.Log("마스터 서버 접속 성공");
 
-        //나의 이름을 포톤에 설정
-        PhotonNetwork.NickName = inputText.text;
-
         //로비진입
         PhotonNetwork.JoinLobby();
+
+        //나의 이름을 포톤에 설정
+        PhotonNetwork.NickName = inputText.text;
     }
-    public override void OnJoinedLobby() //Lobby 진입에 성공했으면 호출되는 함수
-    {
-        Debug.Log("로비 진입 성공");
-    }
+
     public void OnClickConnect() // 마스터 서버 접속 요청(OkBtn에 연결)
     {
         // 마스터 서버 접속 요청
@@ -437,6 +434,8 @@ public class UserSetManager : MonoBehaviourPunCallbacks
         //로딩바 ui 애니메이션 보여주기
         LoadingSceneController.Instance.LoadScene("Main");
     }
+
+
     private void OnDestroy() // 이벤트 해제
     {
         inputText.onValueChanged.RemoveListener(ValidateNickname);

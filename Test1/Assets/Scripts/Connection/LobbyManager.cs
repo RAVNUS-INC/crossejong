@@ -56,6 +56,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     // 난이도 변경 객체 참조
     public ChangeLevel Changelevel;
 
+
     private void Awake() 
     {
         if (instance == null)
@@ -65,10 +66,37 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         else
         {
             Destroy(gameObject); // 중복 방지
-        }
+        }        
+    }
 
-        ResetRoomSetPanel(); // 첫 메인 접속 시 최초 실행
-        
+    private void Start()
+    {
+        if (!PhotonNetwork.InLobby) //현재 로비에 없다면
+        {
+            if (UserInfoManager.instance.isFirstConnect) //이때 지금이 첫 로그인으로 들어온 경우라면
+            {
+                UserInfoManager.instance.isFirstConnect = false; //로비 재접속이 이후부턴 수행되도록
+                return;
+            }
+            else
+            { 
+                PhotonNetwork.JoinLobby(); //로비 접속 시도
+            }
+        }
+        else
+        {
+            return;
+        }
+    }
+
+    public override void OnJoinedLobby() //Lobby 진입에 성공했으면 호출되는 함수
+    {
+        Debug.Log("로비 진입 성공");
+        Main.instance.GetProfileImageIndex(); // PlayFab에서 저장된 이미지 인덱스를 불러와 이미지 업데이트
+        Main.instance.GetUserDisplayName(); //유저 네임 불러와서 텍스트로 표시
+        Main.instance.GetUserBirth(); //유저 출생연도 불러오기만 하기
+        Main.instance.profilePanel.SetActive(false); //프로필 패널 비활성화
+        ResetRoomSetPanel();
     }
 
     // 방 만들 때 선택 옵션 버튼과 방이름 규칙에 관한 초기화(방 속성 x버튼 누를때도 실행-초기화)
@@ -467,15 +495,15 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             int joinedImageIndex = (int)propertiesThatChanged["PlayerProfile"];
 
             // 본인은 제외 (이미 방 입장 시점에 OnJoinedRoom에서 처리했으므로)
-            if (joinedActorNumber != PhotonNetwork.LocalPlayer.ActorNumber)
-            {
-                // TODO: 새 유저 입장 감지 후 행동 실행
-                Debug.Log($"플레이어 넘버: {joinedActorNumber} 입장!");
-                Debug.Log($"플레이어 이름 {joinedName}");
-                Debug.Log($"플레이어 사진 {joinedImageIndex}");
-            }
+            //if (joinedActorNumber != PhotonNetwork.LocalPlayer.ActorNumber)
+            //{
+            //      TODO: 새 유저 입장 감지 후 행동 실행
+            //      Debug.Log($"플레이어 넘버: {joinedActorNumber} 입장!");
+            //      Debug.Log($"플레이어 이름 {joinedName}");
+            //      Debug.Log($"플레이어 사진 {joinedImageIndex}");
+            //}
 
-            // TODO: 유저 입장 감지 후 행동 실행
+            //TODO: 유저 입장 감지 후 행동 실행
             Debug.Log($"플레이어 넘버: {joinedActorNumber} 입장!");
             Debug.Log($"플레이어 이름 {joinedName}");
             Debug.Log($"플레이어 사진 {joinedImageIndex}");

@@ -86,11 +86,9 @@ public class UserProfileLoad : MonoBehaviourPun
         countDown.photonView.RPC("StartCountDown", RpcTarget.All);
     }
 
-    //[PunRPC]
+
     public void RequestRemoveUserInfo(int userNum) //players 리스트에서 삭제하는 과정
     {
-        //if (!PhotonNetwork.IsMasterClient) return; // 방장만 실행
-
         //직접 삭제
         players.RemoveAll(p => p.myActNum == userNum);
         Debug.Log($"플레이어 {userNum}가 리스트에서 제거됨.");
@@ -112,7 +110,7 @@ public class UserProfileLoad : MonoBehaviourPun
         else
         {
             // 모든 유저에게 동기화 요청
-           // SyncPlayerList();
+            SyncPlayerList();
         }
     }
 
@@ -165,7 +163,7 @@ public class UserProfileLoad : MonoBehaviourPun
         // 유저들 사진 리스트를 모두가 갱신받음
         userImageList = imgIndexes;
 
-        Debug.Log($"플레이어 리스트 동기화됨.");
+        //Debug.Log($"플레이어 리스트 동기화됨.");
 
     }
 

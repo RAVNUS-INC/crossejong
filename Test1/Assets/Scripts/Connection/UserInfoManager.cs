@@ -19,6 +19,7 @@ public class UserInfoManager : MonoBehaviour
         }
     }
 
+    public bool isFirstConnect = true; // 첫 자동로그인으로 로비에 들어간건지 여부
 
     public string MyName; // 유저의 displayname
     public int MyActNum; // 유저의 액터넘버
@@ -34,5 +35,6 @@ public class UserInfoManager : MonoBehaviour
     public const string DISPLAYNAME_KEY = "DisplayName"; // 유저의 DisplayName
     public const string IMAGEINDEX_KEY = "ImageIndex"; // 유저의 이미지 인덱스
     public const string BIRTHYEAR_KEY = "BirthYear"; // 유저의 출생연도
+
 
 }

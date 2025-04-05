@@ -13,8 +13,10 @@ using DG.Tweening;
 using Sequence = DG.Tweening.Sequence;
 
 // 메인에 존재하는 기능에 관한 스크립트
-public class Main : MonoBehaviour
+public class Main : MonoBehaviourPunCallbacks
 {
+    public static Main instance;
+
     //usersetmanager에서 가져온 변수들    
     private TMP_InputField inputField; //프로필 패널 안의 이름입력필드
     private TMP_Text SaveText, warnText; //프로필 패널 안의 저장메시지
@@ -40,6 +42,15 @@ public class Main : MonoBehaviour
 
     private void Awake()
     {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject); // 중복 방지
+        }
+
         // UserSetManager 컴포넌트 참조
         UserSetManager userSetManager = FindObjectOfType<UserSetManager>();
 
@@ -51,18 +62,9 @@ public class Main : MonoBehaviour
         SaveBtn = userSetManager.confirmButton; //프로필 패널 저장버튼
     }
 
+
     void Start()
     {
-        if (PhotonNetwork.InLobby)
-        {
-            Debug.Log("현재 로비에 있음.");
-        }
-        else
-        {
-            Debug.Log("현재 로비에 없음.");
-            PhotonNetwork.JoinLobby();  // 로비로 이동
-        }
-
         // PlayRoom 객체 찾기
         GameObject playRoom = GameObject.Find("PlayRoom");
 
@@ -82,16 +84,12 @@ public class Main : MonoBehaviour
             Destroy(dotweenObject); // 해당 객체 삭제
             Debug.Log("[DOTween] 객체가 삭제되었습니다.");
         }
-        profilePanel.SetActive(false); //프로필 패널 비활성화
-
-        GetProfileImageIndex(); // PlayFab에서 저장된 이미지 인덱스를 불러와 이미지 업데이트
-        GetUserDisplayName(); //유저 네임 불러와서 텍스트로 표시
-        GetUserBirth(); //유저 출생연도 불러오기만 하기
     }
 
 
+
     // 프로필 이미지 인덱스 불러오기 함수
-    private void GetProfileImageIndex()
+    public void GetProfileImageIndex()
     {
         // playerprefs에서 인덱스 정보 불러오기
         UserInfoManager.instance.MyImageIndex = PlayerPrefs.GetInt(UserInfoManager.IMAGEINDEX_KEY, 0);
@@ -115,14 +113,14 @@ public class Main : MonoBehaviour
     }
 
     // 출생연도 불러오기
-    private void GetUserBirth()
+    public void GetUserBirth()
     {
         // playerprefs에서 이름 정보 불러오기
         // 1. PlayerPrefs에서 출생연도 가져오기
         if (PlayerPrefs.HasKey(UserInfoManager.BIRTHYEAR_KEY))
         {
             UserInfoManager.instance.MyBirthYear = PlayerPrefs.GetInt(UserInfoManager.BIRTHYEAR_KEY);
-            Debug.Log($"Birth Year found in PlayerPrefs: {UserInfoManager.instance.MyBirthYear}");
+            //Debug.Log($"Birth Year found in PlayerPrefs: {UserInfoManager.instance.MyBirthYear}");
         }
         else
         {

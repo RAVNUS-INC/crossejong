@@ -9,6 +9,7 @@ using TMPro;
 using DG.Tweening;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using Photon.Pun;
 
 
 // 로그인 화면 전체를 구성하는 코드
@@ -48,6 +49,7 @@ public class LoginManager : MonoBehaviour
 
     public bool isLoginMode = true;  // 로그인 모드 (true: 로그인, false: 회원가입)
     public bool isTouched = false; // 터치 여부 체크
+
 
     // IPointerDownHandler 인터페이스를 통해 클릭 또는 터치 이벤트 감지
     public void ShowLoginPanel()
@@ -281,7 +283,11 @@ public class LoginManager : MonoBehaviour
             InitialTestText.text = "로그인 연결 상태";
 
             // 마스터 서버접속 요청 및 로비로 이동
-            UserSetManager.OnClickConnect();
+            // 마스터 서버 접속 요청
+            PhotonNetwork.ConnectUsingSettings();
+
+            //로딩바 ui 애니메이션 보여주기
+            LoadingSceneController.Instance.LoadScene("Main");
         },
         error =>
         {
@@ -292,6 +298,7 @@ public class LoginManager : MonoBehaviour
             StartTwinkle();
         });
     }
+
 
     // 회원가입 실패 시
     public void OnRegisterFailure(PlayFabError error)

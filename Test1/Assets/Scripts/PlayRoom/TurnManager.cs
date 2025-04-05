@@ -312,12 +312,6 @@ public class TurnManager : MonoBehaviourPunCallbacks
                 // 나갈때 내가 턴이 아니라면?
                 Debug.Log("현재 턴: X. 게임을 퇴장합니다.");   
             }
-            // 나가기 전 나의 프로필을 모두가 비활성화 하도록 요청
-            // photonView.RPC("LeftUserActive", RpcTarget.All, UserInfoManager.instance.MyActNum);
-
-            // 액터넘버 번호 삭제 요청하기, 기존의 ui 변화 주의
-            //userProfileLoad.photonView.RPC("RequestRemoveUserInfo", RpcTarget.MasterClient, UserInfoManager.instance.MyActNum);
-
             //나가기
             PhotonNetwork.LeaveRoom();
         }
@@ -376,9 +370,10 @@ public class TurnManager : MonoBehaviourPunCallbacks
         LeftUserActive(leftNum); //프로필 비활성화 후에 리스트에서 제거
 
 
-        // 만약 현재 방에 있는 플레이어가 2명 미만이라면 - 결과는 정해짐
+        // 만약 현재 방에 있는 플레이어가 1명 뿐이라면
+        // 또는 현재 턴에 있는 사람이 1명 뿐이라면
         // 멀티 테스트 시 주석 해제
-        if (userProfileLoad.sortedPlayers.Length < 2)
+        if (userProfileLoad.sortedPlayers.Length < 2 || (ObjectManager.instance.turnExcluded.Count == userProfileLoad.sortedPlayers.Length - 1))
         {
             if (ObjectManager.instance.IsMyTurn) //현재 내 턴일 때
             {

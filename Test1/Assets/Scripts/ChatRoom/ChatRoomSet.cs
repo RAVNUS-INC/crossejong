@@ -71,18 +71,6 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         UserProfileLoad.PV.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, UserInfoManager.instance.MyName, UserInfoManager.instance.MyImageIndex, UserInfoManager.instance.MyActNum);
     }
 
-    //private IEnumerator EnableMessageQueue()
-    //{
-
-    //    // 씬 로딩 후 딜레이를 추가하여 메시지 큐 재개
-    //    yield return new WaitForSeconds(0.1f); // 씬 로딩 딜레이
-
-    //    PhotonNetwork.IsMessageQueueRunning = true;
-
-    //    Debug.Log("메시지 큐 재개 완료");
-    //}
-
-
     private void Start()
     {
         ChatField.text = ""; //채팅입력창은 항상 비워놓기
