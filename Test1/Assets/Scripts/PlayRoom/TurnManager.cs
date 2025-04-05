@@ -171,8 +171,8 @@ public class TurnManager : MonoBehaviourPunCallbacks
             // 나는 게임 턴에서 이제 제외됨
             ObjectManager.instance.EndMyTurn = true;
 
-            // 모두에게 턴 제외 리스트 추가 및 동기화 요청(uI인덱스 번호를 넘겨줌)
-            photonView.RPC("UpdateExcludedList", RpcTarget.All, ObjectManager.instance.MyIndexNum);
+            // 모두에게 턴 제외 리스트 추가 및 동기화 요청(액터 번호를 넘겨줌)
+            photonView.RPC("UpdateExcludedList", RpcTarget.All, PhotonNetwork.LocalPlayer.ActorNumber);
         }
 
     }
@@ -313,13 +313,10 @@ public class TurnManager : MonoBehaviourPunCallbacks
                 Debug.Log("현재 턴: X. 게임을 퇴장합니다.");   
             }
             // 나가기 전 나의 프로필을 모두가 비활성화 하도록 요청
-            photonView.RPC("LeftUserActive", RpcTarget.All, UserInfoManager.instance.MyActNum);
+            // photonView.RPC("LeftUserActive", RpcTarget.All, UserInfoManager.instance.MyActNum);
 
             // 액터넘버 번호 삭제 요청하기, 기존의 ui 변화 주의
-            userProfileLoad.photonView.RPC("RequestRemoveUserInfo", RpcTarget.MasterClient, UserInfoManager.instance.MyActNum);
-
-            //// 네트워크 및 로컬 객체 삭제
-            //DestroyPlayRoomAndAllChildren();
+            //userProfileLoad.photonView.RPC("RequestRemoveUserInfo", RpcTarget.MasterClient, UserInfoManager.instance.MyActNum);
 
             //나가기
             PhotonNetwork.LeaveRoom();
@@ -376,9 +373,11 @@ public class TurnManager : MonoBehaviourPunCallbacks
         int leftNum = otherPlayer.ActorNumber;
         Debug.Log($"나간 유저의 액터넘버: {leftNum}");
 
+        LeftUserActive(leftNum); //프로필 비활성화 후에 리스트에서 제거
+
+
         // 만약 현재 방에 있는 플레이어가 2명 미만이라면 - 결과는 정해짐
         // 멀티 테스트 시 주석 해제
-
         if (userProfileLoad.sortedPlayers.Length < 2)
         {
             if (ObjectManager.instance.IsMyTurn) //현재 내 턴일 때
@@ -396,16 +395,32 @@ public class TurnManager : MonoBehaviourPunCallbacks
         }
     }
 
-    [PunRPC]
-    public void LeftUserActive(int leftNum)
+    public void LeftUserActive(int leftNum) //누군가 나갔을 때나 턴제외 상황 ui처리
     {
         // 플레이어 목록에서 현재 플레이어의 인덱스를 찾음
         int currentIndex = Array.IndexOf(userProfileLoad.sortedPlayers, leftNum);
 
         if (currentIndex >= 0)
         {
-            userProfileLoad.InRoomUserList[currentIndex].gameObject.SetActive(false);
+            //기본 프로필만 활성화
+            userProfileLoad.InRoomUserList[currentIndex].gameObject.SetActive(true);
             InTurnUserList[currentIndex].gameObject.SetActive(false);
+
+            // 프로필 이미지 위에 검은 그림자 추가
+            userProfileLoad.InRoomUserImg[currentIndex].color = overlayColor;
+
+            //현재 유저가 방에 있다면 ->관전 중, 그게 아니면 나간 상태
+            if (PhotonNetwork.CurrentRoom.PlayerCount == userProfileLoad.sortedPlayers.Length)
+            {
+                CardCount[currentIndex].text = "관전";
+            }
+            else
+            {
+                //비활성화 후 액터넘버 삭제하기
+                userProfileLoad.RequestRemoveUserInfo(leftNum);
+
+                CardCount[currentIndex].text = "나감";
+            }
         }
         else
         {
@@ -421,10 +436,10 @@ public class TurnManager : MonoBehaviourPunCallbacks
         InTurnCardCount[index].text = myCount.ToString();
     }
 
-    public void FindMyIndex() // 내 액터넘버를 바탕으로 현재 나의 UI 인덱스 위치 찾기
+    public int FindMyIndex(int Actnum) // 내 액터넘버를 바탕으로 현재 나의 UI 인덱스 위치 찾기
     {
-        // 플레이어 목록에서 현재 플레이어의 인덱스를 찾음
-        ObjectManager.instance.MyIndexNum = Array.IndexOf(userProfileLoad.sortedPlayers, UserInfoManager.instance.MyActNum);
+        int UserNum = Array.IndexOf(userProfileLoad.sortedPlayers, Actnum);
+        return UserNum;
     }
 
     [PunRPC]
@@ -481,14 +496,14 @@ public class TurnManager : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    private void UpdateExcludedList(int UserIndex)
+    private void UpdateExcludedList(int UserNum)
     {
+        int UserIndex = FindMyIndex(UserNum);
+
         // 턴 제외 리스트에 해당 유저를 추가
         ObjectManager.instance.turnExcluded.Add(UserIndex);
 
-        // 해당 유저 이미지 비활성화 상태로 보이게
-        userProfileLoad.InRoomUserImg[UserIndex].color = overlayColor;
-        InTurnUserImg[UserIndex].color = overlayColor;
+        LeftUserActive(UserNum); //프로필 비활성화
 
         // 턴에서 제외된 사람의 수가 현재 게임 내 플레이어 수 - 1의 값과 같다면(턴에 한 명만 남은 상태)
         if (ObjectManager.instance.turnExcluded.Count == userProfileLoad.sortedPlayers.Length - 1)

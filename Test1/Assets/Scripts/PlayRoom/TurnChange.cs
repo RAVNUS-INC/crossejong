@@ -179,7 +179,7 @@ public class TurnChange : MonoBehaviourPun
         ObjectManager.instance.dropCount = 0;
 
         // 자신의 UI 인덱스 확인 및 업데이트
-        turnManager.FindMyIndex();
+        ObjectManager.instance.MyIndexNum = turnManager.FindMyIndex(PhotonNetwork.LocalPlayer.ActorNumber);
 
         CountUserCard(userCard.displayedCards.Count);
 
