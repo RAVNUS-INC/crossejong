@@ -65,6 +65,9 @@ public class Main : MonoBehaviourPunCallbacks
 
     void Start()
     {
+        GetUserDisplayName();
+        GetProfileImageIndex();
+
         // PlayRoom °´Ã¼ Ã£±â
         GameObject playRoom = GameObject.Find("PlayRoom");
 

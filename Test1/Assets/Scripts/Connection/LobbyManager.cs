@@ -66,26 +66,30 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         else
         {
             Destroy(gameObject); // 중복 방지
-        }        
-    }
+        }
 
-    private void Start()
-    {
-        if (!PhotonNetwork.InLobby) //현재 로비에 없다면
+        if (PhotonNetwork.InLobby) //현재 로비에 있다면
         {
-            if (UserInfoManager.instance.isFirstConnect) //이때 지금이 첫 로그인으로 들어온 경우라면
-            {
-                UserInfoManager.instance.isFirstConnect = false; //로비 재접속이 이후부턴 수행되도록
-                return;
-            }
-            else
-            { 
-                PhotonNetwork.JoinLobby(); //로비 접속 시도
-            }
+            Debug.Log("로비에 있음");
+            Main.instance.GetProfileImageIndex(); // PlayFab에서 저장된 이미지 인덱스를 불러와 이미지 업데이트
+            Main.instance.GetUserDisplayName(); //유저 네임 불러와서 텍스트로 표시
+            Main.instance.GetUserBirth(); //유저 출생연도 불러오기만 하기
+            Main.instance.profilePanel.SetActive(false); //프로필 패널 비활성화
+            ResetRoomSetPanel();
         }
         else
         {
-            return;
+            //Debug.Log("로비에 없음");
+
+            if (UserInfoManager.instance.isFirstConnect) //이때 지금이 첫 로그인으로 들어온 경우라면
+            {
+                UserInfoManager.instance.isFirstConnect = false; //로비 재접속이 이후부턴 수행되도록
+            }
+            else
+            {
+                Debug.Log("로비 접속");
+                PhotonNetwork.JoinLobby(); //로비 접속 시도
+            }
         }
     }
 
@@ -504,9 +508,9 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             //}
 
             //TODO: 유저 입장 감지 후 행동 실행
-            Debug.Log($"플레이어 넘버: {joinedActorNumber} 입장!");
-            Debug.Log($"플레이어 이름 {joinedName}");
-            Debug.Log($"플레이어 사진 {joinedImageIndex}");
+            //Debug.Log($"플레이어 넘버: {joinedActorNumber} 입장!");
+            //Debug.Log($"플레이어 이름 {joinedName}");
+            //Debug.Log($"플레이어 사진 {joinedImageIndex}");
 
 
         }

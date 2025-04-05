@@ -7,8 +7,11 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 using UnityEngine.UI;
 using static UserProfileLoad;
+using System.Globalization;
+
 
 public class GameResult : MonoBehaviourPunCallbacks
 {
@@ -23,18 +26,12 @@ public class GameResult : MonoBehaviourPunCallbacks
     Coroutine BacktoMainRoutine;
     Coroutine EndGameDelayRoutine;
 
+    public List<int> allActorNums = new List<int>(); //초기 리스트 복제
+
     private void Awake()
     {
         SetActive(); // 리스트 기본 비활성화 초기화
     }
-
-    // ------VVV
-    // 카드를 가장 먼저 소진한 유저들 단어완성횟수 오름차순으로 정리한 리스트로부터 결과 표시
-    // sortedplayers리스트에 있는 유저들을 바탕으로 결과창 유저 표시(끝까지 게임을 플레이한 유저들)
-    // 본인이 카드를 소진하면 다른 모두에게 rpc함수를 통해 알림 요청
-    // 2명일 경우 -> 한명이 카드 다 소진 -> 결과 바로 표시
-    // 결과 확인 버튼 누르면 메인으로 돌아가도록
-    // 확인 버튼을 누르지 않아도 15초뒤에 메인으로 자동으로 이동하도록 알림메시지 수행하기
 
     public void SetStat() //유저 초기 세팅 확인버튼(usersetmanager)에 연결
     {
@@ -67,13 +64,94 @@ public class GameResult : MonoBehaviourPunCallbacks
     public void MainCheckTime()
     {
         SetStat(); // 단어완성횟수를 playfab에 즉시 업데이트
-
-        //// 결과창이 띄워지면 15초 타이머를 시작 - 메인 도달까지 남은 시간
-        //if (BacktoMainRoutine == null)
-        //{
-        //    BacktoMainRoutine = StartCoroutine(StartTimer()); // 새 코루틴 시작
-        //}
     }
+
+   public  void CheckIfAllPlayersSubmitted() //모두가 해시 업데이트 했는지 여부 검사
+   {
+        Hashtable roomProps = PhotonNetwork.CurrentRoom.CustomProperties;
+        var allPlayers = PhotonNetwork.CurrentRoom.Players;
+
+        foreach (int actNum in allActorNums)
+        {
+            string leftKey = $"Left_{actNum}";
+
+            if (!roomProps.ContainsKey(leftKey))
+            {
+                Debug.Log($"아직 제출 안 한 유저: {actNum}");
+                return;
+            }
+
+        }
+
+        Debug.Log("모든 유저 제출 완료! 순위 계산 시작");
+        CheckAndRankPlayersByCardCount(); // 여기서 순위 매기는 함수 호출
+    }
+
+    void CheckAndRankPlayersByCardCount() //순위계산시작
+    {
+        Hashtable roomProps = PhotonNetwork.CurrentRoom.CustomProperties;
+        Dictionary<int, (int cardCount, int wordCount)> actorToCardCount = new Dictionary<int, (int, int)>();
+        List<int> leavers = new List<int>();
+
+        foreach(int actorNum in allActorNums) // 전체 유저 기준
+        {
+            string leftKey = $"Left_{actorNum}";
+            string cardKey = $"CardLeft_{actorNum}";
+            string wordKey = $"CompletedWords_{actorNum}";
+
+            bool isLeaver = roomProps.ContainsKey(leftKey) && (bool)roomProps[leftKey] == true;
+
+            if (isLeaver)
+            {
+                leavers.Add(actorNum); // 나간 유저는 따로 저장
+            }
+            else if (roomProps.ContainsKey(cardKey) && roomProps.ContainsKey(wordKey))
+            {
+                int cardCount = (int)roomProps[cardKey];
+                int wordCount = (int)roomProps[wordKey];
+                actorToCardCount[actorNum] = (cardCount, wordCount);
+            }
+        }
+
+        // 카드 개수 기준 오름차순 정렬
+        var sortedPlayers = actorToCardCount.OrderBy(pair => pair.Value.cardCount)
+                                     .Select(pair => pair.Key)
+                                     .ToList();
+
+        // 마지막에 나간 유저들 붙이기
+        sortedPlayers.AddRange(leavers);
+
+        Debug.Log("정렬된 플레이어 순서 (ActorNumber): " + string.Join(", ", sortedPlayers));
+
+        int index = 0;
+        foreach (int actorNum in sortedPlayers)
+        {
+            // 유저 프로필 정보 가져오기
+            int currentPlayerImgIndex = (int)userProfileLoad.GetProfileIndexByActorNumber(actorNum); // 프로필 이미지 인덱스
+            string currentPlayerName = userProfileLoad.GetUserNameByActorNumber(actorNum); // 이름
+
+            ResultUserList[index].SetActive(true);
+
+            //공통ui업데이트
+            ResultUserName[index].text = currentPlayerName;
+            ResultUserImg[index].sprite = userProfileLoad.profileImages[currentPlayerImgIndex];
+
+            // 나간 유저라면 이름과 이미지 대신 "나감" 표시
+            if (leavers.Contains(actorNum))
+            {
+                ResultWordCount[index].text = "나감";
+            }
+            else
+            {
+                // UI 채우기
+                int wordCount = (int)roomProps[$"CompletedWords_{actorNum}"];
+                ResultWordCount[index].text = $"{wordCount}회";
+            }
+            index++;
+        }
+    }
+
+
     public void EndGameDelay()
     {
 
@@ -84,7 +162,7 @@ public class GameResult : MonoBehaviourPunCallbacks
         }
     }
 
-    IEnumerator StartTimer()
+    IEnumerator StartTimer() //지금은 안쓰는 함수
     {
         float remainingTime = 15f;
 
@@ -116,8 +194,7 @@ public class GameResult : MonoBehaviourPunCallbacks
         GameTimerEnd();
     }
 
-    // 결과창 보여주기 시간이 끝났을 때
-    void OnTimerEnd()
+    void OnTimerEnd() //결과창 보여주기 시간이 끝났을 때 - 지금은 안쓰는 함수
     {
         if (BacktoMainRoutine != null)
         {
@@ -130,8 +207,7 @@ public class GameResult : MonoBehaviourPunCallbacks
         TurnManager.instance.LeaveRoom(); // 게임 도중 방을 나갈 때와 같은 원리
     }
 
-    // 게임 종료 대기 메시지가 끝났을 때 - 결과창 보여주기
-    void GameTimerEnd()
+    void GameTimerEnd() // 게임 종료 대기 메시지가 끝났을 때 - 결과창 보여주기
     {
         if (EndGameDelayRoutine != null)
         {
@@ -148,10 +224,6 @@ public class GameResult : MonoBehaviourPunCallbacks
         //MainCheckTime(); // 메인 되돌아가는 타이머 시작
     }
 
-    public void OnConfirmButton() // 게임 결과 확인 버튼을 눌렀을 때 -> 메인 이동
-    {
-        TurnManager.instance.LeaveRoom(); // 게임 도중 방을 나갈 때와 같은 원리
-    }
 
     public void SetActive()
     {
@@ -162,52 +234,4 @@ public class GameResult : MonoBehaviourPunCallbacks
         }
     }
 
-
-    // 방장이 판넬이 보여지기 전 결과 데이터를 미리 업데이트 - 게임이 끝나고 약 1초간 딜레이가 있어야 할 것
-    [PunRPC]
-    public void UpdateResultData(int actorNum, int completeCount) 
-    {
-        // 해당 액터넘버에 해당하는 Player 찾기
-        Player targetPlayer = userProfileLoad.players.FirstOrDefault(p => p.myActNum == actorNum);
-
-        if (targetPlayer != null)
-        {
-            targetPlayer.completeCount = completeCount; // 단어 완성 횟수 저장
-            Debug.Log($"{targetPlayer.displayName}님의 단어 완성 횟수: {completeCount}");
-        }
-
-        // 모든 유저의 정보가 수신되었는지 확인
-        if (userProfileLoad.players.All(p => p.completeCount >= 0))
-        {
-            Debug.Log("모든 유저의 단어 완성 횟수를 받았습니다!");
-
-            // 플레이어들 정보를 내림차순으로 정렬
-            userProfileLoad.players.Sort((x, y) => y.completeCount.CompareTo(x.completeCount));
-
-            // 정보를 업데이트
-            UpdatePlayerInfo();
-        }
-    }
-
-    public void UpdatePlayerInfo()
-    {
-        List<Player> players = userProfileLoad.players;
-
-        // 각 플레이어의 정보를 UI에 업데이트
-        for (int i = 0; i < players.Count; i++)
-        {
-            // 플레이어의 정보에 접근
-            Player currentPlayer = players[i];
-
-            // 플레이어의 이미지 인덱스와 이름을 가져오기
-            int currentPlayerImgIndex = currentPlayer.imgIndex;
-            string currentPlayerName = currentPlayer.displayName;
-            int currentPlayerWordCount = currentPlayer.completeCount;
-
-            ResultUserList[i].SetActive(true);
-            ResultUserImg[i].sprite = userProfileLoad.profileImages[currentPlayerImgIndex];
-            ResultUserName[i].text = currentPlayerName;
-            ResultWordCount[i].text = $"{currentPlayerWordCount}회";
-        }
-    }
 }

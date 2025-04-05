@@ -64,11 +64,9 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         // 현재 인원 업데이트
         PlayersUpdate();
 
-        //나의 입장 알리기
-        PV.RPC("EnterState", RpcTarget.All, UserInfoManager.instance.MyName, true);
+        //나한테만 입장메시지 보이게하기
+        EnterState(UserInfoManager.instance.MyName, true);
 
-        // 본인의 정보 추가를 방장에게 전달 - userProfileLoad 내 함수 실행
-        UserProfileLoad.PV.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, UserInfoManager.instance.MyName, UserInfoManager.instance.MyImageIndex, UserInfoManager.instance.MyActNum);
     }
 
     private void Start()
@@ -298,8 +296,8 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     {
         if (propertiesThatChanged.ContainsKey("PlayerJoined"))
         {
-            // property에 있는 방 정보 불러와 변수에 저장(방이름도 저장)
-            //LoadRoomInfo();
+            // 방장이 아닌 플레이어는 버튼 비활성화
+            RoomSetBtn.interactable = PhotonNetwork.IsMasterClient;
 
             // 현재 인원 업데이트
             PlayersUpdate();
@@ -313,41 +311,84 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
             {
                 // TODO: 새 유저 입장 감지 후 행동 실행
                 Debug.Log($"새 플레이어 넘버: {joinedActorNumber} 입장!");
-
                 Debug.Log($"새 플레이어 이름 {joinedName}");
                 Debug.Log($"새 플레이어 사진 {joinedImageIndex}");
+
+                EnterState(joinedName, true); // 입장 메시지 알림
             }
         }
 
-        //foreach (DictionaryEntry entry in propertiesThatChanged)
-        //{
-        //    string key = entry.Key.ToString();
-        //    object value = entry.Value;
+        // 난이도 변경 감지
+        if (propertiesThatChanged.ContainsKey("difficulty"))
+        {
+            string updatedDifficulty = (string)propertiesThatChanged["difficulty"];
+            //Debug.Log("난이도 변경됨: " + updatedDifficulty);
 
-        //    Debug.Log($"속성 업데이트 반영됨: {key} = {value}");
+            // 관련 함수 실행
+            UpdateRoomUI("difficulty", updatedDifficulty);
+        }
 
-        //    // 변경된 UI 갱신
-        //    UpdateRoomUI(key, value);
-        //}
+        // 제한시간 변경 감지
+        if (propertiesThatChanged.ContainsKey("timeLimit"))
+        {
+            int updatedTimeLimit = (int)propertiesThatChanged["timeLimit"];
+            //Debug.Log("시간제한 변경됨: " + updatedTimeLimit);
+
+            // 관련 함수 실행
+            UpdateRoomUI("timeLimit", updatedTimeLimit);
+        }
+
+        // 난이도 카드 내용 변경 감지
+        if (propertiesThatChanged.ContainsKey("DifficultyContents"))
+        {
+            object[] cardContents = (object[])propertiesThatChanged["DifficultyContents"];
+            //Debug.Log("난이도 카드 내용 변경됨: " + string.Join(", ", cardContents));
+
+            // 관련 함수 실행
+            UpdateRoomUI("DifficultyContents", cardContents);
+        }
+
+        // 난이도인덱스 변경 감지
+        if (propertiesThatChanged.ContainsKey("DifficultyIndex"))
+        {
+            int updatedDifficultyIndex = (int)propertiesThatChanged["DifficultyIndex"];
+            //Debug.Log("난이도인덱스 변경됨: " + updatedDifficultyIndex);
+
+            // 관련 함수 실행
+            UpdateRoomUI("DifficultyIndex", updatedDifficultyIndex);
+        }
+
+        // 제한시간인덱스 변경 감지
+        if (propertiesThatChanged.ContainsKey("TimeLimitIndex"))
+        {
+            int updatedTimeLimitIndex = (int)propertiesThatChanged["TimeLimitIndex"];
+            //Debug.Log("시간제한인덱스 변경됨: " + updatedTimeLimitIndex);
+
+            // 관련 함수 실행
+            UpdateRoomUI("TimeLimitIndex", updatedTimeLimitIndex);
+        }
     }
 
     public override void OnPlayerEnteredRoom(Player newPlayer) // 내가 아닌 새로운 플레이어가 입장한 경우
     {
-        // 방장이 아닌 플레이어는 버튼 비활성화
-        RoomSetBtn.interactable = PhotonNetwork.IsMasterClient;
+        //// 방장이 아닌 플레이어는 버튼 비활성화
+        //RoomSetBtn.interactable = PhotonNetwork.IsMasterClient;
 
         //현재 접속 인원 업데이트
-        PlayersUpdate();
-        //UnityEngine.Debug.Log("새로운 플레이어 입장");
+        //PlayersUpdate();
     }
+
     public override void OnPlayerLeftRoom(Player otherPlayer) // 플레이어가 방을 나갔을 때
     {
+        UserProfileLoad.RemoveUserProfile(otherPlayer.ActorNumber); //나간 플레이어 UI 업데이트
+
         // 방장이 아닌 플레이어는 버튼 비활성화
         RoomSetBtn.interactable = PhotonNetwork.IsMasterClient;
 
         //현재 접속 인원 업데이트
         PlayersUpdate();
-        //UnityEngine.Debug.Log("다른 플레이어 방 나감");
+
+        Debug.Log("다른 플레이어 방 나감");
     }
  
     public void LeaveRoom() // 방을 나갈때
@@ -355,10 +396,10 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         if (PhotonNetwork.InRoom)
         {
             //나의 퇴장을 모두에게 알리기
-            PV.RPC("EnterState", RpcTarget.All, UserInfoManager.instance.MyName, false);
+            //PV.RPC("EnterState", RpcTarget.All, UserInfoManager.instance.MyName, false);
 
             // 본인의 정보 삭제 요청을 방장에게 전달
-            UserProfileLoad.PV.RPC("RequestRemoveUserInfo", RpcTarget.MasterClient, UserInfoManager.instance.MyActNum);
+            //UserProfileLoad.PV.RPC("RequestRemoveUserInfo", RpcTarget.MasterClient, UserInfoManager.instance.MyActNum);
 
             //로딩바 ui 애니메이션 보여주기
             LoadingSceneController.Instance.LoadScene("Main");
@@ -417,7 +458,6 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
         Debug.Log("누군가의 채팅이 도착했습니다");
     }
 
-    [PunRPC]
     public void EnterState(string enteruserName, bool isbool) //유저의 입장 퇴장 메시지 알리미
     {
         // 내가 입장/퇴장했음을 알리는 메시지 띄우기

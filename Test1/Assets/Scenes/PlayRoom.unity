@@ -3009,9 +3009,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 874691621}
-        m_TargetAssemblyTypeName: GameResult, Assembly-CSharp
-        m_MethodName: OnConfirmButton
+      - m_Target: {fileID: 1884434056}
+        m_TargetAssemblyTypeName: TurnManager, Assembly-CSharp
+        m_MethodName: LeaveRoom
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -8979,10 +8979,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: c5ac001d15a97ec44a0c9dd9a2e82ccf, type: 3}
   - {fileID: 21300000, guid: 623524c3b9ab0554cb61476f0063e6ee, type: 3}
   - {fileID: 21300000, guid: eebe400fed789c546b814d459be063ab, type: 3}
-  players: []
-  userNameList: []
-  userImageList: 
-  sortedPlayers: 
+  ActPlayerIntList: 
 --- !u!114 &617193426
 MonoBehaviour:
   m_ObjectHideFlags: 0

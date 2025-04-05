@@ -63,6 +63,7 @@ public class ObjectManager : MonoBehaviourPun
     public Vector3 startDragPosition; // 드래그 시작 위치
 
 
+
     private void Start()
     {
         // 방의 난이도 불러오기
