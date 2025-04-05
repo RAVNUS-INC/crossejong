@@ -12,15 +12,17 @@ using UnityEngine.SceneManagement;
 using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
-//using static UnityEditor.Progress;
+using ExitGames.Client.Photon; // Photon에서 사용하는 
 using static UnityEngine.EventSystems.PointerEventData;
 using Button = UnityEngine.UI.Button;
 using Debug = UnityEngine.Debug;
 using Image = UnityEngine.UI.Image;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 //방 생성 및 방 참여에 관한 코드
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
+    private static LobbyManager instance;
 
     // 방 생성 관련 UI
     [SerializeField] TMP_InputField input_RoomName; //방 이름
@@ -52,11 +54,21 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     // 생성된 방 이름을 저장하는 변수
     private string selectedRoomName = null;
     // 난이도 변경 객체 참조
-    public ChangeLevel Changelevel; 
+    public ChangeLevel Changelevel;
 
     private void Awake() 
     {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject); // 중복 방지
+        }
+
         ResetRoomSetPanel(); // 첫 메인 접속 시 최초 실행
+        
     }
 
     // 방 만들 때 선택 옵션 버튼과 방이름 규칙에 관한 초기화(방 속성 x버튼 누를때도 실행-초기화)
@@ -431,10 +443,45 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom() // 방에 입장했을 때 자동 호출
     {
-        //Debug.Log("방 입장 성공!");
-
         // 메시지 큐 정지
-        PhotonNetwork.IsMessageQueueRunning = false;
+        //PhotonNetwork.IsMessageQueueRunning = false;
+
+        UserInfoManager.instance.MyActNum = PhotonNetwork.LocalPlayer.ActorNumber; //액터넘버
+
+        Hashtable update = new Hashtable
+        {
+            { "PlayerJoined", UserInfoManager.instance.MyActNum }, //액터넘버
+            { "PlayerName", UserInfoManager.instance.MyName }, //내 이름
+            { "PlayerProfile", UserInfoManager.instance.MyImageIndex } //사진 인덱스
+        };
+
+        PhotonNetwork.CurrentRoom.SetCustomProperties(update);
+    }
+
+    public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged) //방에 처음 들어왔을 때만 수행되는 함수
+    {
+        if (propertiesThatChanged.ContainsKey("PlayerJoined"))
+        {
+            int joinedActorNumber = (int)propertiesThatChanged["PlayerJoined"];
+            string joinedName = (string)propertiesThatChanged["PlayerName"];
+            int joinedImageIndex = (int)propertiesThatChanged["PlayerProfile"];
+
+            // 본인은 제외 (이미 방 입장 시점에 OnJoinedRoom에서 처리했으므로)
+            if (joinedActorNumber != PhotonNetwork.LocalPlayer.ActorNumber)
+            {
+                // TODO: 새 유저 입장 감지 후 행동 실행
+                Debug.Log($"플레이어 넘버: {joinedActorNumber} 입장!");
+                Debug.Log($"플레이어 이름 {joinedName}");
+                Debug.Log($"플레이어 사진 {joinedImageIndex}");
+            }
+
+            // TODO: 유저 입장 감지 후 행동 실행
+            Debug.Log($"플레이어 넘버: {joinedActorNumber} 입장!");
+            Debug.Log($"플레이어 이름 {joinedName}");
+            Debug.Log($"플레이어 사진 {joinedImageIndex}");
+
+
+        }
     }
 
     public override void OnJoinRoomFailed(short returnCode, string message) // 방 입장에 실패했을 때
