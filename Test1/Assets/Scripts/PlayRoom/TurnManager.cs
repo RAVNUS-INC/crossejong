@@ -15,6 +15,8 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Image = UnityEngine.UI.Image;
 using DG.Tweening;
 using Button = UnityEngine.UI.Button;
+using System.Linq; // 꼭 필요함!
+
 
 public class TurnManager : MonoBehaviourPunCallbacks
 {
@@ -54,6 +56,9 @@ public class TurnManager : MonoBehaviourPunCallbacks
             // "timeLimit" 값을 가져옴
             TimeLimit = (int)PhotonNetwork.CurrentRoom.CustomProperties["timeLimit"];
         }
+
+        //리스트 복제해놓기
+        gameResult.allActorNums = userProfileLoad.ActPlayerIntList.ToList();
     }
 
     // 카운트다운 3 2 1 후 실행
@@ -313,6 +318,10 @@ public class TurnManager : MonoBehaviourPunCallbacks
                 // 나갈때 내가 턴이 아니라면?
                 Debug.Log("현재 턴: X. 게임을 퇴장합니다.");   
             }
+
+            //방장에게 자신의 단어완성횟수 전달
+            photonView.RPC("ReceiveUserData", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer.ActorNumber, ObjectManager.instance.MyCompleteWordCount);
+
             //나가기
             PhotonNetwork.LeaveRoom();
         }
@@ -414,15 +423,14 @@ public class TurnManager : MonoBehaviourPunCallbacks
             {
                 CardCount[currentIndex].text = "나감";
 
-                if (PhotonNetwork.LocalPlayer.IsMasterClient) //방장이 나간 사람의 프로퍼티를 기록해줌
-                {
-                    Hashtable hash = new Hashtable();
-                    hash[$"Left_{leftNum}"] = true;
-                    PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
-                }
+                //if (PhotonNetwork.LocalPlayer.IsMasterClient) //방장이 나간 사람의 프로퍼티를 기록해줌
+                //{
+                //    Hashtable hash = new Hashtable();
+                //    hash[$"Left_{leftNum}"] = true;
+                //    PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
 
-                //리스트 복제해놓기
-                gameResult.allActorNums = userProfileLoad.ActPlayerIntList;
+                //    Debug.Log("나간 유저의 값을 기록했습니다");
+                //}
 
                 //액터넘버 삭제하기
                 userProfileLoad.ActPlayerIntList.Remove(leftNum);
@@ -447,8 +455,6 @@ public class TurnManager : MonoBehaviourPunCallbacks
         int index = userProfileLoad.ActPlayerIntList.IndexOf(Actnum);
         return index;
     }
-
-    
 
     [PunRPC]
     public void ShowEndGameMsg() // 모두에게 게임 종료 알림 메시지를 띄우도록 하고, 자신의 코루틴이 진행중이라면 종료
@@ -517,6 +523,23 @@ public class TurnManager : MonoBehaviourPunCallbacks
         // 알람메시지 없애기
         ObjectManager.instance.AlaramMsg.gameObject.SetActive(false);
     }
+
+    [PunRPC]
+    public void ReceiveUserData(int senderActorNum, int data) //방장이 나간 유저의 완성횟수를 전달받음
+    {
+        Debug.Log($"유저 {senderActorNum} 로부터 받은 데이터: {data}");
+
+        if (PhotonNetwork.LocalPlayer.IsMasterClient) //방장이 나간 사람의 프로퍼티를 기록해줌
+        {
+            Hashtable hash = new Hashtable();
+            hash[$"Left_{senderActorNum}"] = true;
+            hash[$"CompletedWords_{senderActorNum}"] = data;
+            PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
+
+            Debug.Log("나간 유저의 값을 기록했습니다");
+        }
+    }
+
 
 
     [PunRPC]

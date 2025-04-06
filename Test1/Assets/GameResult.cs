@@ -71,6 +71,9 @@ public class GameResult : MonoBehaviourPunCallbacks
         Hashtable roomProps = PhotonNetwork.CurrentRoom.CustomProperties;
         var allPlayers = PhotonNetwork.CurrentRoom.Players;
 
+        string result = string.Join(", ", allActorNums);
+        //Debug.Log("[체크]복제리스트 " + result);
+
         foreach (int actNum in allActorNums)
         {
             string leftKey = $"Left_{actNum}";
@@ -93,7 +96,10 @@ public class GameResult : MonoBehaviourPunCallbacks
         Dictionary<int, (int cardCount, int wordCount)> actorToCardCount = new Dictionary<int, (int, int)>();
         List<int> leavers = new List<int>();
 
-        foreach(int actorNum in allActorNums) // 전체 유저 기준
+        string result = string.Join(", ", allActorNums);
+        Debug.Log("[계산]복제리스트 " + result);
+
+        foreach (int actorNum in allActorNums) // 전체 유저 기준
         {
             string leftKey = $"Left_{actorNum}";
             string cardKey = $"CardLeft_{actorNum}";
@@ -104,12 +110,14 @@ public class GameResult : MonoBehaviourPunCallbacks
             if (isLeaver)
             {
                 leavers.Add(actorNum); // 나간 유저는 따로 저장
+                //Debug.Log("나간 유저 추가 성공");
             }
             else if (roomProps.ContainsKey(cardKey) && roomProps.ContainsKey(wordKey))
             {
                 int cardCount = (int)roomProps[cardKey];
                 int wordCount = (int)roomProps[wordKey];
                 actorToCardCount[actorNum] = (cardCount, wordCount);
+                //Debug.Log("기존 유저 추가 성공");
             }
         }
 
@@ -121,7 +129,7 @@ public class GameResult : MonoBehaviourPunCallbacks
         // 마지막에 나간 유저들 붙이기
         sortedPlayers.AddRange(leavers);
 
-        Debug.Log("정렬된 플레이어 순서 (ActorNumber): " + string.Join(", ", sortedPlayers));
+        Debug.Log("최종 액터넘버 순위 (ActorNumber): " + string.Join(", ", sortedPlayers));
 
         int index = 0;
         foreach (int actorNum in sortedPlayers)
@@ -136,17 +144,22 @@ public class GameResult : MonoBehaviourPunCallbacks
             ResultUserName[index].text = currentPlayerName;
             ResultUserImg[index].sprite = userProfileLoad.profileImages[currentPlayerImgIndex];
 
-            // 나간 유저라면 이름과 이미지 대신 "나감" 표시
-            if (leavers.Contains(actorNum))
-            {
-                ResultWordCount[index].text = "나감";
-            }
-            else
-            {
-                // UI 채우기
-                int wordCount = (int)roomProps[$"CompletedWords_{actorNum}"];
-                ResultWordCount[index].text = $"{wordCount}회";
-            }
+            // UI 채우기
+            int wordCount = (int)roomProps[$"CompletedWords_{actorNum}"];
+            ResultWordCount[index].text = $"{wordCount}회";
+
+            //// 나간 유저라면 이름과 이미지 대신 "나감" 표시
+            //if (leavers.Contains(actorNum))
+            //{
+            //    ResultWordCount[index].text = "나감";
+            //}
+            //else
+            //{
+            //    // UI 채우기
+            //    int wordCount = (int)roomProps[$"CompletedWords_{actorNum}"];
+            //    ResultWordCount[index].text = $"{wordCount}회";
+            //}
+
             index++;
         }
     }

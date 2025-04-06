@@ -75,7 +75,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             Main.instance.GetUserDisplayName(); //유저 네임 불러와서 텍스트로 표시
             Main.instance.GetUserBirth(); //유저 출생연도 불러오기만 하기
             Main.instance.profilePanel.SetActive(false); //프로필 패널 비활성화
-            ResetRoomSetPanel();
         }
         else
         {
@@ -93,14 +92,18 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         }
     }
 
+    private void Start()
+    {
+        ResetRoomSetPanel(); //방 생성 패널 초기화
+    }
+
     public override void OnJoinedLobby() //Lobby 진입에 성공했으면 호출되는 함수
     {
         Debug.Log("로비 진입 성공");
         Main.instance.GetProfileImageIndex(); // PlayFab에서 저장된 이미지 인덱스를 불러와 이미지 업데이트
         Main.instance.GetUserDisplayName(); //유저 네임 불러와서 텍스트로 표시
         Main.instance.GetUserBirth(); //유저 출생연도 불러오기만 하기
-        Main.instance.profilePanel.SetActive(false); //프로필 패널 비활성화
-        ResetRoomSetPanel();
+        Main.instance.profilePanel.SetActive(false); //프로필 패널 비활성화  
     }
 
     // 방 만들 때 선택 옵션 버튼과 방이름 규칙에 관한 초기화(방 속성 x버튼 누를때도 실행-초기화)
