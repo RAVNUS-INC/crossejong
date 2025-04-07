@@ -44,8 +44,10 @@ public class UserCard : MonoBehaviourPun
     {
         int playerCount = userProfileLoad.ActPlayerIntList.Count; // 현재 방의 플레이어 수
         Debug.Log($"플레이어수: {playerCount}");
+
         int cardCount = GetCardCount(playerCount); // 인원 수에 따른 카드 장수 결정
         Debug.Log($"카드장수: {cardCount}");
+
         for (int i = 0; i < userProfileLoad.ActPlayerIntList.Count; i++) //players수만큼 반복
         {
             // 방장만 랜덤으로 11장의 카드 인덱스를 뽑음
@@ -63,7 +65,7 @@ public class UserCard : MonoBehaviourPun
     {
         switch (playerCount)
         {
-            case 1: return 8;
+            case 1: return 15; //혼자하기의 경우 
             case 2: return 11;
             case 3: return 10;
             case 4: return 9;

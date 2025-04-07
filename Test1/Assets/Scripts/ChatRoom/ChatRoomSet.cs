@@ -371,11 +371,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
 
     public override void OnPlayerEnteredRoom(Player newPlayer) // 내가 아닌 새로운 플레이어가 입장한 경우
     {
-        //// 방장이 아닌 플레이어는 버튼 비활성화
-        //RoomSetBtn.interactable = PhotonNetwork.IsMasterClient;
 
-        //현재 접속 인원 업데이트
-        //PlayersUpdate();
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer) // 플레이어가 방을 나갔을 때
@@ -436,11 +432,11 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     public void UserReadyState() //준비 버튼에 직접 연결(준비 상태 알리는 역할, 방장은 이동까지 수행)
     {
         // 테스트 시에만 주석처리, 실제 빌드 시 주석지우기!
-        //if (PhotonNetwork.CurrentRoom.PlayerCount <= 1)
-        //{
-        //    Debug.Log("방에 1명 이하만 존재하므로 실행하지 않음.");
-        //    return;
-        //}
+        if (PhotonNetwork.CurrentRoom.PlayerCount <= 1)
+        {
+            Debug.Log("방에 1명 이하만 존재하므로 실행하지 않음.");
+            return;
+        }
 
         ReadyBtn.interactable = false; // 버튼 한번 눌렀으면 다음부턴 비활성화(준비 취소 불가능)
 

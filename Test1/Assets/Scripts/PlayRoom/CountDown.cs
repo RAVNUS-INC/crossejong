@@ -18,10 +18,17 @@ public class Countdown : MonoBehaviourPun
     public FieldCard fieldCard;
     public TurnManager turnMananger;
     public TurnChange turnChange;
+    public GameResult gameResult;
+    public UserProfileLoad userProfileLoad;
 
     private void Start()
     {
         WaitingPanel.SetActive(true); // 맨 처음엔 패널 활성화
+
+        if (PhotonNetwork.PlayerList.Length == 1) //만약 혼자하기라면
+        {
+            photonView.RPC("StartCountDown", RpcTarget.MasterClient); //스스로 타이머 시작
+        }
     }
 
     [PunRPC]
@@ -65,6 +72,11 @@ public class Countdown : MonoBehaviourPun
 
     private void StartGame() // 방장만 수행
     {
+        //리스트 복제해놓기
+        gameResult.allActorNums = userProfileLoad.ActPlayerIntList;
+        string result = string.Join(", ", gameResult.allActorNums);
+        Debug.Log("[시작]복제리스트 " + result);
+
         ObjectManager.instance.IsMyTurn = true;
 
         userCard.FirstUserCardArea(); // 방장이 카드를 몇장씩 뽑아 플레이어들에게 나눠줌

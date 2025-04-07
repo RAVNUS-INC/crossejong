@@ -17931,6 +17931,8 @@ MonoBehaviour:
   fieldCard: {fileID: 910563715}
   turnMananger: {fileID: 1884434056}
   turnChange: {fileID: 542433695}
+  gameResult: {fileID: 874691621}
+  userProfileLoad: {fileID: 617193425}
 --- !u!114 &1304853457
 MonoBehaviour:
   m_ObjectHideFlags: 0

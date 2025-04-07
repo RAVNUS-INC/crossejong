@@ -24,9 +24,15 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 {
 
     // 방 생성 관련 UI
+    public GameObject RoomSet_A_Panel; //혼자하기 방 패널(활성화 여부에 따른 처리)
+
     [SerializeField] TMP_InputField input_RoomName; //방 이름
+
     [SerializeField] Button[] btn_MaxPlayers, btn_Difficulty, btn_TimeLimit; // 최대인원, 난이도, 제한시간 버튼
+    [SerializeField] Button[] btn_Difficulty_A, btn_TimeLimit_A; // 최대인원, 난이도, 제한시간 버튼(혼자 하기 패널)
+
     [SerializeField] Image[] PlayerSel, DiffSel, TimeSel; //선택된 상태를 나타내는 이미지 배열
+    [SerializeField] Image[] DiffSel_A, TimeSel_A; //선택된 상태를 나타내는 이미지 배열(혼자 하기 패널)
 
     // 방 생성 시 이름 규칙 경고메시지
     [SerializeField] TMP_Text warningText;
@@ -97,6 +103,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     private void Start()
     {
         ResetRoomSetPanel(); //방 생성 패널 초기화
+        ResetRoomSetPanel_Alone(); //패널A 초기화
     }
 
     public override void OnJoinedLobby() //Lobby 진입에 성공했으면 호출되는 함수
@@ -131,6 +138,26 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         Changelevel.ChangeLevelLow();
 
         UnityEngine.Debug.Log("메인화면 초기화 완료");
+    }
+
+    public void ResetRoomSetPanel_Alone()
+    {
+        // 기본 버튼 설정값 (0,0,0) 노란색으로 표시
+        SetDefaultSelection(0);
+
+        //혼자하기 버튼
+        DifficultySet(btn_Difficulty_A);
+        TimeLimitSet(btn_TimeLimit_A);
+
+        // 기본 설정인 초급 난이도로 초기화
+        Changelevel.ChangeLevelLow();
+
+        UnityEngine.Debug.Log("메인화면 초기화 완료_A");
+    }
+
+    public void StartGameAlone() //혼자하기-시작하기 버튼 클릭 시 바로 플레이룸 이동
+    {
+
     }
 
     private void MaxPlayerSet(Button[] buttons)
@@ -314,12 +341,20 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                 PlayerSel[i].gameObject.SetActive(true);
                 TimeSel[i].gameObject.SetActive(true);
                 DiffSel[i].gameObject.SetActive(true);
+                //혼자하기
+                TimeSel_A[i].gameObject.SetActive(true);
+                DiffSel_A[i].gameObject.SetActive(true);
+
             }
             else
             {
                 PlayerSel[i].gameObject.SetActive(false);
                 TimeSel[i].gameObject.SetActive(false);
                 DiffSel[i].gameObject.SetActive(false);
+                //혼자하기
+                TimeSel_A[i].gameObject.SetActive(false);
+                DiffSel_A[i].gameObject.SetActive(false);
+
             }
         }
 
@@ -332,17 +367,31 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         {
             if (i == selectedIndex) //현재 선택한 인덱스와 i값이 같을때
             {
-                if (buttons == btn_MaxPlayers)
+                if (buttons == btn_MaxPlayers) //최대인원 버튼 선택
                 {
                     PlayerSel[i].gameObject.SetActive(true);
                 }
-                else if (buttons == btn_TimeLimit)
+                else if (buttons == btn_TimeLimit || buttons == btn_TimeLimit_A) //제한시간 버튼 선택
                 {
-                    TimeSel[i].gameObject.SetActive(true);
+                    if (RoomSet_A_Panel.gameObject.activeSelf)
+                    {
+                        TimeSel_A[i].gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        TimeSel[i].gameObject.SetActive(true);
+                    }
                 }
-                else
+                else if (buttons == btn_Difficulty || buttons == btn_Difficulty_A) //난이도 버튼 선택
                 {
-                    DiffSel[i].gameObject.SetActive(true);
+                    if (RoomSet_A_Panel.gameObject.activeSelf)
+                    {
+                        DiffSel_A[i].gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        DiffSel[i].gameObject.SetActive(true);
+                    }
                 }
             }
             else //현재 선택한 인덱스와 i값이 다를때
@@ -351,13 +400,27 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                 {
                     PlayerSel[i].gameObject.SetActive(false);
                 }
-                else if (buttons == btn_TimeLimit)
+                else if (buttons == btn_TimeLimit || buttons == btn_TimeLimit_A) //제한시간 버튼 선택
                 {
-                    TimeSel[i].gameObject.SetActive(false);
+                    if (RoomSet_A_Panel.gameObject.activeSelf)
+                    {
+                        TimeSel_A[i].gameObject.SetActive(false);
+                    }
+                    else
+                    {
+                        TimeSel[i].gameObject.SetActive(false);
+                    }      
                 }
-                else
+                else if (buttons == btn_Difficulty || buttons == btn_Difficulty_A) //난이도 버튼 선택
                 {
-                    DiffSel[i].gameObject.SetActive(false);
+                    if (RoomSet_A_Panel.gameObject.activeSelf)
+                    {
+                        DiffSel_A[i].gameObject.SetActive(false);
+                    }
+                    else
+                    {
+                        DiffSel[i].gameObject.SetActive(false);
+                    }
                 }
             }
         }
@@ -443,17 +506,27 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             {"timeLimit", selectedTimeLimit}  // 제한시간 int값(15,30,45)
         };
 
-        //로비에도 보이게 할 것인가?(목록에)->건드리면 X
-        options.CustomRoomPropertiesForLobby = new string[] { "difficulty", "timeLimit" };
+        if (!string.IsNullOrWhiteSpace(input_RoomName.text)) //2인 이상 방을 만든다면(방이름 존재) 로비에 보이게
+        {
+            //방 생성
+            PhotonNetwork.CreateRoom(input_RoomName.text, options);
 
-        //방 목록에 보이게 할것인가?
-        options.IsVisible = true;
+            //로비에도 보이게 할 것인가?(목록에)->건드리면 X
+            options.CustomRoomPropertiesForLobby = new string[] { "difficulty", "timeLimit" };
 
-        //방 생성
-        PhotonNetwork.CreateRoom(input_RoomName.text, options);
+            //방 목록에 보이게 할것인가?
+            options.IsVisible = true;
 
-        //로딩바 ui 애니메이션 보여주기
-        LoadingSceneController.Instance.LoadScene("MakeRoom");
+            //로딩바 ui 애니메이션 보여주기
+            LoadingSceneController.Instance.LoadScene("MakeRoom");
+        }
+        else //아니면 안보이게
+        {
+            input_RoomName.text = "Default";
+
+            //방 생성
+            PhotonNetwork.CreateRoom(input_RoomName.text, options);
+        }            
     }
 
     public override void OnCreatedRoom() // 방 생성에 성공했을 때
@@ -480,9 +553,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom() // 방에 입장했을 때 자동 호출
     {
-        // 메시지 큐 정지
-        //PhotonNetwork.IsMessageQueueRunning = false;
-
         UserInfoManager.instance.MyActNum = PhotonNetwork.LocalPlayer.ActorNumber; //액터넘버
 
         Hashtable update = new Hashtable
@@ -517,6 +587,11 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             //Debug.Log($"플레이어 이름 {joinedName}");
             //Debug.Log($"플레이어 사진 {joinedImageIndex}");
 
+            if (input_RoomName.text == "Default") //현재 혼자하기로 방에 들어온거라면
+            {
+                //바로 플레이룸으로 이동
+                LoadingSceneController.Instance.LoadScene("PlayRoom");
+            }
 
         }
     }

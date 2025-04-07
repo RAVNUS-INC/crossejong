@@ -181,8 +181,7 @@ public class TurnChange : MonoBehaviourPun
             APIStatusMsg.text = "오류";
             RollBackAreas();
             ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
-            ObjectManager.instance.ShowMessageFor2Seconds("만든 단어와 입력한 단어가 일치하지 않습니다.");
-            //ObjectManager.instance.AlaramMsg.text = "만든 단어와 입력한 단어가 일치하지 않습니다.";
+            ObjectManager.instance.AlaramMsg.text = "만든 단어와 입력한 단어가 일치하지 않습니다.";
         }
         cardInputField.gameObject.SetActive(false);
         CardDropBtn.gameObject.SetActive(true);

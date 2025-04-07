@@ -62,8 +62,6 @@ public class ObjectManager : MonoBehaviourPun
     public Button RollBackBtn; //롤백버튼은 놓은 게 있으면 활성화
     public Vector3 startDragPosition; // 드래그 시작 위치
 
-
-
     private void Start()
     {
         // 방의 난이도 불러오기
@@ -110,8 +108,17 @@ public class ObjectManager : MonoBehaviourPun
     }
     public void ShowCardSelectingMessage(bool isDragging)
     {
-        // 드래그 중(카드 고르는 중)을 알리는 메시지를 모두에게 표시
-        photonView.RPC("ShowDragStatus", RpcTarget.All, isDragging, UserInfoManager.instance.MyName);
+        if (PhotonNetwork.PlayerList.Length != 1) //만약 다인원의 방이라면
+        {
+            // 드래그 중(카드 고르는 중)을 알리는 메시지를 모두에게 표시
+            photonView.RPC("ShowDragStatus", RpcTarget.All, isDragging, UserInfoManager.instance.MyName);
+        }
+        else
+        {
+            //상태메시지 비우기
+            StatusMsg.text = "";
+        }
+        
     }
    
     [PunRPC]
@@ -125,18 +132,5 @@ public class ObjectManager : MonoBehaviourPun
         {
             ObjectManager.instance.StatusMsg.text = $"{name}님이 단어를 입력 중..";
         }
-    }
-
-    // 메시지를 2초 동안 띄우는 메서드
-    public void ShowMessageFor2Seconds(string message)
-    {
-        StartCoroutine(ShowMessageCoroutine(message));
-    }
-
-    private IEnumerator ShowMessageCoroutine(string message)
-    {
-        AlaramMsg.text = message;  // 메시지 설정
-        yield return new WaitForSeconds(2.5f);  // 2초 기다리기
-        AlaramMsg.text = "";  // 메시지 제거
     }
 }

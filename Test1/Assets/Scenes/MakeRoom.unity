@@ -20569,10 +20569,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: c5ac001d15a97ec44a0c9dd9a2e82ccf, type: 3}
   - {fileID: 21300000, guid: 623524c3b9ab0554cb61476f0063e6ee, type: 3}
   - {fileID: 21300000, guid: eebe400fed789c546b814d459be063ab, type: 3}
-  players: []
-  userNameList: []
-  userImageList: 
-  sortedPlayers: 
+  ActPlayerIntList: 
 --- !u!114 &1800025133
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20828,7 +20825,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1347379074}
   m_HandleRect: {fileID: 1347379073}
   m_Direction: 2
-  m_Value: 1
+  m_Value: 0
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
