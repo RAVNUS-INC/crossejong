@@ -84,7 +84,6 @@ public class TurnChange : MonoBehaviourPun
                     ObjectManager.instance.dropCount = 0;
                     ObjectManager.instance.inputWords = wordInput;
                     StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
-                    isContinue = false;
                 }
                 else
                 {
@@ -102,11 +101,6 @@ public class TurnChange : MonoBehaviourPun
                 {
                     for (int j = 0; j < 19; j++)
                     {
-                        if (isContinue == false)
-                        {
-                            break;
-                        }
-
                         if (ObjectManager.instance.dropCount != 0)
                         {
                             if (ObjectManager.instance.createdWords[i] == charList[j])  // 자음카드가 포함된 경우
