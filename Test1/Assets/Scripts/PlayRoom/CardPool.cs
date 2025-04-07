@@ -173,7 +173,7 @@ public class CardPool : MonoBehaviour
         {
             GameObject foundCard = cards.Find(c => c.name == name); // 이름으로 검색
             randomCards.Add(foundCard);
-            Debug.Log($"랜덤카드 '{name}' 생성됨");
+            //Debug.Log($"랜덤카드 '{name}' 생성됨");
         }
         return randomCards;
     }

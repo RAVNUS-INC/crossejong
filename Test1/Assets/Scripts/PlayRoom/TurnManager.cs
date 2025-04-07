@@ -11,9 +11,12 @@ using static UserProfileLoad;
 using PlayFab.ClientModels;
 using Unity.VisualScripting;
 using UnityEngine.UIElements;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 using Image = UnityEngine.UI.Image;
 using DG.Tweening;
 using Button = UnityEngine.UI.Button;
+using System.Linq; // 꼭 필요함!
+
 
 public class TurnManager : MonoBehaviourPunCallbacks
 {
@@ -53,6 +56,9 @@ public class TurnManager : MonoBehaviourPunCallbacks
             // "timeLimit" 값을 가져옴
             TimeLimit = (int)PhotonNetwork.CurrentRoom.CustomProperties["timeLimit"];
         }
+
+        //리스트 복제해놓기
+        gameResult.allActorNums = userProfileLoad.ActPlayerIntList.ToList();
     }
 
     // 카운트다운 3 2 1 후 실행
@@ -90,19 +96,19 @@ public class TurnManager : MonoBehaviourPunCallbacks
     [PunRPC]
     public void CurrentTurnUI(int nextnum)  // 현재 턴 UI 모두에게 같은 모습으로 표시
     {
-        for (int i = 0; i < userProfileLoad.sortedPlayers.Length; i++)
+        for (int i = 0; i < userProfileLoad.ActPlayerIntList.Count; i++)
         {
-            if (nextnum == userProfileLoad.sortedPlayers[i])
+            if (nextnum == userProfileLoad.ActPlayerIntList[i])
             {
                 // 현재 턴인 플레이어 UI 설정
                 userProfileLoad.InRoomUserList[i].gameObject.SetActive(false);
                 InTurnUserList[i].gameObject.SetActive(true);
 
                 // 이미지 및 이름 정보 업데이트
-                int index = userProfileLoad.userImageList[i];
+                int index = (int)userProfileLoad.GetProfileIndexByActorNumber(nextnum);
                 InTurnUserImg[i].sprite = userProfileLoad.profileImages[index];
 
-                string name = userProfileLoad.userNameList[i];
+                string name = userProfileLoad.GetUserNameByActorNumber(nextnum);
                 InTurnUserName[i].text = name;
 
                 // 프로필 이미지 위에 검은 그림자 추가
@@ -122,9 +128,9 @@ public class TurnManager : MonoBehaviourPunCallbacks
     [PunRPC]
     void UpdateTimerRPC(int nextnum, float time) // 남아있는 시간 UI 업데이트
     {
-        for (int i = 0; i < userProfileLoad.sortedPlayers.Length; i++)
+        for (int i = 0; i < userProfileLoad.ActPlayerIntList.Count; i++)
         {
-            if (nextnum == userProfileLoad.sortedPlayers[i])
+            if (nextnum == userProfileLoad.ActPlayerIntList[i])
             {
                 timerText[i].text = Mathf.CeilToInt(time).ToString(); // 남은 시간을 정수로 표시
                 timerImages[i].fillAmount = time / TimeLimit; //남은 시간에 맞게 타이머이미지 업데이트
@@ -171,8 +177,8 @@ public class TurnManager : MonoBehaviourPunCallbacks
             // 나는 게임 턴에서 이제 제외됨
             ObjectManager.instance.EndMyTurn = true;
 
-            // 모두에게 턴 제외 리스트 추가 및 동기화 요청(uI인덱스 번호를 넘겨줌)
-            photonView.RPC("UpdateExcludedList", RpcTarget.All, ObjectManager.instance.MyIndexNum);
+            // 모두에게 턴 제외 리스트 추가 및 동기화 요청(액터 번호를 넘겨줌)
+            photonView.RPC("UpdateExcludedList", RpcTarget.All, UserInfoManager.instance.MyActNum);
         }
 
     }
@@ -206,16 +212,16 @@ public class TurnManager : MonoBehaviourPunCallbacks
         // 다음 플레이어의 인덱스를 계산 (마지막 플레이어일 경우 순환)
         int CurrentIndex = ObjectManager.instance.MyIndexNum;
 
-        int NextIndex = (CurrentIndex + 1) % userProfileLoad.sortedPlayers.Length; // 다음 인덱스 계산
+        int NextIndex = (CurrentIndex + 1) % userProfileLoad.ActPlayerIntList.Count; // 다음 인덱스 계산
 
         while (ObjectManager.instance.turnExcluded.Contains(NextIndex)) //포함하지 않을때까지 돌림
         {
             CurrentIndex = NextIndex;  // 현재 인덱스 갱신
-            NextIndex = (CurrentIndex + 1) % userProfileLoad.sortedPlayers.Length;  // 다음 인덱스 계산
+            NextIndex = (CurrentIndex + 1) % userProfileLoad.ActPlayerIntList.Count;  // 다음 인덱스 계산
         }
 
         // 다음 플레이어의 액터 넘버
-        int nextActorNumber = userProfileLoad.sortedPlayers[NextIndex];
+        int nextActorNumber = userProfileLoad.ActPlayerIntList[NextIndex];
 
         NextPlayerNum = nextActorNumber;
 
@@ -312,14 +318,9 @@ public class TurnManager : MonoBehaviourPunCallbacks
                 // 나갈때 내가 턴이 아니라면?
                 Debug.Log("현재 턴: X. 게임을 퇴장합니다.");   
             }
-            // 나가기 전 나의 프로필을 모두가 비활성화 하도록 요청
-            photonView.RPC("LeftUserActive", RpcTarget.All, UserInfoManager.instance.MyActNum);
 
-            // 액터넘버 번호 삭제 요청하기, 기존의 ui 변화 주의
-            userProfileLoad.photonView.RPC("RequestRemoveUserInfo", RpcTarget.MasterClient, UserInfoManager.instance.MyActNum);
-
-            //// 네트워크 및 로컬 객체 삭제
-            //DestroyPlayRoomAndAllChildren();
+            //방장에게 자신의 단어완성횟수 전달
+            photonView.RPC("ReceiveUserData", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer.ActorNumber, ObjectManager.instance.MyCompleteWordCount);
 
             //나가기
             PhotonNetwork.LeaveRoom();
@@ -376,10 +377,12 @@ public class TurnManager : MonoBehaviourPunCallbacks
         int leftNum = otherPlayer.ActorNumber;
         Debug.Log($"나간 유저의 액터넘버: {leftNum}");
 
-        // 만약 현재 방에 있는 플레이어가 2명 미만이라면 - 결과는 정해짐
-        // 멀티 테스트 시 주석 해제
+        LeftUserActive(leftNum); //프로필 비활성화
 
-        if (userProfileLoad.sortedPlayers.Length < 2)
+        // 만약 현재 방에 있는 플레이어가 1명 뿐이라면
+        // 또는 현재 턴에 있는 사람이 1명 뿐이라면
+        // 멀티 테스트 시 주석 해제
+        if (userProfileLoad.ActPlayerIntList.Count < 2 || (ObjectManager.instance.turnExcluded.Count == userProfileLoad.ActPlayerIntList.Count - 1))
         {
             if (ObjectManager.instance.IsMyTurn) //현재 내 턴일 때
             {
@@ -396,16 +399,42 @@ public class TurnManager : MonoBehaviourPunCallbacks
         }
     }
 
-    [PunRPC]
-    public void LeftUserActive(int leftNum)
+    public void LeftUserActive(int leftNum) //누군가 나갔을 때나 턴제외 상황 ui처리
     {
         // 플레이어 목록에서 현재 플레이어의 인덱스를 찾음
-        int currentIndex = Array.IndexOf(userProfileLoad.sortedPlayers, leftNum);
+        int currentIndex = FindMyIndex(leftNum);
 
         if (currentIndex >= 0)
         {
-            userProfileLoad.InRoomUserList[currentIndex].gameObject.SetActive(false);
+            // 기본 프로필만 활성화
+            userProfileLoad.InRoomUserList[currentIndex].gameObject.SetActive(true);
             InTurnUserList[currentIndex].gameObject.SetActive(false);
+
+            // 기본적으로 프로필 이미지 위에 검은 그림자 추가
+            userProfileLoad.InRoomUserImg[currentIndex].color = overlayColor;
+
+
+            //현재 유저가 방에 있다면 ->관전 중, 그게 아니면 나간 상태
+            if (PhotonNetwork.CurrentRoom.PlayerCount == userProfileLoad.ActPlayerIntList.Count)
+            {
+                CardCount[currentIndex].text = "관전";
+            }
+            else
+            {
+                CardCount[currentIndex].text = "나감";
+
+                //if (PhotonNetwork.LocalPlayer.IsMasterClient) //방장이 나간 사람의 프로퍼티를 기록해줌
+                //{
+                //    Hashtable hash = new Hashtable();
+                //    hash[$"Left_{leftNum}"] = true;
+                //    PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
+
+                //    Debug.Log("나간 유저의 값을 기록했습니다");
+                //}
+
+                //액터넘버 삭제하기
+                userProfileLoad.ActPlayerIntList.Remove(leftNum);
+            }
         }
         else
         {
@@ -421,28 +450,50 @@ public class TurnManager : MonoBehaviourPunCallbacks
         InTurnCardCount[index].text = myCount.ToString();
     }
 
-    public void FindMyIndex() // 내 액터넘버를 바탕으로 현재 나의 UI 인덱스 위치 찾기
+    public int FindMyIndex(int Actnum) // 내 액터넘버를 바탕으로 현재 나의 UI 인덱스 위치 찾기
     {
-        // 플레이어 목록에서 현재 플레이어의 인덱스를 찾음
-        ObjectManager.instance.MyIndexNum = Array.IndexOf(userProfileLoad.sortedPlayers, UserInfoManager.instance.MyActNum);
-    }
-
-    [PunRPC]
-    public void ShowResultPopup() 
-    {
-        gameResult.EndMsg.gameObject.SetActive(false); // 게임 종료 메시지 비활성화
-        gameResult.GameResultPopup.gameObject.SetActive(true); // 게임 종료 팝업 활성화
+        int index = userProfileLoad.ActPlayerIntList.IndexOf(Actnum);
+        return index;
     }
 
     [PunRPC]
     public void ShowEndGameMsg() // 모두에게 게임 종료 알림 메시지를 띄우도록 하고, 자신의 코루틴이 진행중이라면 종료
     {
+        //카드 개수, 단어 완성횟수 전달하기
+        int myactnum = UserInfoManager.instance.MyActNum;
+        Hashtable hash = new Hashtable();
+
+        hash[$"CompletedWords_{myactnum}"] = ObjectManager.instance.MyCompleteWordCount;
+        hash[$"CardLeft_{myactnum}"] = UserCard.instance.displayedCards.Count;
+        hash[$"Left_{myactnum}"] = false;
+
+        PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
+
+        Debug.Log("나의 완성횟수를 모두에게 전달했습니다");
+
         gameResult.ResultPanel.gameObject.SetActive(true); // 게임 결과 판넬 활성화(배경)
         gameResult.EndMsg.gameObject.SetActive(true); // 게임 종료 메시지 활성화
         gameResult.EndMsg.text = "놀이 종료!";
+    }
 
-        gameResult.photonView.RPC("UpdateResultData", RpcTarget.All, UserInfoManager.instance.MyActNum, ObjectManager.instance.MyCompleteWordCount); // 모두에게 자신의 결과를 전달함 - 완성횟수와 액터넘버
-        Debug.Log("나의 완성횟수를 모두에게 전달했습니다");
+    [PunRPC]
+    public void ShowResultPopup()
+    {
+        gameResult.EndMsg.gameObject.SetActive(false); // 게임 종료 메시지 비활성화
+        gameResult.GameResultPopup.gameObject.SetActive(true); // 게임 종료 팝업 활성화
+    }
+
+    public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
+    {
+        // "Left_" 키가 하나라도 포함되어 있으면 체크
+        foreach (var key in propertiesThatChanged.Keys)
+        {
+            if (key.ToString().StartsWith("Left_"))
+            {
+                gameResult.CheckIfAllPlayersSubmitted();
+                break;
+            }
+        }
     }
 
     [PunRPC]
@@ -473,6 +524,23 @@ public class TurnManager : MonoBehaviourPunCallbacks
         ObjectManager.instance.AlaramMsg.gameObject.SetActive(false);
     }
 
+    [PunRPC]
+    public void ReceiveUserData(int senderActorNum, int data) //방장이 나간 유저의 완성횟수를 전달받음
+    {
+        Debug.Log($"유저 {senderActorNum} 로부터 받은 데이터: {data}");
+
+        if (PhotonNetwork.LocalPlayer.IsMasterClient) //방장이 나간 사람의 프로퍼티를 기록해줌
+        {
+            Hashtable hash = new Hashtable();
+            hash[$"Left_{senderActorNum}"] = true;
+            hash[$"CompletedWords_{senderActorNum}"] = data;
+            PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
+
+            Debug.Log("나간 유저의 값을 기록했습니다");
+        }
+    }
+
+
 
     [PunRPC]
     private void RequestTurnMsg(string turnUsername) // 현재 턴 메시지를 모두가 업데이트하는 함수
@@ -481,17 +549,17 @@ public class TurnManager : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    private void UpdateExcludedList(int UserIndex)
+    private void UpdateExcludedList(int UserNum)
     {
+        int UserIndex = FindMyIndex(UserNum);
+
         // 턴 제외 리스트에 해당 유저를 추가
         ObjectManager.instance.turnExcluded.Add(UserIndex);
 
-        // 해당 유저 이미지 비활성화 상태로 보이게
-        userProfileLoad.InRoomUserImg[UserIndex].color = overlayColor;
-        InTurnUserImg[UserIndex].color = overlayColor;
+        LeftUserActive(UserNum); //프로필 비활성화
 
         // 턴에서 제외된 사람의 수가 현재 게임 내 플레이어 수 - 1의 값과 같다면(턴에 한 명만 남은 상태)
-        if (ObjectManager.instance.turnExcluded.Count == userProfileLoad.sortedPlayers.Length - 1)
+        if (ObjectManager.instance.turnExcluded.Count == userProfileLoad.ActPlayerIntList.Count - 1)
         {
             // 남은 한 명의 승리이므로 게임 결과창 표시 - 방장의 요청에 의해
             if (PhotonNetwork.IsMasterClient)

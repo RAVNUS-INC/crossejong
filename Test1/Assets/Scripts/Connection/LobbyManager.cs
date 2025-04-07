@@ -12,15 +12,17 @@ using UnityEngine.SceneManagement;
 using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
-//using static UnityEditor.Progress;
+using ExitGames.Client.Photon; // Photon에서 사용하는 
 using static UnityEngine.EventSystems.PointerEventData;
 using Button = UnityEngine.UI.Button;
 using Debug = UnityEngine.Debug;
 using Image = UnityEngine.UI.Image;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 //방 생성 및 방 참여에 관한 코드
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
+    private static LobbyManager instance;
 
     // 방 생성 관련 UI
     [SerializeField] TMP_InputField input_RoomName; //방 이름
@@ -54,6 +56,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     // 난이도 변경 객체 참조
     public ChangeLevel Changelevel;
 
+
     public static LobbyManager instance = null;
 
 
@@ -63,12 +66,47 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         {
             instance = this;
         }
-        else if (instance != this)
+        else
         {
-            Destroy(gameObject);
+            Destroy(gameObject); // 중복 방지
         }
 
-        ResetRoomSetPanel(); // 첫 메인 접속 시 최초 실행
+        if (PhotonNetwork.InLobby) //현재 로비에 있다면
+        {
+            Debug.Log("로비에 있음");
+            Main.instance.GetProfileImageIndex(); // PlayFab에서 저장된 이미지 인덱스를 불러와 이미지 업데이트
+            Main.instance.GetUserDisplayName(); //유저 네임 불러와서 텍스트로 표시
+            Main.instance.GetUserBirth(); //유저 출생연도 불러오기만 하기
+            Main.instance.profilePanel.SetActive(false); //프로필 패널 비활성화
+        }
+        else
+        {
+            //Debug.Log("로비에 없음");
+
+            if (UserInfoManager.instance.isFirstConnect) //이때 지금이 첫 로그인으로 들어온 경우라면
+            {
+                UserInfoManager.instance.isFirstConnect = false; //로비 재접속이 이후부턴 수행되도록
+            }
+            else
+            {
+                Debug.Log("로비 접속");
+                PhotonNetwork.JoinLobby(); //로비 접속 시도
+            }
+        }
+    }
+
+    private void Start()
+    {
+        ResetRoomSetPanel(); //방 생성 패널 초기화
+    }
+
+    public override void OnJoinedLobby() //Lobby 진입에 성공했으면 호출되는 함수
+    {
+        Debug.Log("로비 진입 성공");
+        Main.instance.GetProfileImageIndex(); // PlayFab에서 저장된 이미지 인덱스를 불러와 이미지 업데이트
+        Main.instance.GetUserDisplayName(); //유저 네임 불러와서 텍스트로 표시
+        Main.instance.GetUserBirth(); //유저 출생연도 불러오기만 하기
+        Main.instance.profilePanel.SetActive(false); //프로필 패널 비활성화  
     }
 
     // 방 만들 때 선택 옵션 버튼과 방이름 규칙에 관한 초기화(방 속성 x버튼 누를때도 실행-초기화)
@@ -443,10 +481,45 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom() // 방에 입장했을 때 자동 호출
     {
-        //Debug.Log("방 입장 성공!");
-
         // 메시지 큐 정지
-        PhotonNetwork.IsMessageQueueRunning = false;
+        //PhotonNetwork.IsMessageQueueRunning = false;
+
+        UserInfoManager.instance.MyActNum = PhotonNetwork.LocalPlayer.ActorNumber; //액터넘버
+
+        Hashtable update = new Hashtable
+        {
+            { "PlayerJoined", UserInfoManager.instance.MyActNum }, //액터넘버
+            { "PlayerName", UserInfoManager.instance.MyName }, //내 이름
+            { "PlayerProfile", UserInfoManager.instance.MyImageIndex } //사진 인덱스
+        };
+
+        PhotonNetwork.CurrentRoom.SetCustomProperties(update);
+    }
+
+    public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged) //방에 처음 들어왔을 때만 수행되는 함수
+    {
+        if (propertiesThatChanged.ContainsKey("PlayerJoined"))
+        {
+            int joinedActorNumber = (int)propertiesThatChanged["PlayerJoined"];
+            string joinedName = (string)propertiesThatChanged["PlayerName"];
+            int joinedImageIndex = (int)propertiesThatChanged["PlayerProfile"];
+
+            // 본인은 제외 (이미 방 입장 시점에 OnJoinedRoom에서 처리했으므로)
+            //if (joinedActorNumber != PhotonNetwork.LocalPlayer.ActorNumber)
+            //{
+            //      TODO: 새 유저 입장 감지 후 행동 실행
+            //      Debug.Log($"플레이어 넘버: {joinedActorNumber} 입장!");
+            //      Debug.Log($"플레이어 이름 {joinedName}");
+            //      Debug.Log($"플레이어 사진 {joinedImageIndex}");
+            //}
+
+            //TODO: 유저 입장 감지 후 행동 실행
+            //Debug.Log($"플레이어 넘버: {joinedActorNumber} 입장!");
+            //Debug.Log($"플레이어 이름 {joinedName}");
+            //Debug.Log($"플레이어 사진 {joinedImageIndex}");
+
+
+        }
     }
 
     public override void OnJoinRoomFailed(short returnCode, string message) // 방 입장에 실패했을 때

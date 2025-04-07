@@ -20,7 +20,7 @@ using TMPro;
 
 // 현재 방/게임에 접속한 플레이어들의 프로필과 이름 표시하는 스크립트(PlayerView)
 // UI관련 RPC
-public class UserProfileLoad : MonoBehaviourPun
+public class UserProfileLoad : MonoBehaviourPunCallbacks
 {
     // 인스펙터에서 PhotonView를 할당
     public PhotonView PV;
@@ -31,10 +31,7 @@ public class UserProfileLoad : MonoBehaviourPun
     public TMP_Text[] InRoomUserName; // 현재 방에 접속한 유저들의 닉네임
     public Sprite[] profileImages; // 3가지 기본 제공 이미지
 
-    public List<Player> players = new List<Player>(); // 플레이어 리스트
-    public string[] userNameList; // 유저 닉네임 리스트(디스플레이네임)
-    public int[] userImageList; // 유저 이미지 리스트(프로필사진)
-    public int[] sortedPlayers; // 정렬된 플레이어 리스트(액터넘버)
+    public List<int> ActPlayerIntList = new List<int>(); // 액터넘버 리스트
 
     void Awake() 
     {
@@ -43,178 +40,137 @@ public class UserProfileLoad : MonoBehaviourPun
 
     private void Start()
     {
-        // 현재 씬 이름이 "PlayRoom"인지 확인
-        if (SceneManager.GetActiveScene().name == "PlayRoom")
+        AddMyProfileToRoomProperties(UserInfoManager.instance.MyName, UserInfoManager.instance.MyImageIndex);
+    }
+
+    public void AddMyProfileToRoomProperties(string name, int profileIndex)
+    {
+        object existing;
+        PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("UserProfiles", out existing);
+
+        List<Hashtable> userList = new List<Hashtable>();
+
+        // 기존 데이터가 있다면 가져오기
+        if (existing != null)
         {
-            // 본인의 정보 추가를 방장에게 전달 - userProfileLoad 내 함수 실행
-            PV.RPC("RequestAddPlayerInfo", RpcTarget.MasterClient, UserInfoManager.instance.MyName, UserInfoManager.instance.MyImageIndex, UserInfoManager.instance.MyActNum);
+            var rawArray = (object[])existing;
+            foreach (var obj in rawArray)
+            {
+                userList.Add((Hashtable)obj);
+            }
+        }
+
+        int myActorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+        string myKey = "Player_" + myActorNumber;
+
+        // 중복 유저 체크
+        bool alreadyExists = userList.Any(u => (string)u["Key"] == myKey);
+
+        if (alreadyExists)
+        {
+            // 이미 존재하는 유저라면 UI 업데이트만 수행 ---- playroom에서 수행
+            Debug.Log("중복 유저 - 프로퍼티는 수정하지 않음, UI만 갱신");
+            UpdateRoomUserUIFromProperties(); // UI 수동 동기화
+
+            Debug.Log($"{ActPlayerIntList.Count}");
+            PV.RPC("RequestStartGame", RpcTarget.MasterClient);
+            return;
+        }
+
+        // 신규 유저 데이터 생성
+        Hashtable myData = new Hashtable
+        {
+            ["ActorNumber"] = myActorNumber,
+            ["Key"] = myKey,
+            ["Name"] = name,
+            ["Index"] = profileIndex
+        };
+
+        // 리스트에 추가
+        userList.Add(myData);
+
+        // Custom Properties에 저장
+        Hashtable updated = new Hashtable
+        {
+            ["UserProfiles"] = userList.ToArray() // object[]로 저장
+        };
+
+        PhotonNetwork.CurrentRoom.SetCustomProperties(updated);
+    }
+
+
+    public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged) //누군가 들어오면 이를 UI 업데이트
+    {
+        if (propertiesThatChanged.ContainsKey("UserProfiles"))
+        {
+            UpdateRoomUserUIFromProperties();
         }
     }
 
-    // players 리스트를 외부에서 접근할 수 있도록 메서드 제공
-    public List<Player> GetPlayers()
+    public void RemoveUserProfile(int actorNumber) //누군가 나가면 제거, UI 재업데이트
     {
-        return players;
-    }
+        // 나간 유저 퇴장 메시지 띄우기
+        string name = GetUserNameByActorNumber(actorNumber);
+        ChatRoomSet.instance.EnterState(name, false);
 
-    [PunRPC]
-    public void RequestAddPlayerInfo(string displayName, int imgIndex, int myActNum) // 방장만 실행
-    {
-        if (!PhotonNetwork.IsMasterClient) return; 
+        object existing;
+        PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("UserProfiles", out existing);
 
-        // 방장이 플레이어를 리스트에 추가
-        players.Add(new Player(displayName, imgIndex, myActNum));
+        if (existing == null) return;
 
-        // 모든 유저에게 동기화 요청
-        SyncPlayerList();
+        var rawArray = (object[])existing;
+        List<Hashtable> userList = new List<Hashtable>();
 
-        // 현재 플레이방에 있으며, 방 속성에서 설정한 인원과 리스트 길이가 같을 때 -> 카운트다운 실행
-        //if ((SceneManager.GetActiveScene().name == "PlayRoom") && (players.Count == PhotonNetwork.CurrentRoom.MaxPlayers))
-
-        if ((SceneManager.GetActiveScene().name == "PlayRoom"))
+        foreach (var obj in rawArray)
         {
-            Debug.Log("모든 플레이어 입장 완료!");
-
-            // 모두가 입장했으므로 자신을 포함한 모두에게 카운트다운 실행 요청
-            // 1초 뒤에 RPC 호출
-            Invoke("StartCountDownAll", 1f);
+            var user = (Hashtable)obj;
+            if (user.ContainsKey("ActorNumber") && (int)user["ActorNumber"] != actorNumber)
+            {
+                userList.Add(user);
+            }
         }
 
+        // 방 프로퍼티 갱신
+        Hashtable updated = new Hashtable();
+        updated["UserProfiles"] = userList.ToArray();
+        PhotonNetwork.CurrentRoom.SetCustomProperties(updated);
+
+        PrintAllUserProfiles();
+
     }
+
+    public void UpdateRoomUserUIFromProperties() // UI 업데이트
+    {
+        object existing;
+        if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("UserProfiles", out existing))
+        {
+            var rawList = (object[])existing;
+
+            ActPlayerIntList.Clear(); // 액터넘버 리스트 비우기
+            SetActive(); //객체 초기화 비활성화
+
+            for (int i = 0; i < rawList.Length && i < InRoomUserList.Length; i++)
+            {
+                Hashtable userData = (Hashtable)rawList[i];
+                string name = (string)userData["Name"];
+                int profileIndex = (int)userData["Index"];
+                int actnum = (int)userData["ActorNumber"];
+
+                InRoomUserList[i].SetActive(true);
+                InRoomUserName[i].text = name;
+                InRoomUserImg[i].sprite = profileImages[profileIndex];
+
+                ActPlayerIntList.Add(actnum); // 액터넘버리스트 추가
+            }
+
+            Debug.Log("ActPlayerIntList: " + string.Join(", ", ActPlayerIntList));
+        }
+    }
+
+
     void StartCountDownAll()
     {
         countDown.photonView.RPC("StartCountDown", RpcTarget.All);
-    }
-
-    [PunRPC]
-    public void RequestRemoveUserInfo(int userNum) //players 리스트에서 삭제하는 과정
-    {
-        if (!PhotonNetwork.IsMasterClient) return; // 방장만 실행
-
-        //직접 삭제
-        players.RemoveAll(p => p.myActNum == userNum);
-        Debug.Log($"플레이어 {userNum}가 리스트에서 제거됨.");
-
-        // 만약 플레이방에서 누군가 퇴장했을 때 - UI의 변화는 제외해야 함
-        if (SceneManager.GetActiveScene().name == "PlayRoom")
-        {
-            if (!PhotonNetwork.IsMasterClient) return;
-
-            // actnum 리스트 재정렬
-            OrderedPlayers();
-
-            PV.RPC("UpdatePlayerListNotUI", RpcTarget.All,
-                players.Select(p => p.displayName).ToArray(),
-                players.Select(p => p.imgIndex).ToArray(),
-                players.Select(p => p.myActNum).ToArray(),
-                sortedPlayers);
-        }
-        else
-        {
-            // 모든 유저에게 동기화 요청
-            SyncPlayerList();
-        }
-    }
-
-    void SyncPlayerList() // 방장만 실행->모두에게 리스트 ui업뎃 요청
-    {
-        if (!PhotonNetwork.IsMasterClient) return;
-
-        // actnum 리스트 재정렬
-        OrderedPlayers();
-
-        PV.RPC("UpdatePlayerList", RpcTarget.All,
-            players.Select(p => p.displayName).ToArray(),
-            players.Select(p => p.imgIndex).ToArray(),
-            players.Select(p => p.myActNum).ToArray(),
-            sortedPlayers);
-    }
-
-    [PunRPC]
-    void UpdatePlayerList(string[] names, int[] imgIndexes, int[] actNums, int[] playerList)
-    {
-        players.Clear(); //처음엔 초기화
-        players = names.Select((t, i) => new Player(t, imgIndexes[i], actNums[i])).ToList();
-
-        //actnum 오름차순 리스트를 모두가 갱신받음
-        sortedPlayers = playerList;
-
-        // 유저들 이름 리스트를 모두가 갱신받음
-        userNameList = names;
-
-        // 유저들 사진 리스트를 모두가 갱신받음
-        userImageList = imgIndexes;
-
-        Debug.Log($"플레이어 수에 따른 리스트 동기화 완료");
-
-        UpdatePlayerViewUI();
-    }
-
-    [PunRPC]
-    void UpdatePlayerListNotUI(string[] names, int[] imgIndexes, int[] actNums, int[] playerList)
-    {
-        players.Clear(); //처음엔 초기화
-        players = names.Select((t, i) => new Player(t, imgIndexes[i], actNums[i])).ToList();
-
-        //actnum 오름차순 리스트를 모두가 갱신받음
-        sortedPlayers = playerList;
-
-        // 유저들 이름 리스트를 모두가 갱신받음
-        userNameList = names;
-
-        // 유저들 사진 리스트를 모두가 갱신받음
-        userImageList = imgIndexes;
-
-        Debug.Log($"플레이어 리스트 동기화됨.");
-
-    }
-
-    void UpdatePlayerViewUI() // 접속자 프로필 활성화
-    {
-        // 초기에 모든 프로필 오브젝트 비활성화
-        SetActive();
-
-        int myIndex = 1;
-        // 가장 작은 ActorNumber 찾기 == 방장
-        int masterActorNumber = GetMasterActorNumber();
-
-        // 방장과 방장이 아닌 유저들 모두 업데이트
-        foreach (var player in players)
-        {
-            if (player.myActNum == masterActorNumber) //방장이면
-            {
-                InRoomUserList[0].SetActive(true); // 프로필을 활성화
-                InRoomUserName[0].text = player.displayName; //이름 텍스트 표시
-                InRoomUserImg[0].sprite = profileImages[player.imgIndex]; // 이미지 표시
-                continue;
-            }
-            else //방장이 아니면
-            {
-                InRoomUserList[myIndex].SetActive(true); // 플레이어의 프로필 활성화
-                InRoomUserName[myIndex].text = player.displayName;  // 플레이어의 이름 텍스트 표시
-                InRoomUserImg[myIndex].sprite = profileImages[player.imgIndex]; // 플레이어의 이미지 표시
-                myIndex++;
-            }
-
-        }
-    }
-
-    // 플레이어 정보를 관리하는 클래스
-    [System.Serializable]
-    public class Player
-    {
-        public string displayName;
-        public int imgIndex;
-        public int myActNum;
-        public int completeCount;   // 단어 완성 횟수 (추가된 필드)
-
-        public Player(string displayName, int imgIndex, int myActNum)
-        {
-            this.displayName = displayName;
-            this.imgIndex = imgIndex;
-            this.myActNum = myActNum;
-            this.completeCount = -1;  // 기본값 -1로 초기화
-        }
     }
 
     public void SetActive()
@@ -226,28 +182,82 @@ public class UserProfileLoad : MonoBehaviourPun
         }
     }
 
-    //반복문을 사용하여 가장 작은 ActorNumber 찾기 == 방장
-    public int GetMasterActorNumber()
+    [PunRPC]
+    public void RequestStartGame() //방장이 요청받아 수행
     {
-        int masterActorNumber = int.MaxValue;  // 초기값을 최대값으로 설정
-
-        // players 리스트에서 가장 작은 ActorNumber를 찾음
-        foreach (var player in players)
+        if ((PhotonNetwork.CurrentRoom.PlayerCount == ActPlayerIntList.Count))
         {
-            if (player.myActNum < masterActorNumber)
-            {
-                masterActorNumber = player.myActNum;
-            }
+            Debug.Log("모든 플레이어 입장 완료!");
+
+            // 모두가 입장했으므로 자신을 포함한 모두에게 카운트다운 실행 요청
+            // 1초 뒤에 RPC 호출
+            Invoke("StartCountDownAll", 1f);
         }
-        return masterActorNumber;
     }
 
-    public void OrderedPlayers() //actnum을 오름차순으로 정렬한 int 리스트
-    { 
-        // players 리스트를 myActNum 기준으로 오름차순 정렬
-        sortedPlayers = players.OrderBy(player => player.myActNum)
-                                   .Select(player => player.myActNum)
-                                   .ToArray();
-        Debug.Log($"오름차순 정렬 완료: {string.Join(", ", sortedPlayers)}");
+    public int? GetProfileIndexByActorNumber(int targetActorNumber)
+    {
+        object existingProfilesObj;
+        if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("UserProfiles", out existingProfilesObj))
+        {
+            object[] userProfiles = (object[])existingProfilesObj;
+
+            foreach (object profileObj in userProfiles)
+            {
+                Hashtable profile = (Hashtable)profileObj;
+                if ((int)profile["ActorNumber"] == targetActorNumber)
+                {
+                    return (int)profile["Index"]; // profileIndex 반환
+                }
+            }
+        }
+
+        return null; // 못 찾은 경우
+    }
+    public string GetUserNameByActorNumber(int targetActorNumber)
+    {
+        object existingProfilesObj;
+        if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("UserProfiles", out existingProfilesObj))
+        {
+            object[] userProfiles = (object[])existingProfilesObj;
+
+            foreach (object profileObj in userProfiles)
+            {
+                Hashtable profile = (Hashtable)profileObj;
+                if ((int)profile["ActorNumber"] == targetActorNumber)
+                {
+                    return (string)profile["Name"]; // 이름 반환
+                }
+            }
+        }
+
+        return null; // 못 찾은 경우
+    }
+
+    public void PrintAllUserProfiles()
+    {
+        object existingProfilesObj;
+        if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("UserProfiles", out existingProfilesObj))
+        {
+            object[] userProfiles = (object[])existingProfilesObj;
+
+            Debug.Log($"[UserProfiles] 현재 총 {userProfiles.Length}명의 데이터가 있습니다:");
+
+            foreach (object profileObj in userProfiles)
+            {
+                Hashtable profile = (Hashtable)profileObj;
+
+                int actorNum = (int)profile["ActorNumber"];
+                string name = (string)profile["Name"];
+                int index = (int)profile["Index"];
+                string key = (string)profile["Key"];
+
+                Debug.Log($" - ActorNumber: {actorNum}, Name: {name}, Index: {index}, Key: {key}");
+            }
+        }
+        else
+        {
+            Debug.Log("UserProfiles가 존재하지 않습니다.");
+        }
     }
 }

@@ -39,18 +39,36 @@ public class UserCard : MonoBehaviourPun
     public List<GameObject> displayedCards; // UserCardArea에서 보여지는 카드 리스트
 
 
-    //UserCardArea로 11개의 랜덤 카드 이동
+    //UserCardArea로 인원 수에 따라 특정 개수의 랜덤 카드 이동
     public void FirstUserCardArea()
     {
-        for (int i = 0; i < userProfileLoad.sortedPlayers.Length; i++) //players수만큼 반복
+        int playerCount = userProfileLoad.ActPlayerIntList.Count; // 현재 방의 플레이어 수
+        Debug.Log($"플레이어수: {playerCount}");
+        int cardCount = GetCardCount(playerCount); // 인원 수에 따른 카드 장수 결정
+        Debug.Log($"카드장수: {cardCount}");
+        for (int i = 0; i < userProfileLoad.ActPlayerIntList.Count; i++) //players수만큼 반복
         {
             // 방장만 랜덤으로 11장의 카드 인덱스를 뽑음
             // 직렬화(list->int[])수행(rpc함수는 list를 인자로 받지 못함)
-            string[] randomnames = cardPool.GetRandomCardsName(11);
+            string[] randomnames = cardPool.GetRandomCardsName(cardCount);
 
             // 방장이 자신을 포함한 모든 유저에게 11장의 카드를 추가, 배치하도록 요청
             photonView.RPC("AddCardObjectToAll", RpcTarget.All, randomnames, i);
 
+        }
+    }
+
+    // 인원 수에 따라 카드 장수를 반환하는 함수
+    private int GetCardCount(int playerCount)
+    {
+        switch (playerCount)
+        {
+            case 1: return 8;
+            case 2: return 11;
+            case 3: return 10;
+            case 4: return 9;
+            case 5: return 7;
+            default: return 11; // 기본값 (예외처리)
         }
     }
 
@@ -59,10 +77,10 @@ public class UserCard : MonoBehaviourPun
     void AddCardObjectToAll(string[] RandomNames, int count)
     {
         // 정렬된 리스트를 반복문으로 순차적으로 처리
-        if (userProfileLoad.sortedPlayers[count] == UserInfoManager.instance.MyActNum)
+        if (userProfileLoad.ActPlayerIntList[count] == UserInfoManager.instance.MyActNum)
         {
-            Debug.Log($"나는 현재 {count}번째 유저: Num {userProfileLoad.sortedPlayers[count]}");
-            TurnChange.instance.APIStatusMsg.text = $"나는 현재 {count}번째 유저";
+            Debug.Log($"나는 현재 {count}번째 유저: Num {userProfileLoad.ActPlayerIntList[count]}");
+            //TurnChange.instance.APIStatusMsg.text = $"나는 현재 {count}번째 유저";
 
             List<GameObject> randomCards = cardPool.GetRandomCardsObject(RandomNames); //랜덤인덱스에 해당하는 오브젝트 추가
             cardPool.GetCardsToTarGetArea(randomCards, userCardContainer, displayedCards); // 디스플레이 카드 상태 업데이트

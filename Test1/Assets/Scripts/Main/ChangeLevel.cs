@@ -23,7 +23,7 @@ public class ChangeLevel : MonoBehaviour
         "아", "안", "어", "오", "요", "우", "음", "이", "인", "일",
         "자", "장", "전", "정", "제", "주", "지", "진",
         "하", "한", "해" };
-        Debug.Log(string.Join(", ", cardFrontBlack));
+        //Debug.Log(string.Join(", ", cardFrontBlack));
 
         cardFrontSpecial = new List<string>
        {"C", "B"};
@@ -44,7 +44,7 @@ public class ChangeLevel : MonoBehaviour
         "아", "안", "용", "원", "위", "유", "의", "이", "인", "일",
         "자", "장", "전", "정", "제", "조", "주", "지",
         "해", "화" };
-        Debug.Log(string.Join(", ", cardFrontBlack));
+        //Debug.Log(string.Join(", ", cardFrontBlack));
 
         cardFrontSpecial = new List<string>
        {"C", "B"};
@@ -66,7 +66,7 @@ public class ChangeLevel : MonoBehaviour
         "자", "장", "재", "전", "정", "제", "조", "주", "지", "진",
         "천",
         "학", "호", "화"};
-        Debug.Log(string.Join(", ", cardFrontBlack));
+        //Debug.Log(string.Join(", ", cardFrontBlack));
 
         cardFrontSpecial = new List<string>
        {"C", "B"};
