@@ -535,14 +535,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
     [PunRPC]
     private void RequestTurnMsg(string turnUsername) // 현재 턴 메시지를 모두가 업데이트하는 함수
     {
-        if (PhotonNetwork.PlayerList.Length != 1) 
-        {
-            ObjectManager.instance.StatusMsg.text = $"{turnUsername}님의 차례";
-        }
-        else //만약 혼자하기라면
-        {
-            ObjectManager.instance.StatusMsg.text = "";
-        }   
+        ObjectManager.instance.StatusMsg.text = $"{turnUsername}님의 차례";
     }
 
     [PunRPC]

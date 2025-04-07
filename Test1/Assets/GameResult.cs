@@ -148,18 +148,6 @@ public class GameResult : MonoBehaviourPunCallbacks
             int wordCount = (int)roomProps[$"CompletedWords_{actorNum}"];
             ResultWordCount[index].text = $"{wordCount}회";
 
-            //// 나간 유저라면 이름과 이미지 대신 "나감" 표시
-            //if (leavers.Contains(actorNum))
-            //{
-            //    ResultWordCount[index].text = "나감";
-            //}
-            //else
-            //{
-            //    // UI 채우기
-            //    int wordCount = (int)roomProps[$"CompletedWords_{actorNum}"];
-            //    ResultWordCount[index].text = $"{wordCount}회";
-            //}
-
             index++;
         }
     }

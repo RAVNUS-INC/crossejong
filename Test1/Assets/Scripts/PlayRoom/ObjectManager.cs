@@ -108,17 +108,9 @@ public class ObjectManager : MonoBehaviourPun
     }
     public void ShowCardSelectingMessage(bool isDragging)
     {
-        if (PhotonNetwork.PlayerList.Length != 1) //만약 다인원의 방이라면
-        {
-            // 드래그 중(카드 고르는 중)을 알리는 메시지를 모두에게 표시
-            photonView.RPC("ShowDragStatus", RpcTarget.All, isDragging, UserInfoManager.instance.MyName);
-        }
-        else
-        {
-            //상태메시지 비우기
-            StatusMsg.text = "";
-        }
-        
+        // 드래그 중(카드 고르는 중)을 알리는 메시지를 모두에게 표시
+        photonView.RPC("ShowDragStatus", RpcTarget.All, isDragging, UserInfoManager.instance.MyName);
+
     }
    
     [PunRPC]
