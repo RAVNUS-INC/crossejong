@@ -8,6 +8,21 @@ using System.Text;
 
 public class SaveCreatedWords : MonoBehaviour
 {
+    public static SaveCreatedWords instance = null;
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+        }
+
+    }
+
     private List<string> userCreateWordData = new List<string>();  // 출생년도와 플레이어가 만든 단어와 횟수
     private string filePath;
     public string cardLevelInfo;
@@ -42,13 +57,13 @@ public class SaveCreatedWords : MonoBehaviour
             Debug.Log(userBirthYear + "_Userdata.csv 파일이 존재합니다.");
         }
 
-        //ClearCSVContent();
-
         LoadCSVData();
     }
 
     public void LoadCSVData()
     {
+        userCreateWordData.Clear();  // 기존 리스트 초기화
+
         string[] lines = File.ReadAllLines(filePath); // 모든 줄 읽기
 
         for (int i = 1; i < lines.Length; i++) // 첫 번째 줄(타이틀) 제외
@@ -66,10 +81,17 @@ public class SaveCreatedWords : MonoBehaviour
         }
     }
 
+    string NormalizeString(string input)
+    {
+        return input.Trim().Replace(" ", "").Normalize(NormalizationForm.FormC);
+    }
+
+
     public void AddWordToCSV(string userBirthYear,string newWord)
     {
         TurnChange.instance.APIStatusMsg.text = $"단어: {newWord}";
         bool wordExists = false;
+        string normalizedNewWord = NormalizeString(newWord);
 
         for (int i = 0; i < userCreateWordData.Count; i++)
         {
@@ -82,7 +104,9 @@ public class SaveCreatedWords : MonoBehaviour
             string word = rowData[2].Trim();
             int count = int.Parse(rowData[3].Trim());  //int로 변환
 
-            if (birthYear == userBirthYear && cardLevel == cardLevelInfo && word == newWord) // 출생년도와 난이도가 같은 기존 단어가 있다면
+            string existingWord = NormalizeString(word);
+
+            if (birthYear == userBirthYear && cardLevel == cardLevelInfo && existingWord == normalizedNewWord) // 출생년도와 난이도가 같은 기존 단어가 있다면
             {
                 count += 1; // 횟수 증가
                 userCreateWordData[i] = $"{birthYear},{cardLevel},{word},{count}"; // 업데이트
@@ -92,7 +116,7 @@ public class SaveCreatedWords : MonoBehaviour
             }
 
         }
-        if (!wordExists)
+        if (wordExists == false)
         {
             cardLevelInfo = LobbyManager.instance.selectedDifficulty;
             userCreateWordData.Add($"{userBirthYear},{cardLevelInfo},{newWord},1");

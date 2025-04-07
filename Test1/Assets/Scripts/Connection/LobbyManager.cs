@@ -22,7 +22,6 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 //规 积己 棺 规 曼咯俊 包茄 内靛
 public class LobbyManager : MonoBehaviourPunCallbacks
 {
-    private static LobbyManager instance;
 
     // 规 积己 包访 UI
     [SerializeField] TMP_InputField input_RoomName; //规 捞抚
