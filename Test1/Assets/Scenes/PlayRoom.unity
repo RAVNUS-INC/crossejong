@@ -9036,7 +9036,7 @@ MonoBehaviour:
   observableSearch: 0
   ObservedComponents:
   - {fileID: 0}
-  sceneViewId: 4
+  sceneViewId: 2
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1 &631174144
@@ -12885,7 +12885,7 @@ MonoBehaviour:
   observableSearch: 0
   ObservedComponents:
   - {fileID: 0}
-  sceneViewId: 2
+  sceneViewId: 4
   InstantiationId: 0
   isRuntimeInstantiated: 0
 --- !u!1 &929170726
@@ -20634,6 +20634,7 @@ MonoBehaviour:
   backgroundImage: {fileID: 1327255790}
   timerText: {fileID: 1541525224}
   timerDuration: 5
+  lastSceneName: 
 --- !u!1 &1484566894
 GameObject:
   m_ObjectHideFlags: 0
@@ -25610,6 +25611,7 @@ MonoBehaviour:
   userCard: {fileID: 11155626}
   userCardFullPopup: {fileID: 1768101437}
   fieldCard: {fileID: 910563715}
+  tutorialManager: {fileID: 1479674732}
   InTurnUserList:
   - {fileID: 1200990909}
   - {fileID: 52237293}

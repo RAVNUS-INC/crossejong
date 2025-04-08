@@ -27632,6 +27632,7 @@ MonoBehaviour:
   selectedDifficulty: "\uCD08\uAE09"
   rtContent: {fileID: 507353501}
   Changelevel: {fileID: 582928732}
+  tutorialManager: {fileID: 1587336239}
 --- !u!4 &1582562256
 Transform:
   m_ObjectHideFlags: 0
@@ -27710,6 +27711,7 @@ MonoBehaviour:
   backgroundImage: {fileID: 763758241}
   timerText: {fileID: 1229898113}
   timerDuration: 5
+  lastSceneName: 
 --- !u!4 &1587336240
 Transform:
   m_ObjectHideFlags: 0

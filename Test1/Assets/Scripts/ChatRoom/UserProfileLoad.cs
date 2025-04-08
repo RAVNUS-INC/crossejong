@@ -22,6 +22,8 @@ using TMPro;
 // UI관련 RPC
 public class UserProfileLoad : MonoBehaviourPunCallbacks
 {
+    public static UserProfileLoad instance;
+
     // 인스펙터에서 PhotonView를 할당
     public PhotonView PV;
 
@@ -36,6 +38,11 @@ public class UserProfileLoad : MonoBehaviourPunCallbacks
     void Awake() 
     {
         SetActive(); // 리스트 표시 비활성화
+
+        if (instance == null)
+        {
+            instance = this;
+        }
     }
 
     private void Start()
@@ -252,7 +259,7 @@ public class UserProfileLoad : MonoBehaviourPunCallbacks
                 int index = (int)profile["Index"];
                 string key = (string)profile["Key"];
 
-                Debug.Log($" - ActorNumber: {actorNum}, Name: {name}, Index: {index}, Key: {key}");
+                //Debug.Log($" - ActorNumber: {actorNum}, Name: {name}, Index: {index}, Key: {key}");
             }
         }
         else

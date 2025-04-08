@@ -29,6 +29,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
     public UserCard userCard; // 턴이 아닐 때 카드 객체 선택 방지를 위해 사용
     public UserCardFullPopup userCardFullPopup; // 턴이 아닐 때 카드 객체 선택 방지를 위해 사용
     public FieldCard fieldCard; //단어완성 성공 시 다른 유저들 보드판에 실제 업데이트
+    public TutorialManager tutorialManager; 
 
     public GameObject[] InTurnUserList; // 턴에 있는 상태의 유저 이미지 배열
     public Image[] InTurnUserImg, timerImages; // 턴에 있는 유저들의 프로필사진, 남은 타이머 UI 이미지
@@ -321,6 +322,8 @@ public class TurnManager : MonoBehaviourPunCallbacks
             //방장에게 자신의 단어완성횟수 전달
             photonView.RPC("ReceiveUserData", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer.ActorNumber, ObjectManager.instance.MyCompleteWordCount);
 
+            CheckLobbyManager.instance.Beforescene = "PlayRoom";
+
             //나가기
             PhotonNetwork.LeaveRoom();
         }
@@ -374,7 +377,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
     {
         // 나간 유저의 액터넘버 찾기
         int leftNum = otherPlayer.ActorNumber;
-        Debug.Log($"나간 유저의 액터넘버: {leftNum}");
+        //Debug.Log($"나간 유저의 액터넘버: {leftNum}");
 
         LeftUserActive(leftNum); //프로필 비활성화
 
@@ -449,6 +452,10 @@ public class TurnManager : MonoBehaviourPunCallbacks
     [PunRPC]
     public void ShowEndGameMsg() // 모두에게 게임 종료 알림 메시지를 띄우도록 하고, 자신의 코루틴이 진행중이라면 종료
     {
+        gameResult.ResultPanel.gameObject.SetActive(true); // 게임 결과 판넬 활성화(배경)
+        gameResult.EndMsg.gameObject.SetActive(true); // 게임 종료 메시지 활성화
+        gameResult.EndMsg.text = "놀이 종료!";
+
         //카드 개수, 단어 완성횟수 전달하기
         int myactnum = UserInfoManager.instance.MyActNum;
         Hashtable hash = new Hashtable();
@@ -459,11 +466,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
         PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
 
-        Debug.Log("나의 완성횟수를 모두에게 전달했습니다");
-
-        gameResult.ResultPanel.gameObject.SetActive(true); // 게임 결과 판넬 활성화(배경)
-        gameResult.EndMsg.gameObject.SetActive(true); // 게임 종료 메시지 활성화
-        gameResult.EndMsg.text = "놀이 종료!";
+        Debug.Log("나의 완성횟수를 업데이트했습니다");
     }
 
     [PunRPC]
@@ -480,6 +483,8 @@ public class TurnManager : MonoBehaviourPunCallbacks
         {
             if (key.ToString().StartsWith("Left_"))
             {
+                string result = string.Join(", ", gameResult.allActorNums);
+                Debug.Log($"[감지]복제본:{result}");
                 gameResult.CheckIfAllPlayersSubmitted();
                 break;
             }
@@ -524,9 +529,10 @@ public class TurnManager : MonoBehaviourPunCallbacks
             Hashtable hash = new Hashtable();
             hash[$"Left_{senderActorNum}"] = true;
             hash[$"CompletedWords_{senderActorNum}"] = data;
+
             PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
 
-            Debug.Log("나간 유저의 값을 기록했습니다");
+            //Debug.Log("나간 유저의 값을 기록했습니다");
         }
     }
 
