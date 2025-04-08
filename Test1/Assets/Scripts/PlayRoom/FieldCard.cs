@@ -118,7 +118,7 @@ public class FieldCard : MonoBehaviourPun
                 }
             }
         }
-        TurnChange.instance.APIStatusMsg.text = $"OnOffDropAreas 수행";
+        TurnChange.instance.APIStatusMsg.text = $"OnOffDropAreas 완료";
     }
         
 
@@ -333,7 +333,16 @@ public class FieldCard : MonoBehaviourPun
             Debug.Log($"첫 카드 '{i}' 받음");
             TurnChange.instance.APIStatusMsg.text = $"첫 카드 '{i}' 받음";
         }
-        List<GameObject> randomCards = cardPool.GetRandomCardsObject(usedNames);
+        List<GameObject> randomCards = null;
+        try
+        {
+            randomCards = cardPool.GetRandomCardsObject(usedNames);
+            TurnChange.instance.APIStatusMsg.text = $"랜덤카드 개수{randomCards.Count}";
+        }
+        catch (Exception e)
+        {
+            TurnChange.instance.APIStatusMsg.text = $"카드풀 에러";
+        }
 
         cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
         GameObject middleObejcts = ObjectManager.instance.grid[ObjectManager.instance.gridCount/2, ObjectManager.instance.gridCount / 2];
