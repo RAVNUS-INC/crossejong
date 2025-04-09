@@ -74,6 +74,16 @@ public class TurnChange : MonoBehaviourPun
 
         if (wordInput.Length > ObjectManager.instance.dropCount)
         {
+            if(ObjectManager.instance.createdWords != wordInput)
+            {
+                Debug.Log("오타입니다");
+                APIStatusMsg.text = "오타";
+                RollBackAreas();
+                ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
+                ObjectManager.instance.AlaramMsg.text = "만든 단어와 입력한 단어가 일치하지 않습니다.";
+                isContinue = false;
+            }
+
             if (ObjectManager.instance.dropCount != 0)
             {
                 if (ObjectManager.instance.createdWords.Contains(wordInput))  // 글자로 이루어진 단어일 경우
@@ -175,7 +185,7 @@ public class TurnChange : MonoBehaviourPun
             APIStatusMsg.text = "오류";
             RollBackAreas();
             ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
-            ObjectManager.instance.AlaramMsg.text = "만든 단어와 입력한 단어가 일치하지 않습니다.";
+            ObjectManager.instance.AlaramMsg.text = "입력한 단어가 낸 카드보다 작거나 같습니다.";
         }
         cardInputField.gameObject.SetActive(false);
         CardDropBtn.gameObject.SetActive(true);
