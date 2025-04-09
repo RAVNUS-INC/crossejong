@@ -3,6 +3,7 @@ using TMPro; // TextMeshPro를 사용하기 위한 네임스페이스
 using System.Collections;
 using UnityEngine.UI;
 using Photon.Pun;
+using System.Linq;
 
 public class Countdown : MonoBehaviourPun
 
@@ -72,11 +73,6 @@ public class Countdown : MonoBehaviourPun
 
     private void StartGame() // 방장만 수행
     {
-        //리스트 복제해놓기
-        gameResult.allActorNums = userProfileLoad.ActPlayerIntList;
-        string result = string.Join(", ", gameResult.allActorNums);
-        Debug.Log("[시작]복제리스트 " + result);
-
         ObjectManager.instance.IsMyTurn = true;
 
         userCard.FirstUserCardArea(); // 방장이 카드를 몇장씩 뽑아 플레이어들에게 나눠줌
@@ -94,6 +90,12 @@ public class Countdown : MonoBehaviourPun
     [PunRPC]
     private void LetsCardCount() // 자신의 카드 개수 업데이트
     {
+        //리스트 복제해놓기
+        gameResult.allActorNums = userProfileLoad.ActPlayerIntList.ToList();
+        string result = string.Join(", ", gameResult.allActorNums);
+
+        Debug.Log("[시작]복제리스트 " + result);
+
         turnChange.TurnEnd();
     }
 }

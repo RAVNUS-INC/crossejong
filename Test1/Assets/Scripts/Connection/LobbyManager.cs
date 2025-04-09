@@ -63,7 +63,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
 
     public static LobbyManager instance = null;
-
+    public TutorialManager tutorialManager;
 
     private void Awake()
     {
@@ -86,24 +86,54 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         }
         else
         {
-            //Debug.Log("로비에 없음");
+            Debug.Log("로비에 없음");
 
-            if (UserInfoManager.instance.isFirstConnect) //이때 지금이 첫 로그인으로 들어온 경우라면
+            if (CheckLobbyManager.instance.Beforescene == "Default") //이때 지금이 첫 로그인으로 들어온 경우라면
             {
-                UserInfoManager.instance.isFirstConnect = false; //로비 재접속이 이후부턴 수행되도록
+                Debug.Log("자동로그인 서버 연결 진행 중...");
             }
-            else
+            else //플레이룸이나 채팅방에 있다가 온거라면
             {
-                Debug.Log("로비 접속");
-                PhotonNetwork.JoinLobby(); //로비 접속 시도
+                //Debug.Log("마스터 서버에 연결됐을 때 로비 자동 접속을 위해 대기 중...");
+
+                if (PhotonNetwork.NetworkClientState == ClientState.ConnectedToMasterServer)
+                {
+                    Debug.Log("현재 마스터 서버에 연결되어 있음");
+
+                    if (PhotonNetwork.InLobby)
+                    {
+                        Debug.Log("이미 로비에 있음");
+                    }
+                    else
+                    {
+                        Debug.Log("로비 연결 시도");
+                        PhotonNetwork.JoinLobby();
+                    }
+                }
+                else
+                {
+                    Debug.Log("마스터 서버에 연결되어 있지 않음. 연결 시도 중...");
+                    PhotonNetwork.ConnectUsingSettings();
+                }
             }
         }
+
     }
 
     private void Start()
     {
         ResetRoomSetPanel(); //방 생성 패널 초기화
         ResetRoomSetPanel_Alone(); //패널A 초기화
+    }
+
+    public override void OnConnectedToMaster()
+    {
+        //자동로그인 첫 진입이 아닐 경우에만 수행
+        if (CheckLobbyManager.instance.Beforescene != "Default")
+        {
+            Debug.Log("마스터 서버 연결됨 → 로비 접속 시도");
+            PhotonNetwork.JoinLobby();
+        }
     }
 
     public override void OnJoinedLobby() //Lobby 진입에 성공했으면 호출되는 함수
@@ -153,11 +183,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
         Changelevel.ChangeLevelLow();
 
         UnityEngine.Debug.Log("메인화면 초기화 완료_A");
-    }
-
-    public void StartGameAlone() //혼자하기-시작하기 버튼 클릭 시 바로 플레이룸 이동
-    {
-
     }
 
     private void MaxPlayerSet(Button[] buttons)
@@ -517,6 +542,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             //방 목록에 보이게 할것인가?
             options.IsVisible = true;
 
+            //PhotonNetwork.IsMessageQueueRunning = false;
+
             //로딩바 ui 애니메이션 보여주기
             LoadingSceneController.Instance.LoadScene("MakeRoom");
         }
@@ -542,10 +569,13 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     public void OnClickJoinRoom() // 방 입장
     {
-        if (!string.IsNullOrEmpty(selectedRoomName)) //방이름이 뭐라도 있으면
+        if (!string.IsNullOrEmpty(selectedRoomName)) //방이름이 뭐라도 있으면(다인원 방)
         {
             PhotonNetwork.JoinRoom(selectedRoomName);    
         }
+
+        //PhotonNetwork.IsMessageQueueRunning = false;
+
         //로딩바 ui 애니메이션 보여주기
         LoadingSceneController.Instance.LoadScene("MakeRoom");
 
@@ -553,6 +583,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom() // 방에 입장했을 때 자동 호출
     {
+
         UserInfoManager.instance.MyActNum = PhotonNetwork.LocalPlayer.ActorNumber; //액터넘버
 
         Hashtable update = new Hashtable
@@ -592,7 +623,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                 //바로 플레이룸으로 이동
                 LoadingSceneController.Instance.LoadScene("PlayRoom");
             }
-
         }
     }
 

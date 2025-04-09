@@ -94,6 +94,7 @@ public class TurnChange : MonoBehaviourPun
                     ObjectManager.instance.dropCount = 0;
                     ObjectManager.instance.inputWords = wordInput;
                     StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
+                    APIStatusMsg.text = "86줄 밑";
                 }
                 else
                 {

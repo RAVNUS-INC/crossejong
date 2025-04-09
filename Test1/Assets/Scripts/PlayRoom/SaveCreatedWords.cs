@@ -30,10 +30,12 @@ public class SaveCreatedWords : MonoBehaviour
 
     public void ReadCSV(string userBirthYear)
     {
-        string directoryPath = Path.Combine(Application.dataPath, "Scripts/CSV");
+        string directoryPath = Path.Combine(Application.persistentDataPath, "Scripts/CSV");
+        TurnChange.instance.APIStatusMsg.text = "33밑";
         if (!Directory.Exists(directoryPath))
         {
             Directory.CreateDirectory(directoryPath);  // 폴더가 없으면 생성
+            TurnChange.instance.APIStatusMsg.text = "36밑";
             Debug.Log("CSV 폴더가 없어서 새로 생성했습니다.");
         }
         else
@@ -42,12 +44,15 @@ public class SaveCreatedWords : MonoBehaviour
         }
 
         Debug.Log("파일 경로를 불러옵니다");
-        filePath = Path.Combine(Application.dataPath, "Scripts/CSV/" + userBirthYear + "_Userdata.csv");
+        //filePath = Path.Combine(Application.dataPath, "Scripts/CSV/" + userBirthYear + "_Userdata.csv");
+        filePath = Path.Combine(Application.persistentDataPath, userBirthYear + "_Userdata.csv");
+        TurnChange.instance.APIStatusMsg.text = "45밑";
 
         Debug.Log(filePath);
 
         if (!File.Exists(filePath))
         {
+            TurnChange.instance.APIStatusMsg.text = "50밑";
             Debug.Log(userBirthYear + "_Userdata.csv 파일이 존재하지 않아 새로 생성합니다.");
 
             return;
@@ -56,8 +61,9 @@ public class SaveCreatedWords : MonoBehaviour
         {
             Debug.Log(userBirthYear + "_Userdata.csv 파일이 존재합니다.");
         }
-
+        TurnChange.instance.APIStatusMsg.text = "59밑";
         LoadCSVData();
+        TurnChange.instance.APIStatusMsg.text = "60밑";
     }
 
     public void LoadCSVData()
@@ -154,8 +160,11 @@ public class SaveCreatedWords : MonoBehaviour
     public void OnUserCreatesWord(string userBirthYear, string newWord)
     {
         Debug.Log("단어 저장을 시작합니다");
+        TurnChange.instance.APIStatusMsg.text = "156밑";
         ReadCSV(userBirthYear);
+        TurnChange.instance.APIStatusMsg.text = "157밑";
         AddWordToCSV(userBirthYear, newWord);
+        TurnChange.instance.APIStatusMsg.text = "158밑";
     }
 
     // CSV 파일을 지우는 함수 (필요시 사용)

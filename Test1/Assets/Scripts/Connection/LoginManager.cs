@@ -64,21 +64,19 @@ public class LoginManager : MonoBehaviour
         TouchPanel.SetActive(false);
 
         // 실제 앱 빌드 시 playerprefs정보 초기화 수행!
-
         //PlayerPrefs.DeleteAll();
         //PlayFabClientAPI.ForgetAllCredentials(); // 자동 로그인 방지 (PlayFab 인증 정보 초기화)
 
         // 자동 로그인 수행
         AutoLoginWithDeviceID();
 
+        //UnlinkDeviceID();
+
         //Debug.Log("PlayerPrefs 삭제 및 디바이스 연결 해제");
     }
 
     void Start() 
     {
-        // 로그인 상태 확인 및 첫 로그인 체크
-        //AutoLoginWithDeviceID();
-
         ResetPasswordToggle(); //토글 비활성화
         ResetWarningTexts(); //경고메시지 비활성화
 

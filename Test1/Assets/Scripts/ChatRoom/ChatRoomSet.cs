@@ -71,6 +71,8 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+        //PhotonNetwork.IsMessageQueueRunning = true;
+
         ChatField.text = ""; //채팅입력창은 항상 비워놓기
         ReadyBtn.interactable = true; // 처음에는 준비버튼 활성화
 
@@ -391,11 +393,7 @@ public class ChatRoomSet : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.InRoom)
         {
-            //나의 퇴장을 모두에게 알리기
-            //PV.RPC("EnterState", RpcTarget.All, UserInfoManager.instance.MyName, false);
-
-            // 본인의 정보 삭제 요청을 방장에게 전달
-            //UserProfileLoad.PV.RPC("RequestRemoveUserInfo", RpcTarget.MasterClient, UserInfoManager.instance.MyActNum);
+            CheckLobbyManager.instance.Beforescene = "MakeRoom";
 
             //로딩바 ui 애니메이션 보여주기
             LoadingSceneController.Instance.LoadScene("Main");
