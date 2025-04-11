@@ -77,10 +77,11 @@ public class Countdown : MonoBehaviourPun
 
         userCard.FirstUserCardArea(); // 방장이 카드를 몇장씩 뽑아 플레이어들에게 나눠줌
 
-        fieldCard.FirstFieldCard(); // 방장이 첫 카드 뽑아 모두에게 수행 추가 요청
-
         // 각자 모두 현재 카드 개수 세기 요청
         photonView.RPC("LetsCardCount", RpcTarget.All);
+
+        // 방장이 첫 카드 뽑아 모두에게 수행 추가 요청
+        fieldCard.FirstFieldCard(); 
 
         // 방장부터 첫 카운트 다운 시작
         turnMananger.AfterCountdown();
@@ -90,7 +91,7 @@ public class Countdown : MonoBehaviourPun
     [PunRPC]
     private void LetsCardCount() // 자신의 카드 개수 업데이트
     {
-        //리스트 복제해놓기
+        //플레이어 리스트 복제해놓기
         gameResult.allActorNums = userProfileLoad.ActPlayerIntList.ToList();
         string result = string.Join(", ", gameResult.allActorNums);
 

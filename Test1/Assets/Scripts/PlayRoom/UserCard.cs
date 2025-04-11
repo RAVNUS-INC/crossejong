@@ -56,7 +56,6 @@ public class UserCard : MonoBehaviourPun
 
             // 방장이 자신을 포함한 모든 유저에게 11장의 카드를 추가, 배치하도록 요청
             photonView.RPC("AddCardObjectToAll", RpcTarget.All, randomnames, i);
-
         }
     }
 
@@ -90,6 +89,7 @@ public class UserCard : MonoBehaviourPun
 
             // 카드를 배분받은 뒤, 드롭 영역 생성 수행
             fieldCard.CreateDropAreas();
+
         }
         else // 자신의 차례가 아니면 끝내기
         {
