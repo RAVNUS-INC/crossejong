@@ -74,33 +74,6 @@ public class TurnChange : MonoBehaviourPun
 
         if (wordInput.Length > ObjectManager.instance.dropCount)
         {
-            if(ObjectManager.instance.createdWords != wordInput)
-            {
-                Debug.Log("오타입니다");
-                APIStatusMsg.text = "오타";
-                RollBackAreas();
-                ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
-                ObjectManager.instance.AlaramMsg.text = "만든 단어와 입력한 단어가 일치하지 않습니다.";
-                isContinue = false;
-            }
-
-            if (ObjectManager.instance.dropCount != 0)
-            {
-                if (ObjectManager.instance.createdWords.Contains(wordInput))  // 글자로 이루어진 단어일 경우
-                {
-                    Debug.Log("글자로만 이루어진 단어를 사전 API 검사를 시작합니다");
-                    APIStatusMsg.text = "검사 시작";
-                    // wordInput  (사전 API 검사 돌리기)
-                    ObjectManager.instance.dropCount = 0;
-                    ObjectManager.instance.inputWords = wordInput;
-                    StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
-                    APIStatusMsg.text = "86줄 밑";
-                }
-                else
-                {
-                    APIStatusMsg.text = "검사 실패햇음";
-                }
-            }
 
             for (int i = 0; i < ObjectManager.instance.createdWords.Length; i++)
             {
@@ -179,6 +152,28 @@ public class TurnChange : MonoBehaviourPun
                     }
                 }
             }
+
+            if (ObjectManager.instance.dropCount != 0)
+            {
+
+                if (ObjectManager.instance.createdWords.Contains(wordInput))  // 글자로 이루어진 단어일 경우
+                {
+                    Debug.Log("글자로만 이루어진 단어를 사전 API 검사를 시작합니다");
+                    APIStatusMsg.text = "검사 시작";
+                    // wordInput  (사전 API 검사 돌리기)
+                    ObjectManager.instance.dropCount = 0;
+                    ObjectManager.instance.inputWords = wordInput;
+                    StartCoroutine(dictionaryAPI.CheckWordExists(wordInput));
+                    APIStatusMsg.text = "86줄 밑";
+                }
+                else
+                {
+                    APIStatusMsg.text = "검사 실패햇음";
+                    RollBackAreas();
+                    Debug.Log("오타입니다");
+                }
+            }
+
         }
         else
         {
