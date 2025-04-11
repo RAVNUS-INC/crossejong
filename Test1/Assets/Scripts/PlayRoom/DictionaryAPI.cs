@@ -2,15 +2,15 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
-using System.Xml;  // XML ÆÄ½ÌÀ» À§ÇÑ ³×ÀÓ½ºÆäÀÌ½º
+using System.Xml;  // XML ï¿½Ä½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ó½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½
 
 public class DictionaryAPI : MonoBehaviour
 {
     public TurnChange turnChange;
     public SaveCreatedWords saveCreatedWords;
 
-    private string apiUrl = "https://krdict.korean.go.kr/api/search";  // API ¿£µåÆ÷ÀÎÆ®
-    private string apiKey = "BD6ACB6A46D2336CBFB3EF7283A0279C";  // ÀÎÁõÅ°
+    private string apiUrl = "https://krdict.korean.go.kr/api/search";  // API ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
+    private string apiKey = "BD6ACB6A46D2336CBFB3EF7283A0279C";  // ï¿½ï¿½ï¿½ï¿½Å°
 
     public IEnumerator CheckWordExists(string word)
     {
@@ -25,19 +25,19 @@ public class DictionaryAPI : MonoBehaviour
 
             if (request.result == UnityWebRequest.Result.Success)
             {
-                Debug.Log("Response: " + request.downloadHandler.text);  // ÀÀ´ä ³»¿ë Ãâ·Â
+                Debug.Log("Response: " + request.downloadHandler.text);  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 
-                    // XML ÆÄ½Ì
+                    // XML ï¿½Ä½ï¿½
                     XmlDocument xmlDoc = new XmlDocument();
-                    xmlDoc.LoadXml(request.downloadHandler.text);  // ÀÀ´ä ³»¿ë XML·Î ·Îµå
+                    xmlDoc.LoadXml(request.downloadHandler.text);  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ XMLï¿½ï¿½ ï¿½Îµï¿½
 
-                    // XML¿¡¼­ <total> °ª ÃßÃâ
+                    // XMLï¿½ï¿½ï¿½ï¿½ <total> ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                     XmlNode totalNode = xmlDoc.SelectSingleNode("//total");
                     int total = totalNode != null ? int.Parse(totalNode.InnerText) : 0;
 
                     if (total > 0)
                     {
-                        // <word>¿Í <pos> ÅÂ±× °¡Á®¿Í¼­ °Ë»ö¾î¿Í ºñ±³
+                        // <word>ï¿½ï¿½ <pos> ï¿½Â±ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ ï¿½Ë»ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
                         XmlNodeList itemNodes = xmlDoc.SelectNodes("//item");
                         bool wordExists = false;
 
@@ -51,8 +51,8 @@ public class DictionaryAPI : MonoBehaviour
                                 string foundWord = wordNode.InnerText.Trim();
                                 string pos = posNode.InnerText.Trim();
 
-                                // ÀÔ·Â°ª°ú µ¿ÀÏÇÑ ´Ü¾îÀÌ¸ç Ç°»ç°¡ "¸í»ç"ÀÎÁö È®ÀÎ
-                                if (foundWord == word && pos == "¸í»ç")
+                                // ï¿½Ô·Â°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ü¾ï¿½ï¿½Ì¸ï¿½ Ç°ï¿½ç°¡ "ï¿½ï¿½ï¿½ï¿½"ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½
+                                if (foundWord == word && pos == "ï¿½ï¿½ï¿½ï¿½")
                                 {
                                     wordExists = true;
                                     break;
@@ -62,39 +62,41 @@ public class DictionaryAPI : MonoBehaviour
 
                         if (wordExists == true)
                         {
-                            Debug.Log("´Ü¾î '" + word + "'°¡ Á¸ÀçÇÏ¸ç, ¸í»çÀÔ´Ï´Ù.");
-                            turnChange.APIStatusMsg.text = "65ÁÙ ¹Ø";
+                            Debug.Log("ï¿½Ü¾ï¿½ '" + word + "'ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½Ô´Ï´ï¿½.");
+                            turnChange.APIStatusMsg.text = "65ï¿½ï¿½ ï¿½ï¿½";
 
                             Debug.Log(UserInfoManager.instance.MyBirthYear);
-                            // csv ÆÄÀÏ¿¡ ÇÃ·¹ÀÌ¾î°¡ ¸¸µç ´Ü¾î ÀúÀå
-                            saveCreatedWords.OnUserCreatesWord(UserInfoManager.instance.MyBirthYear.ToString(), word);
-                            //turnChange.APIStatusMsg.text = "69ÁÙ ¹Ø";
+                            // csv ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½ï¿½ï¿½ ï¿½Ü¾ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-                            // ´Ü¾î°¡ È®ÀÎµÇ¸é ÅÏ ³Ñ±â±â
+                            SaveGoogleSheets.instance.OnUserCreatesWord(UserInfoManager.instance.MyBirthYear.ToString(), word);
+                            //saveCreatedWords.OnUserCreatesWord(UserInfoManager.instance.MyBirthYear.ToString(), word);
+                            turnChange.APIStatusMsg.text = "69ï¿½ï¿½ ï¿½ï¿½";
+
+                            // ï¿½Ü¾î°¡ È®ï¿½ÎµÇ¸ï¿½ ï¿½ï¿½ ï¿½Ñ±ï¿½ï¿½
                             TurnManager.instance.TossNextTurn();
                         }
                         else
                         {
-                            Debug.Log("´Ü¾î '" + word + "'°¡ Á¸ÀçÇÏÁö ¾Ê°Å³ª, ¸í»ç°¡ ¾Æ´Õ´Ï´Ù.");
-                            turnChange.RollBackAreas(); // API°Ë»ç¿¡ Åë°úÇÏÁö ¸øÇßÀ¸¹Ç·Î Ä«µå¸¦ ´Ù½Ã µ¹·Á³õ±â
+                            Debug.Log("ï¿½Ü¾ï¿½ '" + word + "'ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê°Å³ï¿½, ï¿½ï¿½ï¿½ç°¡ ï¿½Æ´Õ´Ï´ï¿½.");
+                            turnChange.RollBackAreas(); // APIï¿½Ë»ç¿¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ Ä«ï¿½å¸¦ ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                             ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
-                            ObjectManager.instance.AlaramMsg.text = "ÇØ´ç ´Ü¾î°¡ Á¸ÀçÇÏÁö ¾Ê°Å³ª, ¸í»ç°¡ ¾Æ´Õ´Ï´Ù.";
+                            ObjectManager.instance.AlaramMsg.text = "ï¿½Ø´ï¿½ ï¿½Ü¾î°¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê°Å³ï¿½, ï¿½ï¿½ï¿½ç°¡ ï¿½Æ´Õ´Ï´ï¿½.";
                         }
                     }
                     else
                     {
-                        Debug.Log("´Ü¾î '" + word + "'°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù.");
-                        turnChange.RollBackAreas(); // API°Ë»ç¿¡ Åë°úÇÏÁö ¸øÇßÀ¸¹Ç·Î Ä«µå¸¦ ´Ù½Ã µ¹·Á³õ±â
+                        Debug.Log("ï¿½Ü¾ï¿½ '" + word + "'ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê½ï¿½ï¿½Ï´ï¿½.");
+                        turnChange.RollBackAreas(); // APIï¿½Ë»ç¿¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ Ä«ï¿½å¸¦ ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                         ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
-                        ObjectManager.instance.AlaramMsg.text = "Á¸ÀçÇÏÁö ¾Ê´Â ´Ü¾îÀÔ´Ï´Ù.";
+                        ObjectManager.instance.AlaramMsg.text = "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê´ï¿½ ï¿½Ü¾ï¿½ï¿½Ô´Ï´ï¿½.";
                     }
 
             }
             else
             {
-                // ¿äÃ» ½ÇÆÐ ½Ã ¿¡·¯ ·Î±× Ãâ·Â
-                Debug.LogError("API ¿äÃ» ½ÇÆÐ: " + request.error + "\nResponse: " + request.downloadHandler.text);
-                turnChange.RollBackAreas(); // API ¿äÃ» ½ÇÆÐ·Î Ä«µå¸¦ ´Ù½Ã µ¹·Á³õ±â
+                // ï¿½ï¿½Ã» ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Î±ï¿½ ï¿½ï¿½ï¿½
+                Debug.LogError("API ï¿½ï¿½Ã» ï¿½ï¿½ï¿½ï¿½: " + request.error + "\nResponse: " + request.downloadHandler.text);
+                turnChange.RollBackAreas(); // API ï¿½ï¿½Ã» ï¿½ï¿½ï¿½Ð·ï¿½ Ä«ï¿½å¸¦ ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             }
         }
     }
