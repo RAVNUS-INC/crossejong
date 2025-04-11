@@ -339,7 +339,7 @@ public class FieldCard : MonoBehaviourPun
             randomCards = cardPool.GetRandomCardsObject(usedNames);
             TurnChange.instance.APIStatusMsg.text = $"랜덤카드 개수{randomCards.Count}";
         }
-        catch (Exception e)
+        catch (Exception)
         {
             TurnChange.instance.APIStatusMsg.text = $"카드풀 에러";
         }
