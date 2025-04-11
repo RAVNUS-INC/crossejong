@@ -67,9 +67,11 @@ public class DictionaryAPI : MonoBehaviour
 
                             Debug.Log(UserInfoManager.instance.MyBirthYear);
                             // csv 파일에 플레이어가 만든 단어 저장
+                            
                             SaveGoogleSheets.instance.OnUserCreatesWord(UserInfoManager.instance.MyBirthYear.ToString(), word);
                             //saveCreatedWords.OnUserCreatesWord(UserInfoManager.instance.MyBirthYear.ToString(), word);
                             turnChange.APIStatusMsg.text = "69줄 밑";
+
 
                             // 단어가 확인되면 턴 넘기기
                             TurnManager.instance.TossNextTurn();

@@ -169,6 +169,8 @@ public class TurnChange : MonoBehaviourPun
                 else
                 {
                     APIStatusMsg.text = "검사 실패햇음";
+                    ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
+                    ObjectManager.instance.AlaramMsg.text = "입력한 단어와 일치하지 않습니다.";
                     RollBackAreas();
                     Debug.Log("오타입니다");
                 }
@@ -181,7 +183,7 @@ public class TurnChange : MonoBehaviourPun
             APIStatusMsg.text = "오류";
             RollBackAreas();
             ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
-            ObjectManager.instance.AlaramMsg.text = "입력한 단어가 낸 카드보다 작거나 같습니다.";
+            ObjectManager.instance.AlaramMsg.text = "단어를 올바르게 입력해주세요.";
         }
         cardInputField.gameObject.SetActive(false);
         CardDropBtn.gameObject.SetActive(true);

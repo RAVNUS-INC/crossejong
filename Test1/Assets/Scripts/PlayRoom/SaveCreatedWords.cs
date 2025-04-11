@@ -149,6 +149,7 @@ public class SaveCreatedWords : MonoBehaviour
 
             File.WriteAllText(filePath, sb.ToString(), Encoding.UTF8);
             Debug.Log("CSV 파일 저장 완료: " + filePath);
+            TurnChange.instance.APIStatusMsg.text = $"{filePath}";
         }
         catch (Exception e)
         {
@@ -164,7 +165,7 @@ public class SaveCreatedWords : MonoBehaviour
         ReadCSV(userBirthYear);
         TurnChange.instance.APIStatusMsg.text = "157밑";
         AddWordToCSV(userBirthYear, newWord);
-        TurnChange.instance.APIStatusMsg.text = "158밑";
+        //TurnChange.instance.APIStatusMsg.text = "158밑";
     }
 
     // CSV 파일을 지우는 함수 (필요시 사용)
