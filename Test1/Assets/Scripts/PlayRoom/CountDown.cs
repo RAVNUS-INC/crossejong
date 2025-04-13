@@ -43,6 +43,7 @@ public class Countdown : MonoBehaviourPun
         isCountingDown = true;
 
         StartCoroutine(CountDownRoutine(3)); // 타이머 시작
+
     }
 
     private IEnumerator CountDownRoutine(int count)
@@ -75,13 +76,14 @@ public class Countdown : MonoBehaviourPun
     {
         ObjectManager.instance.IsMyTurn = true;
 
-        userCard.FirstUserCardArea(); // 방장이 카드를 몇장씩 뽑아 플레이어들에게 나눠줌
+        // 방장이 첫 카드 뽑아 모두에게 수행 추가 요청
+        //fieldCard.FirstFieldCard(); 
+
+        // 방장이 카드를 몇장씩 뽑아 플레이어들에게 나눠줌
+        userCard.FirstUserCardArea(); 
 
         // 각자 모두 현재 카드 개수 세기 요청
         photonView.RPC("LetsCardCount", RpcTarget.All);
-
-        // 방장이 첫 카드 뽑아 모두에게 수행 추가 요청
-        fieldCard.FirstFieldCard(); 
 
         // 방장부터 첫 카운트 다운 시작
         turnMananger.AfterCountdown();

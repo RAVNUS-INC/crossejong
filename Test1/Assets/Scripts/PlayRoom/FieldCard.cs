@@ -91,7 +91,6 @@ public class FieldCard : MonoBehaviourPun
 
     public void OnOffDropAreas()
     {
-        TurnChange.instance.APIStatusMsg.text = "OnOffDropAreas 시작";
         for (int x = 0; x < ObjectManager.instance.gridCount; x++)
         {
             for (int y = 0; y < ObjectManager.instance.gridCount; y++)
@@ -101,24 +100,27 @@ public class FieldCard : MonoBehaviourPun
                     if (x != 0)
                     {
                         ChangeColorAreas(x - 1, y);
+                        TurnChange.instance.APIStatusMsg.text = "영역 색상 흰색 변경1";
                     }
                     if (x != ObjectManager.instance.gridCount - 1)
                     {
                         ChangeColorAreas(x + 1, y);
+                        TurnChange.instance.APIStatusMsg.text = "영역 색상 흰색 변경2";
                     }
                     if (y != 0)
                     {
                         ChangeColorAreas(x, y - 1);
+                        TurnChange.instance.APIStatusMsg.text = "영역 색상 흰색 변경3";
                     }
                     if (y != ObjectManager.instance.gridCount - 1)
                     { 
                         ChangeColorAreas(x, y + 1);
+                        TurnChange.instance.APIStatusMsg.text = "영역 색상 흰색 변경4";
                     }
 
                 }
             }
         }
-        TurnChange.instance.APIStatusMsg.text = "OnOffDropAreas 완료";
     }
         
 
@@ -346,15 +348,22 @@ public class FieldCard : MonoBehaviourPun
 
         TurnChange.instance.APIStatusMsg.text = "그리드 업데이트 시작";
 
-        cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
-        GameObject middleObejcts = ObjectManager.instance.grid[ObjectManager.instance.gridCount/2, ObjectManager.instance.gridCount / 2];
-        GameObject firstCards = randomCards[0];
-        ObjectManager.instance.grid[ObjectManager.instance.gridCount / 2, ObjectManager.instance.gridCount / 2].SetActive(true);
-        firstCards.transform.SetParent(middleObejcts.transform, false);
-        ObjectManager.instance.grid[ObjectManager.instance.gridCount / 2, ObjectManager.instance.gridCount / 2] = firstCards;
-        TurnChange.instance.APIStatusMsg.text = "그리드 업데이트 완료";
+        //cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
+        try
+        {
+            cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
+        }
+        catch (Exception e)
+        {
+            TurnChange.instance.APIStatusMsg.text = "GetCardsToTarGetArea 에러 발생";
+            Debug.LogError($"GetCardsToTarGetArea 예외: {e.Message}\n{e.StackTrace}");
+            return; // 아래 코드 실행 안 하도록 방지
+        }
+        GameObject firstCards = randomCards[0];        
+        firstCards.transform.SetParent(ObjectManager.instance.grid[ObjectManager.instance.gridCount/2, ObjectManager.instance.gridCount/2].transform, false);
+        ObjectManager.instance.grid[ObjectManager.instance.gridCount/2, ObjectManager.instance.gridCount/2].SetActive(true);
         firstCards.transform.parent.name = firstCards.transform.name;
-        TurnChange.instance.APIStatusMsg.text = "드롭영역 생성 전";
+
         OnOffDropAreas();
     }
 
