@@ -226,11 +226,6 @@ public class TurnChange : MonoBehaviourPun
                     userCard.SelectedUserCard(userCard.displayedCards);
                     userCard.SelectedUserCard(userCardFullPopup.fullDisplayedCards);
 
-                    if (PhotonNetwork.LocalPlayer.IsMasterClient)
-                    {
-                        fieldCard.FirstFieldCard();
-                    }
-
                     // 나의 첫 턴은 끝
                     ObjectManager.instance.IsFirstTurn = false;
                 }

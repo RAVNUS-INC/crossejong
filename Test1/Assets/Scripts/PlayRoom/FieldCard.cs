@@ -316,55 +316,55 @@ public class FieldCard : MonoBehaviourPun
         Invoke("RollBackColorAreas", 0.07f); 
     }
 
-    public void FirstFieldCard()
-    {
-        // 방장만 처음 1장의 카드 이름을 뽑음
-        string[] randomCardNames = cardPool.GetRandomCardsName(1); // 이름을 받는 함수로 변경
+    //public void FirstFieldCard()
+    //{
+    //    // 방장만 처음 1장의 카드 이름을 뽑음
+    //    string[] randomCardNames = cardPool.GetRandomCardsName(1); // 이름을 받는 함수로 변경
 
-        // 모든 플레이어들에게 인덱스리스트를 넘겨 첫 카드 오브젝트를 생성하도록 요청(배열->문자열)
-        photonView.RPC("FirstFieldCardRequestAll", RpcTarget.All, string.Join(",", randomCardNames));
-    }
+    //    // 모든 플레이어들에게 인덱스리스트를 넘겨 첫 카드 오브젝트를 생성하도록 요청(배열->문자열)
+    //    photonView.RPC("FirstFieldCardRequestAll", RpcTarget.All, string.Join(",", randomCardNames));
+    //}
 
-    //방장 포함 모두가 첫 카드 추가를 수행하는 함수
-    [PunRPC]
-    public void FirstFieldCardRequestAll(string names)
-    {
-        string[] usedNames = names.Split(','); // 다시 배열로 변환
-        foreach (string i in usedNames)
-        {
-            Debug.Log($"첫 카드 '{i}' 받음");
-            TurnChange.instance.APIStatusMsg.text = $"첫 카드 '{i}' 받음";
-        }
-        List<GameObject> randomCards = null;
-        try
-        {
-            randomCards = cardPool.GetRandomCardsObject(usedNames);
-            TurnChange.instance.APIStatusMsg.text = $"랜덤카드 개수{randomCards.Count}";
-        }
-        catch (Exception)
-        {
-            TurnChange.instance.APIStatusMsg.text = $"카드풀 에러";
-        }
+    ////방장 포함 모두가 첫 카드 추가를 수행하는 함수
+    //[PunRPC]
+    //public void FirstFieldCardRequestAll(string names)
+    //{
+    //    string[] usedNames = names.Split(','); // 다시 배열로 변환
+    //    foreach (string i in usedNames)
+    //    {
+    //        Debug.Log($"첫 카드 '{i}' 받음");
+    //        TurnChange.instance.APIStatusMsg.text = $"첫 카드 '{i}' 받음";
+    //    }
+    //    List<GameObject> randomCards = null;
+    //    try
+    //    {
+    //        randomCards = cardPool.GetRandomCardsObject(usedNames);
+    //        TurnChange.instance.APIStatusMsg.text = $"랜덤카드 개수{randomCards.Count}";
+    //    }
+    //    catch (Exception)
+    //    {
+    //        TurnChange.instance.APIStatusMsg.text = $"카드풀 에러";
+    //    }
 
-        TurnChange.instance.APIStatusMsg.text = "그리드 업데이트 시작";
+    //    TurnChange.instance.APIStatusMsg.text = "그리드 업데이트 시작";
 
-        //cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
-        try
-        {
-            cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
-        }
-        catch (Exception e)
-        {
-            TurnChange.instance.APIStatusMsg.text = "GetCardsToTarGetArea 에러 발생";
-            Debug.LogError($"GetCardsToTarGetArea 예외: {e.Message}\n{e.StackTrace}");
-            return; // 아래 코드 실행 안 하도록 방지
-        }
-        GameObject firstCards = randomCards[0];        
-        firstCards.transform.SetParent(ObjectManager.instance.grid[ObjectManager.instance.gridCount/2, ObjectManager.instance.gridCount/2].transform, false);
-        ObjectManager.instance.grid[ObjectManager.instance.gridCount/2, ObjectManager.instance.gridCount/2].SetActive(true);
-        firstCards.transform.parent.name = firstCards.transform.name;
+    //    //cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
+    //    try
+    //    {
+    //        cardPool.GetCardsToTarGetArea(randomCards, fieldContainer, fieldDisplayedCards);
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        TurnChange.instance.APIStatusMsg.text = "GetCardsToTarGetArea 에러 발생";
+    //        Debug.LogError($"GetCardsToTarGetArea 예외: {e.Message}\n{e.StackTrace}");
+    //        return; // 아래 코드 실행 안 하도록 방지
+    //    }
+    //    GameObject firstCards = randomCards[0];        
+    //    firstCards.transform.SetParent(ObjectManager.instance.grid[ObjectManager.instance.gridCount/2, ObjectManager.instance.gridCount/2].transform, false);
+    //    ObjectManager.instance.grid[ObjectManager.instance.gridCount/2, ObjectManager.instance.gridCount/2].SetActive(true);
+    //    firstCards.transform.parent.name = firstCards.transform.name;
 
-        OnOffDropAreas();
-    }
+    //    OnOffDropAreas();
+    //}
 
 }

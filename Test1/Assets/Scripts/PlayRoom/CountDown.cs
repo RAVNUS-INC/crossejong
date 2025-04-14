@@ -13,7 +13,8 @@ public class Countdown : MonoBehaviourPun
     public float startDelay = 1f; // 시작 딜레이
     public Button startGameButton; //게임 시작버튼
     public GameObject WaitingPanel; // 모두가 접속하기 전까지 보이는 패널(대기상태표시)
-    public Image fieldArea; // 보드판 활성화를 위해
+    public Image fieldArea; // 활성화를 위해
+    public Image userArea; // 활성화를 위해
     private bool isCountingDown = false;
 
     public FieldCard fieldCard;
@@ -24,7 +25,13 @@ public class Countdown : MonoBehaviourPun
 
     private void Start()
     {
+        ObjectManager.instance.gridCount = 19;
+
         WaitingPanel.SetActive(true); // 맨 처음엔 패널 활성화
+
+        fieldArea.gameObject.SetActive(false); //보드판 비활
+
+        userArea.gameObject.SetActive(false); //유저 영역 비활
 
         if (PhotonNetwork.PlayerList.Length == 1) //만약 혼자하기라면
         {
@@ -37,13 +44,13 @@ public class Countdown : MonoBehaviourPun
     {
         WaitingPanel.SetActive(false); // 게임 시작했으므로 패널 비활성화
 
-        fieldArea.gameObject.SetActive(true); // 카운트다운 숫자가 보이게
+        countDownText.gameObject.SetActive(true); // 카운트다운 텍스트 표시
 
         if (isCountingDown) return; // 이미 실행 중이면 중복 실행 방지
+
         isCountingDown = true;
 
         StartCoroutine(CountDownRoutine(3)); // 타이머 시작
-
     }
 
     private IEnumerator CountDownRoutine(int count)
@@ -55,6 +62,11 @@ public class Countdown : MonoBehaviourPun
             yield return new WaitForSeconds(1f);
             count--;
         }
+        
+        if (PhotonNetwork.IsMasterClient)
+        {
+            userCard.FirstUserCardArea(); //카드배분
+        }
 
         // "시작!" 표시
         countDownText.text = "Start!"; // TMP_Text로 설정
@@ -62,7 +74,9 @@ public class Countdown : MonoBehaviourPun
 
         countDownText.gameObject.SetActive(false); // 카운트다운 텍스트 숨김
 
-        ObjectManager.instance.gridCount = 19;
+        fieldArea.gameObject.SetActive(true); //보드판 비활
+
+        userArea.gameObject.SetActive(true); //유저 영역 비활
 
         if (PhotonNetwork.IsMasterClient)
         {
@@ -79,8 +93,8 @@ public class Countdown : MonoBehaviourPun
         // 방장이 첫 카드 뽑아 모두에게 수행 추가 요청
         //fieldCard.FirstFieldCard(); 
 
-        // 방장이 카드를 몇장씩 뽑아 플레이어들에게 나눠줌
-        userCard.FirstUserCardArea(); 
+        //// 방장이 카드를 몇장씩 뽑아 플레이어들에게 나눠줌
+        //userCard.FirstUserCardArea(); 
 
         // 각자 모두 현재 카드 개수 세기 요청
         photonView.RPC("LetsCardCount", RpcTarget.All);
