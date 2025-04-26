@@ -40234,7 +40234,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_HeartAmount: 0
-  HeartRechargeInterval: 10
+  HeartRechargeInterval: 30
   timerText: {fileID: 439628481}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
