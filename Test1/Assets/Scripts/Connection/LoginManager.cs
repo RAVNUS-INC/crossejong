@@ -130,16 +130,6 @@ public class LoginManager : MonoBehaviour
         RegisterBtn.interactable = allFilled && noErrors; ;
     }
 
-    //private void LoadUserInfoFromPrefs() // 플레이어 정보 로컬에 저장된 값 불러오기
-    //{
-    //    // GetString의 두번째 값은 기본값을 나타냄
-    //    UserInfoManager.instance.MyName = PlayerPrefs.GetString(UserInfoManager.DISPLAYNAME_KEY, "Guest");
-    //    UserInfoManager.instance.MyImageIndex = PlayerPrefs.GetInt(UserInfoManager.IMAGEINDEX_KEY, 0);
-
-    //    // 필요한 곳에 정보를 설정하거나 UI에 반영
-    //   Debug.Log($"로컬 - DisplayName: {UserInfoManager.instance.MyName}, ImageIndex: {UserInfoManager.instance.MyImageIndex}");
-    //}
-
     // 로그인/회원가입 전환 함수 - 신규회원이신가요? 버튼을 누를 때
     public void ToggleLoginMode()
     {
@@ -269,6 +259,7 @@ public class LoginManager : MonoBehaviour
 
     public void AutoLoginWithDeviceID() // 연동된 기기를 통해 자동로그인 수행
     {
+
         var request = new LoginWithAndroidDeviceIDRequest
         {
             AndroidDeviceId = SystemInfo.deviceUniqueIdentifier,
@@ -277,15 +268,24 @@ public class LoginManager : MonoBehaviour
 
         PlayFabClientAPI.LoginWithAndroidDeviceID(request, result =>
         {
-            Debug.Log("기기 ID로 자동 로그인 성공: " + result.PlayFabId);
-            InitialTestText.text = "로그인 연결 상태";
+            if (PlayerPrefs.HasKey(UserInfoManager.DISPLAYNAME_KEY)) //저장된 이름이 있다면
+            {
+                Debug.Log("기기 ID로 자동 로그인 성공: " + result.PlayFabId);
+                InitialTestText.text = "로그인 연결 상태";
 
-            // 마스터 서버접속 요청 및 로비로 이동
-            // 마스터 서버 접속 요청
-            PhotonNetwork.ConnectUsingSettings();
+                // 마스터 서버접속 요청 및 로비로 이동
+                // 마스터 서버 접속 요청
+                PhotonNetwork.ConnectUsingSettings();
 
-            //로딩바 ui 애니메이션 보여주기
-            LoadingSceneController.Instance.LoadScene("Main");
+                //로딩바 ui 애니메이션 보여주기
+                LoadingSceneController.Instance.LoadScene("Main");
+            }
+            else // 저장된 PlayerPrefs 이름이 없다면
+            {
+                // 터치패널 활성화
+                TouchPanel.SetActive(true);
+                StartTwinkle();
+            }
         },
         error =>
         {

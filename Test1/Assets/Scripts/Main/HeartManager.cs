@@ -15,10 +15,12 @@ public class HeartManager : MonoBehaviour
         if (PlayerPrefs.HasKey("HeartAmount"))
         {
             currentHearts = PlayerPrefs.GetInt("HeartAmount"); //playerprefs에 저장된 하트값이 있으면 불러오기
+            Debug.Log($"{currentHearts}");
             if (currentHearts < 0)
             {
                 currentHearts = 0;
             }
+            Debug.Log("(일반)불러온 보유 하트 수: " + currentHearts);
         }
         else //저장된 값이 없으면 기본값 5로 설정
         {
@@ -30,7 +32,7 @@ public class HeartManager : MonoBehaviour
 
     void Start()
     {
-        UpdateHeartUI(currentHearts);
+        //UpdateHeartUI(currentHearts);
     }
 
     //public void UseHeart()
@@ -51,11 +53,14 @@ public class HeartManager : MonoBehaviour
 
     public void UpdateHeartUI(int count)
     {
-        for (int i = 0; i < heartImages.Length; i++)
+        if (heartImages != null)
         {
-            Color color = heartImages[i].color;
-            color.a = (i < count) ? 1f : 0.3f; // 하트가 있는 경우 불투명(1), 없는 경우 투명도 30%(0.3)
-            heartImages[i].color = color;
+            for (int i = 0; i < heartImages.Length; i++)
+            {
+                Color color = heartImages[i].color;
+                color.a = (i < count) ? 1f : 0.3f; // 하트가 있는 경우 불투명(1), 없는 경우 투명도 30%(0.3)
+                heartImages[i].color = color;
+            }
         }
     }
 
