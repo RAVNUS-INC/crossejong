@@ -2,15 +2,15 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
-using System.Xml;  // XML �Ľ��� ���� ���ӽ����̽�
+using System.Xml;  // XML 파싱을 위한 네임스페이스
 
 public class DictionaryAPI : MonoBehaviour
 {
     public TurnChange turnChange;
     public SaveCreatedWords saveCreatedWords;
 
-    private string apiUrl = "https://krdict.korean.go.kr/api/search";  // API ��������Ʈ
-    private string apiKey = "BD6ACB6A46D2336CBFB3EF7283A0279C";  // ����Ű
+    private string apiUrl = "https://krdict.korean.go.kr/api/search";  // API 엔드포인트
+    private string apiKey = "BD6ACB6A46D2336CBFB3EF7283A0279C";  // 인증키
 
     public IEnumerator CheckWordExists(string word)
     {
@@ -25,78 +25,79 @@ public class DictionaryAPI : MonoBehaviour
 
             if (request.result == UnityWebRequest.Result.Success)
             {
-                Debug.Log("Response: " + request.downloadHandler.text);  // ���� ���� ���
+                Debug.Log("Response: " + request.downloadHandler.text);  // 응답 내용 출력
 
-                    // XML �Ľ�
-                    XmlDocument xmlDoc = new XmlDocument();
-                    xmlDoc.LoadXml(request.downloadHandler.text);  // ���� ���� XML�� �ε�
+                // XML 파싱
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(request.downloadHandler.text);  // 응답 내용 XML로 로드
 
-                    // XML���� <total> �� ����
-                    XmlNode totalNode = xmlDoc.SelectSingleNode("//total");
-                    int total = totalNode != null ? int.Parse(totalNode.InnerText) : 0;
+                // XML에서 <total> 값 추출
+                XmlNode totalNode = xmlDoc.SelectSingleNode("//total");
+                int total = totalNode != null ? int.Parse(totalNode.InnerText) : 0;
 
-                    if (total > 0)
+                if (total > 0)
+                {
+                    // <word>와 <pos> 태그 가져와서 검색어와 비교
+                    XmlNodeList itemNodes = xmlDoc.SelectNodes("//item");
+                    bool wordExists = false;
+
+                    foreach (XmlNode itemNode in itemNodes)
                     {
-                        // <word>�� <pos> �±� �����ͼ� �˻���� ��
-                        XmlNodeList itemNodes = xmlDoc.SelectNodes("//item");
-                        bool wordExists = false;
+                        XmlNode wordNode = itemNode.SelectSingleNode("word");
+                        XmlNode posNode = itemNode.SelectSingleNode("pos");
 
-                        foreach (XmlNode itemNode in itemNodes)
+                        if (wordNode != null && posNode != null)
                         {
-                            XmlNode wordNode = itemNode.SelectSingleNode("word");
-                            XmlNode posNode = itemNode.SelectSingleNode("pos");
+                            string foundWord = wordNode.InnerText.Trim();
+                            string pos = posNode.InnerText.Trim();
 
-                            if (wordNode != null && posNode != null)
+                            // 입력값과 동일한 단어이며 품사가 "명사"인지 확인
+                            if (foundWord == word && pos == "명사")
                             {
-                                string foundWord = wordNode.InnerText.Trim();
-                                string pos = posNode.InnerText.Trim();
-
-                                // �Է°��� ������ �ܾ��̸� ǰ�簡 "����"���� Ȯ��
-                                if (foundWord == word && pos == "����")
-                                {
-                                    wordExists = true;
-                                    break;
-                                }
+                                wordExists = true;
+                                break;
                             }
                         }
+                    }
 
-                        if (wordExists == true)
-                        {
-                            Debug.Log("�ܾ� '" + word + "'�� �����ϸ�, �����Դϴ�.");
-                            turnChange.APIStatusMsg.text = "65�� ��";
+                    if (wordExists == true)
+                    {
+                        Debug.Log("단어 '" + word + "'가 존재하며, 명사입니다.");
+                        turnChange.APIStatusMsg.text = "65줄 밑";
 
-                            Debug.Log(UserInfoManager.instance.MyBirthYear);
-                            // csv ���Ͽ� �÷��̾ ���� �ܾ� ����
+                        Debug.Log(UserInfoManager.instance.MyBirthYear);
+                        // csv 파일에 플레이어가 만든 단어 저장
 
-                            SaveGoogleSheets.instance.OnUserCreatesWord(UserInfoManager.instance.MyBirthYear.ToString(), word);
-                            //saveCreatedWords.OnUserCreatesWord(UserInfoManager.instance.MyBirthYear.ToString(), word);
-                            turnChange.APIStatusMsg.text = "69�� ��";
+                        SaveGoogleSheets.instance.OnUserCreatesWord(UserInfoManager.instance.MyBirthYear.ToString(), word);
+                        //saveCreatedWords.OnUserCreatesWord(UserInfoManager.instance.MyBirthYear.ToString(), word);
+                        turnChange.APIStatusMsg.text = "69줄 밑";
 
-                            // �ܾ Ȯ�εǸ� �� �ѱ��
-                            TurnManager.instance.TossNextTurn();
-                        }
-                        else
-                        {
-                            Debug.Log("�ܾ� '" + word + "'�� �������� �ʰų�, ���簡 �ƴմϴ�.");
-                            turnChange.RollBackAreas(); // API�˻翡 ������� �������Ƿ� ī�带 �ٽ� ��������
-                            ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
-                            ObjectManager.instance.AlaramMsg.text = "�ش� �ܾ �������� �ʰų�, ���簡 �ƴմϴ�.";
-                        }
+
+                        // 단어가 확인되면 턴 넘기기
+                        TurnManager.instance.TossNextTurn();
                     }
                     else
                     {
-                        Debug.Log("�ܾ� '" + word + "'�� �������� �ʽ��ϴ�.");
-                        turnChange.RollBackAreas(); // API�˻翡 ������� �������Ƿ� ī�带 �ٽ� ��������
+                        Debug.Log("단어 '" + word + "'가 존재하지 않거나, 명사가 아닙니다.");
+                        turnChange.RollBackAreas(); // API검사에 통과하지 못했으므로 카드를 다시 돌려놓기
                         ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
-                        ObjectManager.instance.AlaramMsg.text = "�������� �ʴ� �ܾ��Դϴ�.";
+                        ObjectManager.instance.AlaramMsg.text = "해당 단어가 존재하지 않거나, 명사가 아닙니다.";
                     }
+                }
+                else
+                {
+                    Debug.Log("단어 '" + word + "'가 존재하지 않습니다.");
+                    turnChange.RollBackAreas(); // API검사에 통과하지 못했으므로 카드를 다시 돌려놓기
+                    ObjectManager.instance.AlaramMsg.gameObject.SetActive(true);
+                    ObjectManager.instance.AlaramMsg.text = "존재하지 않는 단어입니다.";
+                }
 
             }
             else
             {
-                // ��û ���� �� ���� �α� ���
-                Debug.LogError("API ��û ����: " + request.error + "\nResponse: " + request.downloadHandler.text);
-                turnChange.RollBackAreas(); // API ��û ���з� ī�带 �ٽ� ��������
+                // 요청 실패 시 에러 로그 출력
+                Debug.LogError("API 요청 실패: " + request.error + "\nResponse: " + request.downloadHandler.text);
+                turnChange.RollBackAreas(); // API 요청 실패로 카드를 다시 돌려놓기
             }
         }
     }

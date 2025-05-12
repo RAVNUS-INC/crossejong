@@ -48,6 +48,8 @@ public class UserCard : MonoBehaviourPun
         int cardCount = GetCardCount(playerCount); // 인원 수에 따른 카드 장수 결정
         Debug.Log($"카드장수: {cardCount}");
 
+        string[] firstcardname = cardPool.GetRandomCardsName(1);  //한 장의 카드 선택
+
         for (int i = 0; i < userProfileLoad.ActPlayerIntList.Count; i++) //players수만큼 반복
         {
             // 방장만 랜덤으로 11장의 카드 인덱스를 뽑음
@@ -55,8 +57,7 @@ public class UserCard : MonoBehaviourPun
             string[] randomnames = cardPool.GetRandomCardsName(cardCount);
 
             // 방장이 자신을 포함한 모든 유저에게 11장의 카드를 추가, 배치하도록 요청
-            photonView.RPC("AddCardObjectToAll", RpcTarget.All, randomnames, i);
-
+            photonView.RPC("AddCardObjectToAll", RpcTarget.All, randomnames, i, firstcardname);
         }
     }
 
@@ -76,20 +77,29 @@ public class UserCard : MonoBehaviourPun
 
     // 플레이어 리스트를 순환하며 자신의 카드 추가하기
     [PunRPC]
-    void AddCardObjectToAll(string[] RandomNames, int count)
+    void AddCardObjectToAll(string[] RandomNames, int count, string[] firstname)
     {
         // 정렬된 리스트를 반복문으로 순차적으로 처리
         if (userProfileLoad.ActPlayerIntList[count] == UserInfoManager.instance.MyActNum)
         {
             Debug.Log($"나는 현재 {count}번째 유저: Num {userProfileLoad.ActPlayerIntList[count]}");
-            //TurnChange.instance.APIStatusMsg.text = $"나는 현재 {count}번째 유저";
-
+            
             List<GameObject> randomCards = cardPool.GetRandomCardsObject(RandomNames); //랜덤인덱스에 해당하는 오브젝트 추가
             cardPool.GetCardsToTarGetArea(randomCards, userCardContainer, displayedCards); // 디스플레이 카드 상태 업데이트
             cardPool.SortCardIndex(displayedCards);
 
             // 카드를 배분받은 뒤, 드롭 영역 생성 수행
             fieldCard.CreateDropAreas();
+
+            Debug.Log("필드카드 배치 시작");
+            // 필드카드 추가 배치 수행
+            List<GameObject> fieldcardObj = cardPool.GetRandomCardsObject(firstname);
+            cardPool.GetCardsToTarGetArea(fieldcardObj, fieldCard.fieldContainer, fieldCard.fieldDisplayedCards);
+            GameObject firstCards = fieldcardObj[0];
+            firstCards.transform.SetParent(ObjectManager.instance.grid[ObjectManager.instance.gridCount / 2, ObjectManager.instance.gridCount / 2].transform, false);
+            ObjectManager.instance.grid[ObjectManager.instance.gridCount / 2, ObjectManager.instance.gridCount / 2].SetActive(true);
+            firstCards.transform.parent.name = firstCards.transform.name;
+            fieldCard.OnOffDropAreas();
         }
         else // 자신의 차례가 아니면 끝내기
         {

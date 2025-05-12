@@ -4,15 +4,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class HeartRechargeManager : MonoBehaviour
 {
+    public static HeartRechargeManager instance;
+
     public int m_HeartAmount = 5; //보유 하트 개수
     private DateTime m_AppQuitTime = new DateTime(1970, 1, 1).ToLocalTime(); //앱이 종료된 시간을 저장
     private int m_TimerQuitTime = 0; //종료 시점에서 타이머 시간 저장
 
     private const int MAX_HEART = 5; //하트 최대값
-    public int HeartRechargeInterval = 180; //하트 충전 간격(단위:초)
+    public int HeartRechargeInterval = 60; //하트 충전 간격(단위:초)
     private Coroutine m_RechargeTimerCoroutine = null; //하트 충전 타이머를 위한 코루틴 변수
     private int m_RechargeRemainTime = 0; //다음 하트 충전까지 남은 시간을 저장
 
@@ -21,7 +24,10 @@ public class HeartRechargeManager : MonoBehaviour
     //Unity 오브젝트가 초기화될 때 호출(초기화 수행)
     private void Awake()
     {
-        Init();
+
+        instance = this;
+        DontDestroyOnLoad(this.gameObject);
+
     }
 
     private void Start()
@@ -31,6 +37,7 @@ public class HeartRechargeManager : MonoBehaviour
         LoadTimerQuitTime(); //하트 타이머 불러오기
         SetRechargeScheduler(); //남은 시간 계산 및 업데이트
     }
+
     //게임 초기화, 중간 이탈, 중간 복귀 시 실행되는 함수
     public void OnApplicationFocus(bool value)
     {
@@ -58,6 +65,7 @@ public class HeartRechargeManager : MonoBehaviour
         SaveTimerQuitTime();
     } //하트 정보와 종료 시간을 저장
 
+  
     //하트 사용 버튼을 클릭했을 때 실행되는 함수
     public void OnClickUseHeart()
     {
@@ -71,11 +79,19 @@ public class HeartRechargeManager : MonoBehaviour
     //초기화를 위한 함수
     public void Init()
     {
-        //PlayerPrefs.DeleteKey("HeartAmount"); // "HeartAmount" 키에 해당하는 데이터 삭제
-        m_HeartAmount = 5;
-        m_TimerQuitTime = 0;
-        m_AppQuitTime = new DateTime(1970, 1, 1).ToLocalTime();
-     
+        if (m_RechargeTimerCoroutine != null)
+        {
+            StopCoroutine(m_RechargeTimerCoroutine);
+        }
+
+        SaveHeartInfo();
+        SaveAppQuitTime();
+        SaveTimerQuitTime();
+
+        GameObject heartRechargeManager = GameObject.Find("heartRechargemanager");
+        Destroy(heartRechargeManager);
+        Debug.Log("하트 초기화완료");
+
     }//하트 개수, 충전까지 남은 시간, 앱 종료 시간을 초기화, 디버그 출력
 
     //저장된 하트 정보를 로드하는 함수
@@ -88,10 +104,15 @@ public class HeartRechargeManager : MonoBehaviour
             if (PlayerPrefs.HasKey("HeartAmount"))
             {
                 m_HeartAmount = PlayerPrefs.GetInt("HeartAmount"); //playerprefs에 저장된 하트값이 있으면 불러오기
-                if (m_HeartAmount < 0)
+                if (m_HeartAmount == 0)
                 {
-                    m_HeartAmount = 0;
-                    //하트 사용 버튼 비활성화 필요
+                    LobbyManager.instance.btn_1.interactable = false;
+                    LobbyManager.instance.btn_2.interactable = false;
+                }
+                else
+                {
+                    LobbyManager.instance.btn_1.interactable = true;
+                    LobbyManager.instance.btn_2.interactable = true;
                 }
             }
             else //저장된 값이 없으면 기본값 5로 설정
@@ -220,6 +241,7 @@ public class HeartRechargeManager : MonoBehaviour
         if (m_HeartAmount >= 5)
         {
             Debug.Log("현재 하트 개수가 5개 이상이므로 충전 스케줄러를 실행하지 않습니다.");
+            timerText.text = "MAX"; // text 업데이트
             return; // 5개 이상이면 함수 종료
         }
 
@@ -256,11 +278,12 @@ public class HeartRechargeManager : MonoBehaviour
         {
             m_HeartAmount = MAX_HEART;
             HeartManager.Instance.UpdateHeartUI(m_HeartAmount); // UI 업데이트
-            timerText.text = "충전 완료"; // text 업데이트
+            timerText.text = "MAX"; // text 업데이트
         }
         else
         {
             timerText.text = timeText; // UI 업데이트
+            HeartManager.Instance.UpdateHeartUI(m_HeartAmount); // UI 업데이트
             // 충전 타이머 코루틴 실행
             m_RechargeTimerCoroutine = StartCoroutine(DoRechargeTimer(m_TimerQuitTime, onFinish));
         }
@@ -286,8 +309,12 @@ public class HeartRechargeManager : MonoBehaviour
             int minutes = m_RechargeRemainTime / 60;  // 분 계산
             int seconds = m_RechargeRemainTime % 60;  // 초 계산
 
-            // "분:초" 형태로 포맷
-            timerText.text = string.Format("{0:D2}:{1:D2}", minutes, seconds);
+            // timerText가 존재할 때만 갱신
+            if (timerText != null)
+            {
+                // "분:초" 형태로 포맷
+                timerText.text = string.Format("{0:D2}:{1:D2}", minutes, seconds);
+            }
 
             //Debug.Log("하트 충전 타이머 : " + m_RechargeRemainTime + "초");
             yield return new WaitForSeconds(1f);
@@ -295,14 +322,20 @@ public class HeartRechargeManager : MonoBehaviour
         } //1초마다 남은 시간을 감소시키며 로그 출력
 
         m_HeartAmount++;
+        LobbyManager.instance.btn_1.interactable = true;
+        LobbyManager.instance.btn_2.interactable = true;
         HeartManager.Instance.UpdateHeartUI(m_HeartAmount); // UI 업데이트
 
         if (m_HeartAmount >= MAX_HEART)
         {
             m_HeartAmount = MAX_HEART;
             m_RechargeRemainTime = 0;
-            // 타이머 종료 후 텍스트 초기화 (옵션)
-            timerText.text = "충전 완료";
+            // timerText가 존재할 때만 갱신
+            if (timerText != null)
+            {
+                // 타이머 종료 후 텍스트 초기화 (옵션)
+                timerText.text = "MAX";
+            }
             Debug.Log("하트가 꽉 찼습니다");
             m_RechargeTimerCoroutine = null;
         }
@@ -322,7 +355,11 @@ public class HeartRechargeManager : MonoBehaviour
         } //하트가 0개 이하면 함수를 종료
 
         m_HeartAmount--; //그게 아니면 하트를 1개 감소
-        HeartManager.Instance.UpdateHeartUI(m_HeartAmount); //UI 업데이트
+
+        if (SceneManager.GetActiveScene().name == "Main")
+        {
+            HeartManager.Instance.UpdateHeartUI(m_HeartAmount); //UI 업데이트
+        }
         Debug.Log("현재 하트 개수 : " + m_HeartAmount);
 
         // 기존 충전 타이머가 실행 중이라면 중지
