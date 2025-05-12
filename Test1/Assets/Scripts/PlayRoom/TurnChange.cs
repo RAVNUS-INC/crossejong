@@ -225,6 +225,7 @@ public class TurnChange : MonoBehaviourPun
                     // 카드 드래그 가능하게
                     userCard.SelectedUserCard(userCard.displayedCards);
                     userCard.SelectedUserCard(userCardFullPopup.fullDisplayedCards);
+
                     // 나의 첫 턴은 끝
                     ObjectManager.instance.IsFirstTurn = false;
                 }

@@ -175,9 +175,15 @@ public class Main : MonoBehaviourPunCallbacks
             LogTestText.text = "기기 ID 연동 해제 실패";
         });
 
-        
+        HeartRechargeManager.instance.Init();
 
         //Debug.Log("로그아웃되었습니다. 인증 정보가 초기화되었습니다.");
+    }
+
+    // 계정탈퇴 버튼을 누르면->관련 웹링크 열기
+    public void DeleteAccountButton()
+    {
+        Application.OpenURL("https://enormous-sawfish-938.notion.site/1d6dbf9f6d028083b041fcf03152ada3?pvs=4");
     }
 
     // 게임 종료 버튼을 누르면

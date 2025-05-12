@@ -38,6 +38,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     [SerializeField] TMP_Text warningText;
 
     // 방 생성 버튼과 방 참여 버튼, 방 목록을 표시할 스크롤뷰
+    public Button btn_1, btn_2; // 방 만들기, 참여 버튼(초록색)
     [SerializeField] Button btn_CreateRoom, btn_JoinRoom; // 방 만들기, 참여 버튼
     [SerializeField] GameObject roomListItem; // 방 목록 프리팹
 
@@ -115,6 +116,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks
                     Debug.Log("마스터 서버에 연결되어 있지 않음. 연결 시도 중...");
                     PhotonNetwork.ConnectUsingSettings();
                 }
+
+                
             }
         }
 
@@ -124,6 +127,12 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         ResetRoomSetPanel(); //방 생성 패널 초기화
         ResetRoomSetPanel_Alone(); //패널A 초기화
+
+        //if (CheckLobbyManager.instance.Beforescene == "PlayRoom") // 플레이를 한번 하고온거라면
+        //{
+        //    HeartRechargeManager.instance.OnClickUseHeart();
+        //    CheckLobbyManager.instance.Beforescene = "Main";
+        //}
     }
 
     public override void OnConnectedToMaster()

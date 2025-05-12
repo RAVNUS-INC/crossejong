@@ -70,6 +70,7 @@ public class CardDrag : MonoBehaviourPun, IDragHandler, IBeginDragHandler, IEndD
 
     public void OnEndDrag(PointerEventData eventData)
     {
+
         GetComponent<Image>().raycastTarget = true;// Raycast를 다시 활성화
 
         // 드래그가 끝난 후, 카드가 원래 위치로 돌아오도록 처리

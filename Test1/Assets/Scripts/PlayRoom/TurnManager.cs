@@ -57,8 +57,8 @@ public class TurnManager : MonoBehaviourPunCallbacks
             // "timeLimit" 값을 가져옴
             TimeLimit = (int)PhotonNetwork.CurrentRoom.CustomProperties["timeLimit"];
         }
+        HeartRechargeManager.instance.OnClickUseHeart();
 
-        
     }
 
     // 카운트다운 3 2 1 후 실행
@@ -323,6 +323,10 @@ public class TurnManager : MonoBehaviourPunCallbacks
             photonView.RPC("ReceiveUserData", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer.ActorNumber, ObjectManager.instance.MyCompleteWordCount);
 
             CheckLobbyManager.instance.Beforescene = "PlayRoom";
+            HeartRechargeManager.instance.SaveHeartInfo();
+            HeartRechargeManager.instance.SaveTimerQuitTime();
+            HeartRechargeManager.instance.SaveAppQuitTime();
+
 
             //나가기
             PhotonNetwork.LeaveRoom();
@@ -335,6 +339,8 @@ public class TurnManager : MonoBehaviourPunCallbacks
     {
         // PlayRoom 객체 찾기
         GameObject playRoom = GameObject.Find("PlayRoom");
+        // "HeartRechargeManager" 객체 찾기
+        GameObject heartRechargeManager = GameObject.Find("heartRechargemanager");
 
         if (playRoom != null)
         {
@@ -358,6 +364,7 @@ public class TurnManager : MonoBehaviourPunCallbacks
 
             // 이제 PlayRoom 객체 자체도 삭제
             Destroy(playRoom);
+            Destroy(heartRechargeManager);
             Debug.Log("PlayRoom 객체와 하위 객체들 삭제 완료!");
         }
         else
