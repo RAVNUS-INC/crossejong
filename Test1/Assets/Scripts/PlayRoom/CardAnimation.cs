@@ -14,10 +14,10 @@ public class CardAnimation : MonoBehaviourPun
     public CanvasGroup imageCanvasGroup;  // 투명도 제어
     public RectTransform imageTransform; // 이동할 이미지의 RectTransform
 
-    public RectTransform addStartPos; // 카드 추가 시작 위치
-    public RectTransform RollFinPos; // 나 - 롤백 종료 위치
-    public RectTransform[] AllPlayerPos; // 플레이어 프로필 위치
-    public RectTransform FieldCenPos; // 보드 중앙 - 롤백 시작 위치
+    public Transform addStartPos; // 카드 추가 시작 위치
+    public Transform RollFinPos; // 나 - 롤백 종료 위치
+    public Transform[] AllPlayerPos; // 플레이어 프로필 위치
+    public Transform FieldCenPos; // 보드 중앙 - 롤백 시작 위치
     Vector3 addStartPosV;
     Vector3 RollFinPosV;
     Vector3 FieldCenPosV;
@@ -45,9 +45,9 @@ public class CardAnimation : MonoBehaviourPun
 
     private void Start()
     {
-       addStartPosV = addStartPos.anchoredPosition;
-       RollFinPosV = RollFinPos.anchoredPosition;
-       FieldCenPosV = FieldCenPos.anchoredPosition;
+        addStartPosV = addStartPos.position;
+        RollFinPosV = RollFinPos.position;
+        FieldCenPosV = FieldCenPos.position;
 
         //Debug.Log($"추가시작위치: {addStartPosV}");
         //Debug.Log($"롤백끝위치: {RollFinPosV}");
@@ -64,21 +64,21 @@ public class CardAnimation : MonoBehaviourPun
     {
         // 이미지를 활성화하고 애니메이션 시작
         imageTransform.gameObject.SetActive(true);
-        imageTransform.anchoredPosition = addStartPosV; // 위치 초기화
+        imageTransform.position = addStartPosV; // 위치 초기화
 
         // 이동과 투명도 증가 (0 → 1)
         imageCanvasGroup.DOFade(1, fadeDuration);
 
         // 게임 UI내에서의 인덱스 번호가 i와 같다면
         // 이동 애니메이션 수행
-        imageTransform.DOAnchorPos(AllPlayerPos[userActNum].anchoredPosition, duration) // 앵커포지션
+        imageTransform.DOAnchorPos(AllPlayerPos[userActNum].position, duration) // 앵커포지션
             .SetEase(Ease.OutQuad);
 
         // 이동이 끝날 때 투명도 감소 (1 → 0)
         imageCanvasGroup.DOFade(0, duration).SetDelay(duration - fadeDuration).OnComplete(() =>
         {
             imageCanvasGroup.gameObject.SetActive(false);  // 비활성화
-            imageTransform.anchoredPosition = addStartPosV; // 위치 초기화
+            imageTransform.position = addStartPosV; // 위치 초기화
         });
 
     }
@@ -86,32 +86,37 @@ public class CardAnimation : MonoBehaviourPun
     [PunRPC]
     public void RollBackCardAnimation(int userActNum) //누군가 카드를 롤백하면 유저에게 되돌아가는 애니메이션을 취함 
     {
+        FieldCenPosV = ObjectManager.instance.endDragPosition;
+
         // 이미지를 활성화하고 애니메이션 시작
         imageTransform.gameObject.SetActive(true);
-        imageTransform.anchoredPosition = FieldCenPosV; // 위치 초기화
+        imageTransform.position = FieldCenPosV; // 위치 초기화
 
         // 이동과 투명도 증가 (0 → 1)
         imageCanvasGroup.DOFade(1, fadeDuration);
 
         // 게임 UI내에서의 인덱스 번호가 i와 같다면
         // 이동 애니메이션 수행
-        imageTransform.DOAnchorPos(AllPlayerPos[userActNum].anchoredPosition, duration) // 앵커포지션
+        imageTransform.DOAnchorPos(AllPlayerPos[userActNum].position, duration) // 앵커포지션
             .SetEase(Ease.OutQuad);
 
         // 이동이 끝날 때 투명도 감소 (1 → 0)
         imageCanvasGroup.DOFade(0, duration).SetDelay(duration - fadeDuration).OnComplete(() =>
         {
             imageCanvasGroup.gameObject.SetActive(false);  // 비활성화
-            imageTransform.anchoredPosition = FieldCenPosV; // 위치 초기화
+            imageTransform.position = FieldCenPosV; // 위치 초기화
         });
 
     }
 
     public void RollBackCardAnimationUser()
     {
+        FieldCenPosV = ObjectManager.instance.endDragPosition;
+        RollFinPosV = ObjectManager.instance.startDragPosition;
+
         // 이미지를 활성화하고 애니메이션 시작
         imageTransform.gameObject.SetActive(true);
-        imageTransform.anchoredPosition = FieldCenPosV; // 위치 초기화
+        imageTransform.position = FieldCenPosV; // 위치 초기화
 
         // 이동과 투명도 증가 (0 → 1)
         imageCanvasGroup.DOFade(1, fadeDuration);
@@ -125,7 +130,7 @@ public class CardAnimation : MonoBehaviourPun
         imageCanvasGroup.DOFade(0, duration).SetDelay(duration - fadeDuration).OnComplete(() =>
         {
             imageCanvasGroup.gameObject.SetActive(false);  // 비활성화
-            imageTransform.anchoredPosition = FieldCenPosV; // 위치 초기화
+            imageTransform.position = FieldCenPosV; // 위치 초기화
         });
     }
 

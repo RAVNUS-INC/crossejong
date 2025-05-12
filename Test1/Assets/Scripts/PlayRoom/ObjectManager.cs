@@ -61,6 +61,7 @@ public class ObjectManager : MonoBehaviourPun
     public int MyIndexNum; //게임 내 나의 UI 인덱스번호
     public Button RollBackBtn; //롤백버튼은 놓은 게 있으면 활성화
     public Vector3 startDragPosition; // 드래그 시작 위치
+    public Vector3 endDragPosition; // 드래그 끝나는 위치 = 롤백 시작 위치
 
     private void Start()
     {
