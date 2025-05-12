@@ -124,6 +124,8 @@ public class CardDrop : MonoBehaviourPun, IDropHandler
             card.transform.SetParent(transform);
             card.transform.parent.name = card.transform.name;
 
+            ObjectManager.instance.endDragPosition = card.transform.position;
+
             if (fieldCard.fieldDisplayedCards.Contains(card))
             {
                 Debug.Log("필드카드에 해당 카드가 이미 존재합니다");
