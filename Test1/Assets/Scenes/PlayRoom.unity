@@ -6392,6 +6392,7 @@ MonoBehaviour:
   MyIndexNum: 0
   RollBackBtn: {fileID: 602382653}
   startDragPosition: {x: 0, y: 0, z: 0}
+  endDragPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &452245613
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19798,17 +19799,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05c8704f8c263f94d9353bfccda1db94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  getCardButton: {fileID: 536188794}
   imageCanvasGroup: {fileID: 1979590872}
   imageTransform: {fileID: 1979590869}
   addStartPos: {fileID: 806166725}
   RollFinPos: {fileID: 992443651}
-  AllPlayerPos:
-  - {fileID: 1626575992}
-  - {fileID: 1927109376}
-  - {fileID: 1012639151}
-  - {fileID: 1595318908}
-  - {fileID: 1578734784}
   FieldCenPos: {fileID: 453961799}
+  playerPos1: {fileID: 1626575992}
+  playerPos2: {fileID: 1927109376}
+  playerPos3: {fileID: 1012639151}
+  playerPos4: {fileID: 1595318908}
+  playerPos5: {fileID: 1578734784}
+  playerPosList: []
 --- !u!114 &1353556520
 MonoBehaviour:
   m_ObjectHideFlags: 0
